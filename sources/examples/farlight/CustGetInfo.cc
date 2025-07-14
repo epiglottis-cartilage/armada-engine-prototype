@@ -48,10 +48,10 @@ int main(int argc, char* argv[]){
     cout << "code execute to stage: after shader compile and link and destroy" << endl;
 
 
-    string sourceWallTexture = "/home/phage/Pictures/Screenshots/Screenshot_20250513_143013.png";
-    string rscLightedTexture = "/home/phage/Documents/render/gl/resources/emerald.jpg";
+//    string sourceWallTexture = prefixShaderSources + "Screenshot_20250513_143013.png";
+    string rscLightedTexture = prefixShaderSources + "resources/emerald.jpg";
     TextureSdlGl* texLightedTexture = new TextureSdlGl(rscLightedTexture);
-    string sourceFloorTexture = "/home/phage/Documents/render/gl/resources/wall.jpg";
+    string sourceFloorTexture = prefixShaderSources + "resources/wall.jpg";
     TextureSdlGl* floorTexture = new TextureSdlGl(sourceFloorTexture);
 
     GLfloat floor_vertices[] = {
