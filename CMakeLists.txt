@@ -94,9 +94,31 @@ function(add_usrlib lib_name)
     target_include_directories(${lib_name} PUBLIC "${CMAKE_SOURCE_DIR}/sources/usrlibs/${lib_name}")
 endfunction()
 
-add_usrlib(txbridge)
+function(add_usrlib_debug lib_name)
+    # 找到该库的源文件
+    file(GLOB_RECURSE LIB_SOURCES 
+        "${CMAKE_SOURCE_DIR}/sources/usrlibs/${lib_name}/*.cc"
+#        "${CMAKE_SOURCE_DIR}/sources/usrlibs/${lib_name}/*.cc"
+    )
+
+    if(NOT LIB_SOURCES)
+        message(FATAL_ERROR "No source files found for user library '${lib_name}'")
+    endif()
+
+    # 创建静态库目标
+    add_library(${lib_name} STATIC ${LIB_SOURCES})
+
+    # 可选：设置包含目录（让其他 target_link_libraries 时能自动找头文件）
+    target_include_directories(${lib_name} PUBLIC "${CMAKE_SOURCE_DIR}/sources/usrlibs/${lib_name}")
+
+    target_compile_definitions(${lib_name} PRIVATE DEBUG)
+endfunction()
+
+#add_usrlib(txbridge)
+add_usrlib_debug(txbridge)
 add_usrlib(moncams)
 add_usrlib(isl)
+
 
 
 # 示例用法：添加多个例子

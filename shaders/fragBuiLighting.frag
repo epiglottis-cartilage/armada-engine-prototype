@@ -114,7 +114,7 @@ void main() {
     
     color = vec4(ambientResult + diffuseResult + specularResult, 1.0f);
 
-    color = vec4(color.xyz * attenuation, color.w); // Apply attenuation to the final color
+//    color = vec4(color.xyz * attenuation, color.w); // Apply attenuation to the final color
 
 
 //    color = vec4(lightColor * objectColor, 1.0f);

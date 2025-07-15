@@ -40,7 +40,7 @@ SDL_Window* init_win_and_gl(){
 
     SDL_Window* window = SDL_CreateWindow("get gl info", SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HIGHT,  
-        SDL_WINDOW_OPENGL );
+        SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_RESIZABLE );
     error = {SDL_GetError()};
     if(window == NULL){
         cout << "SDL_CreateWindow Error: " << endl;
@@ -230,31 +230,59 @@ void render(SDL_Window* window, GLuint shaderProgram[], GLuint vaoTarget[], GLui
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-        glUseProgram(shaderProgram[0]);
+        glUseProgram(shaderProgram[3]);
 
 /*================================================*/
         //render floor
-//        glm::mat4 matrixFloorFlip = glm::scale(matrixIdentity, glm::vec3(3.0f, 3.0f, 3.0f));
-//        matrixFloorFlip = glm::rotate(matrixFloorFlip, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-//        glUniformMatrix4fv(glGetUniformLocation(shaderProgram[0], "matrixModel"), 1, GL_FALSE, glm::value_ptr(matrixFloorFlip));
-//        glUniformMatrix4fv(glGetUniformLocation(shaderProgram[0], "matrixView"), 1, GL_FALSE, glm::value_ptr(matrixView));
-//        glUniformMatrix4fv(glGetUniformLocation(shaderProgram[0], "matrixProjection"), 1, GL_FALSE, glm::value_ptr(matrixProjection));
-//
-//        #ifdef DEBUG
-//        errorposition(__FILE__, __LINE__);
-//        #endif
-//
-//        glActiveTexture(GL_TEXTURE0);
-//        glBindTexture(GL_TEXTURE_2D, textureTarget[0]);
-//        glUniform1i(glGetUniformLocation(shaderProgram[0], "wallTexture"), 0);
-//        glBindVertexArray(vaoTarget[0]);
-//        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-//
-//        glBindVertexArray(0);
-//        
-//        #ifdef DEBUG
-//        errorposition(__FILE__, __LINE__);
-//        #endif
+        glm::mat4 matrixFloorFlip = glm::scale(matrixIdentity, glm::vec3(3.0f, 3.0f, 3.0f));
+        matrixFloorFlip = glm::rotate(matrixFloorFlip, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        glUniformMatrix4fv(glGetUniformLocation(shaderProgram[3], "matrixModel"), 1, GL_FALSE, glm::value_ptr(matrixFloorFlip));
+        glUniformMatrix4fv(glGetUniformLocation(shaderProgram[3], "matrixView"), 1, GL_FALSE, glm::value_ptr(matrixView));
+        glUniformMatrix4fv(glGetUniformLocation(shaderProgram[3], "matrixProjection"), 1, GL_FALSE, glm::value_ptr(matrixProjection));
+
+        glm::mat4 offsetMatrix = glm::translate(matrixModel, glm::vec3(0.0f, 0.0f, 0.0f));
+        glm::mat3 matrixNormal = glm::transpose(glm::inverse(glm::mat3(offsetMatrix)));
+
+        glUniformMatrix4fv(glGetUniformLocation(shaderProgram[3], "matrixNormal"), 1, GL_FALSE, glm::value_ptr(matrixNormal));
+
+        //fragment shader uniform
+        auto cameraPos = spaceCamera.getCameraPosition();
+        //object material struct
+        glUniform3f(glGetUniformLocation(shaderProgram[3], "material.v3fAmbient"), 0.0215f, 0.1745f, 0.0215f);
+        glUniform1f(glGetUniformLocation(shaderProgram[3], "material.fAmbientCoeff"), 0.1f);
+        glUniform3f(glGetUniformLocation(shaderProgram[3], "material.v3fDiffuse"), 0.07568f, 0.61424f, 0.07568f);
+        glUniform1f(glGetUniformLocation(shaderProgram[3], "material.fDiffuseCoeff"), 1.0f);
+        glUniform3f(glGetUniformLocation(shaderProgram[3], "material.v3fSpecular"), 0.633f, 0.727811f, 0.633f);
+        glUniform1f(glGetUniformLocation(shaderProgram[3], "material.fSpecularCoeff"), 0.6f * 128.0f);
+
+        //light struct
+        glUniform3f(glGetUniformLocation(shaderProgram[3], "light.v3fAmbient"), 1.0f, 1.0f, 1.0f);
+        glUniform3f(glGetUniformLocation(shaderProgram[3], "light.v3fDiffuse"), 1.0f, 1.0f, 1.0f);
+        glUniform3f(glGetUniformLocation(shaderProgram[3], "light.v3fSpecular"), 1.0f, 1.0f, 1.0f);
+//            glUniform3f(glGetUniformLocation(shaderProgram[3], "light.v3fPosition"), cubePositions[i].x, cubePositions[i].y, cubePositions[i].z);
+        glUniform3f(glGetUniformLocation(shaderProgram[3], "light.v3fPosition"), lightPositions[0].x, lightPositions[0].y, lightPositions[0].z);
+        //uniform the light attenuation
+        glUniform1f(glGetUniformLocation(shaderProgram[3], "light.fconst"), 1.0f);
+        glUniform1f(glGetUniformLocation(shaderProgram[3], "light.flinear"), 0.22f);
+        glUniform1f(glGetUniformLocation(shaderProgram[3], "light.fquadratic"), 0.20f);
+
+        glUniform3f(glGetUniformLocation(shaderProgram[3], "v3fViewPos"), cameraPos.x, cameraPos.y, cameraPos.z);
+
+        #ifdef DEBUG
+        errorposition(__FILE__, __LINE__);
+        #endif
+
+        glActiveTexture(GL_TEXTURE0 + 1);
+        glBindTexture(GL_TEXTURE_2D, textureTarget[1]);
+        glUniform1i(glGetUniformLocation(shaderProgram[3], "texture0"), 1);
+        glBindVertexArray(vaoTarget[0]);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+        glBindVertexArray(0);
+        
+        #ifdef DEBUG
+        errorposition(__FILE__, __LINE__);
+        #endif
 
         
 /*================================================*/
@@ -272,51 +300,51 @@ void render(SDL_Window* window, GLuint shaderProgram[], GLuint vaoTarget[], GLui
 
         
 /*================================================*/
-        //render cube
-        for (auto i = 0; i < sizeof(cubePositions) / sizeof(cubePositions[0]); i++){
-            glBindVertexArray(vaoTarget[2]);
-            glm::mat4 offsetMatrix = glm::translate(matrixModel, cubePositions[i]);
-            glm::mat3 matrixNormal = glm::transpose(glm::inverse(glm::mat3(offsetMatrix)));
-
-            glUseProgram(shaderProgram[3]);
-            //vertex shader uniform
-            glUniformMatrix4fv(glGetUniformLocation(shaderProgram[3], "matrixModel"), 1, GL_FALSE, glm::value_ptr(offsetMatrix));
-            glUniformMatrix4fv(glGetUniformLocation(shaderProgram[3], "matrixView"), 1, GL_FALSE, glm::value_ptr(matrixView));
-            glUniformMatrix4fv(glGetUniformLocation(shaderProgram[3], "matrixProjection"), 1, GL_FALSE, glm::value_ptr(matrixProjection));
-
-            glUniformMatrix4fv(glGetUniformLocation(shaderProgram[3], "matrixNormal"), 1, GL_FALSE, glm::value_ptr(matrixNormal));
-
-            //fragment shader uniform
-            auto cameraPos = spaceCamera.getCameraPosition();
-            //object material struct
-            glUniform3f(glGetUniformLocation(shaderProgram[3], "material.v3fAmbient"), 0.0215f, 0.1745f, 0.0215f);
-            glUniform1f(glGetUniformLocation(shaderProgram[3], "material.fAmbientCoeff"), 0.1f);
-            glUniform3f(glGetUniformLocation(shaderProgram[3], "material.v3fDiffuse"), 0.07568f, 0.61424f, 0.07568f);
-            glUniform1f(glGetUniformLocation(shaderProgram[3], "material.fDiffuseCoeff"), 1.0f);
-            glUniform3f(glGetUniformLocation(shaderProgram[3], "material.v3fSpecular"), 0.633f, 0.727811f, 0.633f);
-            glUniform1f(glGetUniformLocation(shaderProgram[3], "material.fSpecularCoeff"), 0.6f * 128.0f);
-
-            //light struct
-            glUniform3f(glGetUniformLocation(shaderProgram[3], "light.v3fAmbient"), 1.0f, 1.0f, 1.0f);
-            glUniform3f(glGetUniformLocation(shaderProgram[3], "light.v3fDiffuse"), 1.0f, 1.0f, 1.0f);
-            glUniform3f(glGetUniformLocation(shaderProgram[3], "light.v3fSpecular"), 1.0f, 1.0f, 1.0f);
-//            glUniform3f(glGetUniformLocation(shaderProgram[3], "light.v3fPosition"), cubePositions[i].x, cubePositions[i].y, cubePositions[i].z);
-            glUniform3f(glGetUniformLocation(shaderProgram[3], "light.v3fPosition"), lightPositions[0].x, lightPositions[0].y, lightPositions[0].z);
-            //uniform the light attenuation
-            glUniform1f(glGetUniformLocation(shaderProgram[3], "light.fconst"), 1.0f);
-            glUniform1f(glGetUniformLocation(shaderProgram[3], "light.flinear"), 0.22f);
-            glUniform1f(glGetUniformLocation(shaderProgram[3], "light.fquadratic"), 0.20f);
-
-            glUniform3f(glGetUniformLocation(shaderProgram[3], "v3fViewPos"), cameraPos.x, cameraPos.y, cameraPos.z);
-
-
-            glActiveTexture(GL_TEXTURE0 + 1);
-            glBindTexture(GL_TEXTURE_2D, textureTarget[1]);
-            glUniform1i(glGetUniformLocation(shaderProgram[3], "texture0"), 1);
-            
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-            glBindVertexArray(0);
-        }
+//        //render cube
+//        for (auto i = 0; i < sizeof(cubePositions) / sizeof(cubePositions[0]); i++){
+//            glBindVertexArray(vaoTarget[2]);
+//            glm::mat4 offsetMatrix = glm::translate(matrixModel, cubePositions[i]);
+//            glm::mat3 matrixNormal = glm::transpose(glm::inverse(glm::mat3(offsetMatrix)));
+//
+//            glUseProgram(shaderProgram[3]);
+//            //vertex shader uniform
+//            glUniformMatrix4fv(glGetUniformLocation(shaderProgram[3], "matrixModel"), 1, GL_FALSE, glm::value_ptr(offsetMatrix));
+//            glUniformMatrix4fv(glGetUniformLocation(shaderProgram[3], "matrixView"), 1, GL_FALSE, glm::value_ptr(matrixView));
+//            glUniformMatrix4fv(glGetUniformLocation(shaderProgram[3], "matrixProjection"), 1, GL_FALSE, glm::value_ptr(matrixProjection));
+//
+//            glUniformMatrix4fv(glGetUniformLocation(shaderProgram[3], "matrixNormal"), 1, GL_FALSE, glm::value_ptr(matrixNormal));
+//
+//            //fragment shader uniform
+//            auto cameraPos = spaceCamera.getCameraPosition();
+//            //object material struct
+//            glUniform3f(glGetUniformLocation(shaderProgram[3], "material.v3fAmbient"), 0.0215f, 0.1745f, 0.0215f);
+//            glUniform1f(glGetUniformLocation(shaderProgram[3], "material.fAmbientCoeff"), 0.1f);
+//            glUniform3f(glGetUniformLocation(shaderProgram[3], "material.v3fDiffuse"), 0.07568f, 0.61424f, 0.07568f);
+//            glUniform1f(glGetUniformLocation(shaderProgram[3], "material.fDiffuseCoeff"), 1.0f);
+//            glUniform3f(glGetUniformLocation(shaderProgram[3], "material.v3fSpecular"), 0.633f, 0.727811f, 0.633f);
+//            glUniform1f(glGetUniformLocation(shaderProgram[3], "material.fSpecularCoeff"), 0.6f * 128.0f);
+//
+//            //light struct
+//            glUniform3f(glGetUniformLocation(shaderProgram[3], "light.v3fAmbient"), 1.0f, 1.0f, 1.0f);
+//            glUniform3f(glGetUniformLocation(shaderProgram[3], "light.v3fDiffuse"), 1.0f, 1.0f, 1.0f);
+//            glUniform3f(glGetUniformLocation(shaderProgram[3], "light.v3fSpecular"), 1.0f, 1.0f, 1.0f);
+////            glUniform3f(glGetUniformLocation(shaderProgram[3], "light.v3fPosition"), cubePositions[i].x, cubePositions[i].y, cubePositions[i].z);
+//            glUniform3f(glGetUniformLocation(shaderProgram[3], "light.v3fPosition"), lightPositions[0].x, lightPositions[0].y, lightPositions[0].z);
+//            //uniform the light attenuation
+//            glUniform1f(glGetUniformLocation(shaderProgram[3], "light.fconst"), 1.0f);
+//            glUniform1f(glGetUniformLocation(shaderProgram[3], "light.flinear"), 0.22f);
+//            glUniform1f(glGetUniformLocation(shaderProgram[3], "light.fquadratic"), 0.20f);
+//
+//            glUniform3f(glGetUniformLocation(shaderProgram[3], "v3fViewPos"), cameraPos.x, cameraPos.y, cameraPos.z);
+//
+//
+//            glActiveTexture(GL_TEXTURE0 + 1);
+//            glBindTexture(GL_TEXTURE_2D, textureTarget[1]);
+//            glUniform1i(glGetUniformLocation(shaderProgram[3], "texture0"), 1);
+//            
+//            glDrawArrays(GL_TRIANGLES, 0, 36);
+//            glBindVertexArray(0);
+//        }
 
 
         #ifdef DEBUG

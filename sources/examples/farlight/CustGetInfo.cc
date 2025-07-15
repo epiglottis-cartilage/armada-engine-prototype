@@ -55,10 +55,10 @@ int main(int argc, char* argv[]){
     TextureSdlGl* floorTexture = new TextureSdlGl(sourceFloorTexture);
 
     GLfloat floor_vertices[] = {
-        -0.9f, 0.9f, 0.0f,     0.0f, 1.0f,
-        0.9f, 0.9f, 0.0f,      1.0f, 1.0f,
-        -0.9f, -0.9f, 0.0f,     0.0f, 0.0f,
-        0.9f, -0.9f, 0.0f,     1.0f, 0.0f,
+        -0.9f, 0.9f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 1.0f,
+        0.9f, 0.9f,  0.0f,    0.0f, 0.0f, 1.0f,   1.0f, 1.0f,
+        -0.9f, -0.9f, 0.0f,  0.0f, 0.0f, 1.0f,    0.0f, 0.0f,
+        0.9f, -0.9f, 0.0f,   0.0f, 0.0f, 1.0f,   1.0f, 0.0f,
     };
 
     GLuint indices_square[] = {
@@ -78,10 +78,12 @@ int main(int argc, char* argv[]){
         glBindBuffer(GL_ARRAY_BUFFER, vboFloor);
         glBufferData(GL_ARRAY_BUFFER, sizeof(floor_vertices), floor_vertices, GL_STATIC_DRAW);
 
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), (GLvoid*)0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8*sizeof(GLfloat), (GLvoid*)0);
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), (GLvoid*)(3*sizeof(GLfloat)));
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8*sizeof(GLfloat), (GLvoid*)(3*sizeof(GLfloat)));
         glEnableVertexAttribArray(1);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8*sizeof(GLfloat), (GLvoid*)(6*sizeof(GLfloat)));
+        glEnableVertexAttribArray(2);
     glBindVertexArray(0);
 
 
@@ -222,7 +224,7 @@ int main(int argc, char* argv[]){
     GLuint vaoArrays[] = {vaoFloor, vaoLightCube, vaoLightedObjectCube};
     GLuint textureArrays[] = {floorTexture->getTextureId(), texLightedTexture->getTextureId()};
     //00 is for floor, 01 is whitelight, 02 is for lighted object
-    GLuint shaderPrograms[] = {spFloor.getGSP(), spLightWhite.getGSP(), spSpecBui.getGSP(), spBuiLight.getGSP()};
+    GLuint shaderPrograms[] = {spFloor.getGSP(), spLightWhite.getGSP(), spBuiLight.getGSP(), spSpecBui.getGSP()};
 
 
     cout << "code execute to stage: before render" << endl;

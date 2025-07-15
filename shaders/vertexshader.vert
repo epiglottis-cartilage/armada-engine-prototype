@@ -18,8 +18,8 @@ out vec3 FragPos;
 void main()
 {
 
-//    vertNormalOut = mat3(transpose(inverse(matrixModel))) * normal;
-    vertNormalOut =  normal;
+    vertNormalOut = mat3(transpose(inverse(matrixModel))) * normal;
+//    vertNormalOut =  normal;
 
     FragPos = vec3(matrixModel * vec4(position, 1.0f));
 

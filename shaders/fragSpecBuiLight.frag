@@ -40,8 +40,8 @@ void main() {
 
     //diffuse
     vec3 norm = normalize(vertNormalOut);
-//    vec3 lightDir = normalize( light.v3fPosition - FragPos);
-    vec3 lightDir = normalize( light.v3fPosition );
+    vec3 lightDir = normalize( light.v3fPosition - FragPos);
+//    vec3 lightDir = normalize( light.v3fPosition );
     float diff = max(dot(norm, lightDir), 0.0f);
     vec3 diffuseResult = diff * light.v3fDiffuse * vec3(texture(texture0, TexCoord));
 //    diffuseResult = vec3(0.0f);
