@@ -4,6 +4,7 @@
 #include <fstream>
 #include <string>
 #include <iostream>
+#include <vector>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/matrix_integer.hpp>
@@ -12,6 +13,8 @@
 #include <SDL2/SDL_image.h>
 #include <GL/glew.h>
 #include <SDL2/SDL_opengl.h>
+#include <modelloader.hh>
+#include <Camera.hh>
 
 
 
@@ -21,11 +24,10 @@ int programExit(SDL_Window* window);
 
 int getGlInfo();
 
-bool processUserInput(SDL_Event& e, bool quit);
+void render(SDL_Window* window, vector<ShaderFinal> stlShaderList, vector<Model> stlModelList);
 
 GLenum errorposition(const char* file, int line);
 
-void render(SDL_Window* window, GLuint shaderProgram[], GLuint vaoTarget[], GLuint textureTarget[]);
 
 
 

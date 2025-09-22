@@ -1,5 +1,4 @@
 #include "misc.hh"
-#include "Camera.hh"
 
 #define WINDOW_WIDTH 1920
 #define WINDOW_HIGHT 1080
@@ -50,7 +49,12 @@ SDL_Window* init_win_and_gl(){
     }
 
     int flagjpg = IMG_INIT_JPG;
-    if(!(IMG_Init(flagjpg) & flagjpg)){
+    int flagpng = IMG_INIT_PNG;
+    //if(!(IMG_Init(flagjpg) & flagjpg)){
+    auto img_init_result = IMG_Init(flagpng);
+
+    if(img_init_result != flagpng){
+        cout << img_init_result << endl;
         error = {IMG_GetError()};
         cout << "IMG_Init Error: " << error << endl;
     }
@@ -91,23 +95,7 @@ int programExit(SDL_Window* window){
 }
 
 
-int getGlInfo(){
-    GLuint errorcode;
-    GLint tmp;
-
-    glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &tmp);
-
-    cout << "GL_MAX_VERTEX_ATTRIBS: " << tmp << endl;
-
-    return errorcode;
-}
-
-bool processUserInput(SDL_Event& e, bool quit, glm::vec3 cameraPosition){
-
-    return quit;
-}
-
-void render(SDL_Window* window, GLuint shaderProgram[], GLuint vaoTarget[], GLuint textureTarget[]){
+void render(SDL_Window* window, vector<ShaderFinal> stlShaderList, vector<Model> stlModelList){
 
     bool quit = false;
     SDL_Event e;
@@ -125,16 +113,15 @@ void render(SDL_Window* window, GLuint shaderProgram[], GLuint vaoTarget[], GLui
         lastFrameTime = currentFrameTime;
 
 
+        int screenWidth, screenHeight;
+        SDL_GetWindowSize(window, &screenWidth, &screenHeight);
+        float screenRatio = static_cast<float>(screenWidth / screenHeight);
+
         //init the matrixs
         glm::mat4 matrixIdentity = glm::mat4(1.0f);
         glm::mat4 matrixModel = glm::scale(matrixIdentity, glm::vec3(1.0f,1.0f,1.0f ));
         matrixModel = glm::translate(matrixModel, glm::vec3(0.0f, 0.0f, 0.0f));
-//        matrixModel = glm::rotate(matrixModel, glm::radians( fmod((SDL_GetTicks64() / 10.0f), 360.0f)), glm::vec3(0.0f, 1.0f, 0.0f));
-
-
-        int screenWidth, screenHeight;
-        SDL_GetWindowSize(window, &screenWidth, &screenHeight);
-        glm::mat4 matrixProjection = glm::perspective(glm::radians(80.0f), float{screenWidth/screenHeight}, 0.1f, 100.0f);
+        glm::mat4 matrixProjection = glm::perspective(glm::radians(80.0f), screenRatio, 0.1f, 100.0f);
 
 
         //process user input
@@ -206,145 +193,15 @@ void render(SDL_Window* window, GLuint shaderProgram[], GLuint vaoTarget[], GLui
         //spaceCamera.setCameraSensitivity()
         glm::mat4 matrixView = spaceCamera.updateCamera();
 
-        float radiusRotate = 1.0f;
-        glm::vec3 cubePositions[] = {
-//            glm::vec3(radiusRotate * sin(float{ SDL_GetTicks64() / 1000.0f }), 
-//                      1.75, 
-//                      radiusRotate * cos(float{ SDL_GetTicks64() / 1000.0f }) ), 
-            glm::vec3(2.0f, 0.75, 0.0f),  
-            glm::vec3( 0.0f,  0.0f,  0.0f), 
-            glm::vec3( -2.0f,  0.0f, 0.0f),  
-            glm::vec3( 0.0f, -2.0f, 0.0f),  
-            glm::vec3( 0.0f,  0.0f, 2.0f),  
-            glm::vec3( 0.0f,  0.0f, -2.0f),  
-            glm::vec3( 1.5f,  2.0f, -2.5f), 
-            glm::vec3( 1.5f,  0.2f, -1.5f), 
-            glm::vec3(-1.3f,  1.0f, -1.5f)  
-        };
-
-        glm::vec3 lightPositions[] = {
-            glm::vec3(-3.0f,3.0f, -3.0f ),
-        };
 
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-        glUseProgram(shaderProgram[3]);
-
-/*================================================*/
-        //render floor
-        glm::mat4 matrixFloorFlip = glm::scale(matrixIdentity, glm::vec3(3.0f, 3.0f, 3.0f));
-        matrixFloorFlip = glm::rotate(matrixFloorFlip, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-        glUniformMatrix4fv(glGetUniformLocation(shaderProgram[3], "matrixModel"), 1, GL_FALSE, glm::value_ptr(matrixFloorFlip));
-        glUniformMatrix4fv(glGetUniformLocation(shaderProgram[3], "matrixView"), 1, GL_FALSE, glm::value_ptr(matrixView));
-        glUniformMatrix4fv(glGetUniformLocation(shaderProgram[3], "matrixProjection"), 1, GL_FALSE, glm::value_ptr(matrixProjection));
-
-        glm::mat4 offsetMatrix = glm::translate(matrixModel, glm::vec3(0.0f, 0.0f, 0.0f));
-        glm::mat3 matrixNormal = glm::transpose(glm::inverse(glm::mat3(offsetMatrix)));
-
-        glUniformMatrix4fv(glGetUniformLocation(shaderProgram[3], "matrixNormal"), 1, GL_FALSE, glm::value_ptr(matrixNormal));
-
-        //fragment shader uniform
-        auto cameraPos = spaceCamera.getCameraPosition();
-        //object material struct
-        glUniform3f(glGetUniformLocation(shaderProgram[3], "material.v3fAmbient"), 0.0215f, 0.1745f, 0.0215f);
-        glUniform1f(glGetUniformLocation(shaderProgram[3], "material.fAmbientCoeff"), 0.1f);
-        glUniform3f(glGetUniformLocation(shaderProgram[3], "material.v3fDiffuse"), 0.07568f, 0.61424f, 0.07568f);
-        glUniform1f(glGetUniformLocation(shaderProgram[3], "material.fDiffuseCoeff"), 1.0f);
-        glUniform3f(glGetUniformLocation(shaderProgram[3], "material.v3fSpecular"), 0.633f, 0.727811f, 0.633f);
-        glUniform1f(glGetUniformLocation(shaderProgram[3], "material.fSpecularCoeff"), 0.6f * 128.0f);
-
-        //light struct
-        glUniform3f(glGetUniformLocation(shaderProgram[3], "light.v3fAmbient"), 1.0f, 1.0f, 1.0f);
-        glUniform3f(glGetUniformLocation(shaderProgram[3], "light.v3fDiffuse"), 1.0f, 1.0f, 1.0f);
-        glUniform3f(glGetUniformLocation(shaderProgram[3], "light.v3fSpecular"), 1.0f, 1.0f, 1.0f);
-//            glUniform3f(glGetUniformLocation(shaderProgram[3], "light.v3fPosition"), cubePositions[i].x, cubePositions[i].y, cubePositions[i].z);
-        glUniform3f(glGetUniformLocation(shaderProgram[3], "light.v3fPosition"), lightPositions[0].x, lightPositions[0].y, lightPositions[0].z);
-        //uniform the light attenuation
-        glUniform1f(glGetUniformLocation(shaderProgram[3], "light.fconst"), 1.0f);
-        glUniform1f(glGetUniformLocation(shaderProgram[3], "light.flinear"), 0.22f);
-        glUniform1f(glGetUniformLocation(shaderProgram[3], "light.fquadratic"), 0.20f);
-
-        glUniform3f(glGetUniformLocation(shaderProgram[3], "v3fViewPos"), cameraPos.x, cameraPos.y, cameraPos.z);
-
-        #ifdef DEBUG
-        errorposition(__FILE__, __LINE__);
-        #endif
-
-        glActiveTexture(GL_TEXTURE0 + 1);
-        glBindTexture(GL_TEXTURE_2D, textureTarget[1]);
-        glUniform1i(glGetUniformLocation(shaderProgram[3], "texture0"), 1);
-        glBindVertexArray(vaoTarget[0]);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-        glBindVertexArray(0);
+        for (int i = 0; i < stlModelList.size(); i++) {
+            stlModelList[i].Draw(stlShaderList[0]);
+        }
         
-        #ifdef DEBUG
-        errorposition(__FILE__, __LINE__);
-        #endif
-
-        
-/*================================================*/
-//        //render light
-        glUseProgram(shaderProgram[1]);
-        glm::mat4 matrixModelLight = glm::scale(glm::translate(matrixIdentity, lightPositions[0]), glm::vec3(0.2f));
-        glUniformMatrix4fv(glGetUniformLocation(shaderProgram[1], "matrixModel"), 1, GL_FALSE, glm::value_ptr(matrixModelLight));
-        glUniformMatrix4fv(glGetUniformLocation(shaderProgram[1], "matrixView"), 1, GL_FALSE, glm::value_ptr(matrixView));
-        glUniformMatrix4fv(glGetUniformLocation(shaderProgram[1], "matrixProjection"), 1, GL_FALSE, glm::value_ptr(matrixProjection));
-
-        glBindVertexArray(vaoTarget[1]);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        glBindVertexArray(0);
-
-
-        
-/*================================================*/
-//        //render cube
-//        for (auto i = 0; i < sizeof(cubePositions) / sizeof(cubePositions[0]); i++){
-//            glBindVertexArray(vaoTarget[2]);
-//            glm::mat4 offsetMatrix = glm::translate(matrixModel, cubePositions[i]);
-//            glm::mat3 matrixNormal = glm::transpose(glm::inverse(glm::mat3(offsetMatrix)));
-//
-//            glUseProgram(shaderProgram[3]);
-//            //vertex shader uniform
-//            glUniformMatrix4fv(glGetUniformLocation(shaderProgram[3], "matrixModel"), 1, GL_FALSE, glm::value_ptr(offsetMatrix));
-//            glUniformMatrix4fv(glGetUniformLocation(shaderProgram[3], "matrixView"), 1, GL_FALSE, glm::value_ptr(matrixView));
-//            glUniformMatrix4fv(glGetUniformLocation(shaderProgram[3], "matrixProjection"), 1, GL_FALSE, glm::value_ptr(matrixProjection));
-//
-//            glUniformMatrix4fv(glGetUniformLocation(shaderProgram[3], "matrixNormal"), 1, GL_FALSE, glm::value_ptr(matrixNormal));
-//
-//            //fragment shader uniform
-//            auto cameraPos = spaceCamera.getCameraPosition();
-//            //object material struct
-//            glUniform3f(glGetUniformLocation(shaderProgram[3], "material.v3fAmbient"), 0.0215f, 0.1745f, 0.0215f);
-//            glUniform1f(glGetUniformLocation(shaderProgram[3], "material.fAmbientCoeff"), 0.1f);
-//            glUniform3f(glGetUniformLocation(shaderProgram[3], "material.v3fDiffuse"), 0.07568f, 0.61424f, 0.07568f);
-//            glUniform1f(glGetUniformLocation(shaderProgram[3], "material.fDiffuseCoeff"), 1.0f);
-//            glUniform3f(glGetUniformLocation(shaderProgram[3], "material.v3fSpecular"), 0.633f, 0.727811f, 0.633f);
-//            glUniform1f(glGetUniformLocation(shaderProgram[3], "material.fSpecularCoeff"), 0.6f * 128.0f);
-//
-//            //light struct
-//            glUniform3f(glGetUniformLocation(shaderProgram[3], "light.v3fAmbient"), 1.0f, 1.0f, 1.0f);
-//            glUniform3f(glGetUniformLocation(shaderProgram[3], "light.v3fDiffuse"), 1.0f, 1.0f, 1.0f);
-//            glUniform3f(glGetUniformLocation(shaderProgram[3], "light.v3fSpecular"), 1.0f, 1.0f, 1.0f);
-////            glUniform3f(glGetUniformLocation(shaderProgram[3], "light.v3fPosition"), cubePositions[i].x, cubePositions[i].y, cubePositions[i].z);
-//            glUniform3f(glGetUniformLocation(shaderProgram[3], "light.v3fPosition"), lightPositions[0].x, lightPositions[0].y, lightPositions[0].z);
-//            //uniform the light attenuation
-//            glUniform1f(glGetUniformLocation(shaderProgram[3], "light.fconst"), 1.0f);
-//            glUniform1f(glGetUniformLocation(shaderProgram[3], "light.flinear"), 0.22f);
-//            glUniform1f(glGetUniformLocation(shaderProgram[3], "light.fquadratic"), 0.20f);
-//
-//            glUniform3f(glGetUniformLocation(shaderProgram[3], "v3fViewPos"), cameraPos.x, cameraPos.y, cameraPos.z);
-//
-//
-//            glActiveTexture(GL_TEXTURE0 + 1);
-//            glBindTexture(GL_TEXTURE_2D, textureTarget[1]);
-//            glUniform1i(glGetUniformLocation(shaderProgram[3], "texture0"), 1);
-//            
-//            glDrawArrays(GL_TRIANGLES, 0, 36);
-//            glBindVertexArray(0);
-//        }
 
 
         #ifdef DEBUG

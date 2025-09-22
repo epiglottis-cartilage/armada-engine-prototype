@@ -5,6 +5,7 @@
 #include <iostream>
 #include <optional>
 #include <GL/glew.h>
+#include <filesystem>
 
 using namespace std;
 

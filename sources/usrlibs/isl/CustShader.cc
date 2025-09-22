@@ -1,4 +1,4 @@
-#include "CustShader.hh"
+﻿#include "CustShader.hh"
 
 using namespace std;
 
@@ -7,7 +7,37 @@ CustShader::CustShader(GLenum shadertype, string sourceGeneralVertexPath){
     GLchar shaderInfoLog[512];
     GLint success;
     
+
+	#ifdef DEBUG
+    cout << "shader path: " << endl;
+    cout << sourceGeneralVertexPath << endl;
+    namespace fs = std::filesystem;
+	// 检查文件是否存在并可访问
+	if (!fs::exists(sourceGeneralVertexPath)) {
+		std::cerr << "Error: shader file does not exist -> " 
+				  << sourceGeneralVertexPath << std::endl;
+		//throw std::runtime_error("Shader file not found");
+	}
+	if (!fs::is_regular_file(sourceGeneralVertexPath)) {
+		std::cerr << "Error: shader path is not a regular file -> "
+				  << sourceGeneralVertexPath << std::endl;
+		//throw std::runtime_error("Shader path invalid");
+	}
+
+	// 现在安全地打开文件
+	#endif
+
     ifstream file(sourceGeneralVertexPath);
+
+	#ifdef DEBUG
+		if (!file.is_open()) {
+			std::cerr << "Error: failed to open shader file -> " 
+					  << sourceGeneralVertexPath << std::endl;
+			//throw std::runtime_error("Shader file cannot be opened");
+		}
+	#endif
+
+
     string content((istreambuf_iterator<char>(file)), 
         istreambuf_iterator<char>()
     );    

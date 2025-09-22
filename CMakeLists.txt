@@ -1,25 +1,35 @@
-
 cmake_minimum_required(VERSION 3.15)
 project(MyOpenGLExamples)
 
 # 设定 C++ 标准
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(CMAKE_C_COMPILER_LAUNCHER ccache)
-set(CMAKE_CXX_COMPILER_LAUNCHER ccache)
+if(UNIX)
+    set(CMAKE_C_COMPILER_LAUNCHER ccache)
+    set(CMAKE_CXX_COMPILER_LAUNCHER ccache)
+endif()
 
 
-find_package(SDL2 REQUIRED)
+find_package(SDL2 CONFIG REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
-find_package(glm REQUIRED)
-find_package(SDL2_image REQUIRED)
+find_package(glm CONFIG REQUIRED)
+find_package(SDL2_image CONFIG REQUIRED)
+find_package(assimp CONFIG REQUIRED)
 
 
 
 # 添加源代码根目录
 set(EXAMPLES_DIR "${CMAKE_SOURCE_DIR}/sources/examples")
+#set(INCLUDE_DIRECTORIES ${SDL2_INCLUDE_DIR})
+#set(INCLUDE_DIRECTORIES ${_INCLUDE_DIR})
+#set(INCLUDE_DIRECTORIES ${SDL2_INCLUDE_DIR})
+
+
+
+
+
 
 ####################################### add example target function #######################################
 
@@ -115,26 +125,66 @@ function(add_usrlib_debug lib_name)
 endfunction()
 
 #add_usrlib(txbridge)
+#
+##add_usrlib_debug(txbridge)
+#add_usrlib(moncams)
+#add_usrlib(isl)
+#txbridge: bridge stands between SDL2, image and opengl. it grab image from sdl2, convert it into gl format
 add_usrlib_debug(txbridge)
-add_usrlib(moncams)
-add_usrlib(isl)
+target_link_libraries(txbridge PUBLIC SDL2::SDL2 SDL2_image::SDL2_image GLEW::GLEW)
 
+#monocams: a camera implementation
+add_usrlib(moncams)
+target_link_libraries(moncams PUBLIC SDL2::SDL2 glm::glm)
+
+#isl: shader loader and compiler.
+add_usrlib_debug(isl)
+target_link_libraries(isl PUBLIC  GLEW::GLEW)
+
+add_usrlib(dbgjellyfish)
+
+add_usrlib_debug(modelconverter)
+target_link_libraries(modelconverter PUBLIC
+isl
+txbridge
+dbgjellyfish
+
+GLEW::GLEW assimp::assimp glm::glm)
 
 
 # 示例用法：添加多个例子
 add_example_debug(farlight)
 
+
 target_link_libraries(farlight PRIVATE
     txbridge
     moncams
     isl
+    modelconverter
 
     OpenGL::GL
     GLEW::GLEW
     SDL2::SDL2
+#not sure if this line breaks compilation on linux.....
+    SDL2::SDL2main
+#line end
     SDL2_image::SDL2_image
     glm::glm    
+    assimp::assimp
 
 )
 
 
+########WINDOWS DEBUG ZONE###########
+#set(debug_sourcesfile "${CMAKE_SOURCE_DIR}/sources/examples/debug_sources/*.cc")
+
+add_example(debug_sources)
+target_link_libraries(debug_sources PRIVATE 
+    OpenGL::GL
+    GLEW::GLEW
+    SDL2::SDL2
+    SDL2::SDL2main
+    SDL2_image::SDL2_image
+    glm::glm    
+    assimp::assimp
+)

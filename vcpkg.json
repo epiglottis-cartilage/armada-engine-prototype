@@ -1,0 +1,12 @@
+{
+  "name" : "armada-engine-prototype",
+  "version" : "0.0.2",
+  "dependencies": [
+    "sdl2",
+    "sdl2-image",
+    "glm",
+    "glew",
+    "assimp"
+
+  ]
+}
