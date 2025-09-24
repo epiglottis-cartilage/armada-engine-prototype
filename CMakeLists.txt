@@ -90,7 +90,7 @@ endfunction()
 function(build_engine_stclib lib_name)
 
     add_library(${lib_name} STATIC ${ENGINE_SOURCES_FILES} ${ENGINE_HEADERS_FILES})
-    target_link_libraries(${lib_name} PRIVATE
+    target_link_libraries(${lib_name} PUBLIC
 
         OpenGL::GL
         GLEW::GLEW
@@ -123,6 +123,10 @@ function(add_example example_name)
 
     set_target_properties(${example_name} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${example_name}"
+    )
+    target_include_directories(${example_name} PRIVATE 
+        "${INCLUDE_DIRECTORIES}"
+        "${EXAMPLES_DIR}/${example_name}/" 
     )
     target_link_libraries(${example_name} PRIVATE engine )
 

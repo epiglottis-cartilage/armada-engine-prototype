@@ -43,4 +43,7 @@ void Engine::run(){
 
 }
 
+void Engine::shutdown(){
+}
+
 NAMESPACE_END
