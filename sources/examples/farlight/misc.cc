@@ -39,7 +39,7 @@ SDL_Window* init_win_and_gl(){
 
     SDL_Window* window = SDL_CreateWindow("get gl info", SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HIGHT,  
-        SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_RESIZABLE );
+        SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE );
     error = {SDL_GetError()};
     if(window == NULL){
         cout << "SDL_CreateWindow Error: " << endl;

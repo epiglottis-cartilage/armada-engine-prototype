@@ -6,7 +6,8 @@
     "sdl2-image",
     "glm",
     "glew",
-    "assimp"
+    "assimp",
+    "yaml-cpp"
 
   ]
 }

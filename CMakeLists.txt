@@ -17,65 +17,77 @@ find_package(GLEW REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(SDL2_image CONFIG REQUIRED)
 find_package(assimp CONFIG REQUIRED)
+find_package(yaml-cpp CONFIG REQUIRED)
 
 
 
-# 添加源代码根目录
+set(ENGINE_SOURCES_FILES 
+    #engine main
+    ${CMAKE_SOURCES_DIR}/sources/engine/common.hh
+    ${CMAKE_SOURCES_DIR}/sources/engine/engine.cc
+    ${CMAKE_SOURCES_DIR}/sources/engine/engine.hh
+                        /
+    ${CMAKE_SOURCES_DIR}/#rendersystem, core, essential
+    ${CMAKE_SOURCES_DIR}/sources/engine/rendersystem/CustShader.cc
+    ${CMAKE_SOURCES_DIR}/sources/engine/rendersystem/CustShader.hh
+    ${CMAKE_SOURCES_DIR}/sources/engine/rendersystem/modelloader.cc
+    ${CMAKE_SOURCES_DIR}/sources/engine/rendersystem/modelloader.hh
+    ${CMAKE_SOURCES_DIR}/sources/engine/rendersystem/rendersystem.cc
+    ${CMAKE_SOURCES_DIR}/sources/engine/rendersystem/rendersystem.hh
+    ${CMAKE_SOURCES_DIR}/sources/engine/rendersystem/ShaderFinal.cc
+    ${CMAKE_SOURCES_DIR}/sources/engine/rendersystem/ShaderFinal.hh
+    ${CMAKE_SOURCES_DIR}/sources/engine/rendersystem/textureSdlGl.cc
+    ${CMAKE_SOURCES_DIR}/sources/engine/rendersystem/textureSdlGl.hh
+                        /
+    ${CMAKE_SOURCES_DIR}/#camera class
+    ${CMAKE_SOURCES_DIR}/sources/engine/camera/Camera.cc
+    ${CMAKE_SOURCES_DIR}/sources/engine/camera/Camera.hh
+                        /
+    ${CMAKE_SOURCES_DIR}/#utilities, like cosole output debugger, config loader, etc
+    ${CMAKE_SOURCES_DIR}/sources/engine/utils/dbgJellyfish.cc
+    ${CMAKE_SOURCES_DIR}/sources/engine/utils/dbgJellyfish.hh
+    ${CMAKE_SOURCES_DIR}/sources/engine/utils/config.cc
+    ${CMAKE_SOURCES_DIR}/sources/engine/utils/config.hh
+    ${CMAKE_SOURCES_DIR}/sources/engine/utils/configtypes.hh
+)
+
 set(EXAMPLES_DIR "${CMAKE_SOURCE_DIR}/sources/examples")
-#set(INCLUDE_DIRECTORIES ${SDL2_INCLUDE_DIR})
-#set(INCLUDE_DIRECTORIES ${_INCLUDE_DIR})
-#set(INCLUDE_DIRECTORIES ${SDL2_INCLUDE_DIR})
-
-
-
-
-
 
 ####################################### add example target function #######################################
 
 # 定义一个函数，创建一个名为 `example_name` 的构建目标
 function(add_example example_name)
-    # 查找对应例子目录的源文件
     file(GLOB_RECURSE EXAMPLE_SOURCES 
-        "${EXAMPLES_DIR}/${example_name}/*.cc"
-        "${EXAMPLES_DIR}/${example_name}/*.hh"
-    )
+            "${EXAMPLES_DIR}/${example_name}/*.cc"
+            "${EXAMPLES_DIR}/${example_name}/*.hh"
+        )
 
     # 如果找不到任何源文件，报错
     if(NOT EXAMPLE_SOURCES)
         message(FATAL_ERROR "No source files found for example '${example_name}'")
     endif()
 
-    # 创建可执行目标
-    add_executable(${example_name} ${EXAMPLE_SOURCES})
+    add_executable(${example_name} ${ENGINE_SOURCES_FILES} ${EXAMPLE_SOURCES})
 
-    # 设置该目标的输出路径到 build/<example_name>/ 目录中
     set_target_properties(${example_name} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${example_name}"
     )
 
-    # 如果你有通用库或依赖，统一链接（例如 SDL2 / OpenGL / GLM 等）
-    # target_link_libraries(${example_name} SDL2::SDL2 OpenGL::GLM ...) 
 endfunction()
 
 function(add_example_debug example_name)
-    # 查找对应例子目录的源文件
     file(GLOB_RECURSE EXAMPLE_SOURCES 
-        "${EXAMPLES_DIR}/${example_name}/*.cc"
-        "${EXAMPLES_DIR}/${example_name}/*.hh"
-    )
+            "${EXAMPLES_DIR}/${example_name}/*.cc"
+            "${EXAMPLES_DIR}/${example_name}/*.hh"
+        )
 
     # 如果找不到任何源文件，报错
     if(NOT EXAMPLE_SOURCES)
         message(FATAL_ERROR "No source files found for example '${example_name}'")
     endif()
 
-    # 创建可执行目标
-    add_executable(${example_name} ${EXAMPLE_SOURCES})
+    add_executable(${example_name} ${ENGINE_SOURCES_FILES} ${EXAMPLE_SOURCES})
 
-
-
-    # 设置该目标的输出路径到 build/<example_name>/ 目录中
     set_target_properties(${example_name} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${example_name}"
     )
@@ -83,77 +95,37 @@ function(add_example_debug example_name)
     target_compile_definitions(${example_name} PRIVATE DEBUG)
 endfunction()
 
+
+# 通用函数：为某个 target 添加资源复制规则
+function(copy_resources target)
+    foreach(resource IN LISTS ARGN)
+        add_custom_command(TARGET ${target} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${CMAKE_SOURCE_DIR}/${resource}"
+                $<TARGET_FILE_DIR:${target}>/
+        )
+    endforeach()
+endfunction()
 ####################################### static libraries #######################################
 
-# 添加一个用户定义库（静态库）
-function(add_usrlib lib_name)
-    # 找到该库的源文件
-    file(GLOB_RECURSE LIB_SOURCES 
-        "${CMAKE_SOURCE_DIR}/sources/usrlibs/${lib_name}/*.cc"
-#        "${CMAKE_SOURCE_DIR}/sources/usrlibs/${lib_name}/*.cc"
-    )
+#compile engine as a static lib, althought I have no idea if this helps something....
+function(build_engine_stclib lib_name)
 
-    if(NOT LIB_SOURCES)
-        message(FATAL_ERROR "No source files found for user library '${lib_name}'")
-    endif()
+    add_library(${lib_name} STATIC ${ENGINE_SOURCES_FILES})
 
-    # 创建静态库目标
-    add_library(${lib_name} STATIC ${LIB_SOURCES})
-
-    # 可选：设置包含目录（让其他 target_link_libraries 时能自动找头文件）
-    target_include_directories(${lib_name} PUBLIC "${CMAKE_SOURCE_DIR}/sources/usrlibs/${lib_name}")
 endfunction()
 
-function(add_usrlib_debug lib_name)
-    # 找到该库的源文件
-    file(GLOB_RECURSE LIB_SOURCES 
-        "${CMAKE_SOURCE_DIR}/sources/usrlibs/${lib_name}/*.cc"
-#        "${CMAKE_SOURCE_DIR}/sources/usrlibs/${lib_name}/*.cc"
-    )
+function(build_engine_stclib_debug lib_name)
 
-    if(NOT LIB_SOURCES)
-        message(FATAL_ERROR "No source files found for user library '${lib_name}'")
-    endif()
-
-    # 创建静态库目标
-    add_library(${lib_name} STATIC ${LIB_SOURCES})
-
-    # 可选：设置包含目录（让其他 target_link_libraries 时能自动找头文件）
-    target_include_directories(${lib_name} PUBLIC "${CMAKE_SOURCE_DIR}/sources/usrlibs/${lib_name}")
+    add_library(${lib_name} STATIC ${ENGINE_SOURCES_FILES})
 
     target_compile_definitions(${lib_name} PRIVATE DEBUG)
 endfunction()
 
-#add_usrlib(txbridge)
-#
-##add_usrlib_debug(txbridge)
-#add_usrlib(moncams)
-#add_usrlib(isl)
-#txbridge: bridge stands between SDL2, image and opengl. it grab image from sdl2, convert it into gl format
-add_usrlib_debug(txbridge)
-target_link_libraries(txbridge PUBLIC SDL2::SDL2 SDL2_image::SDL2_image GLEW::GLEW)
-
-#monocams: a camera implementation
-add_usrlib(moncams)
-target_link_libraries(moncams PUBLIC SDL2::SDL2 glm::glm)
-
-#isl: shader loader and compiler.
-add_usrlib_debug(isl)
-target_link_libraries(isl PUBLIC  GLEW::GLEW)
-
-add_usrlib(dbgjellyfish)
-
-add_usrlib_debug(modelconverter)
-target_link_libraries(modelconverter PUBLIC
-isl
-txbridge
-dbgjellyfish
-
-GLEW::GLEW assimp::assimp glm::glm)
 
 
-# 示例用法：添加多个例子
-add_example_debug(farlight)
+add_example(sandbox)
+copy_resources(farlight resources/defaulttexture.png)
 
 
 target_link_libraries(farlight PRIVATE

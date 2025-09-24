@@ -1,0 +1,35 @@
+#the bigger the number, the better the quality
+#for example: texture quality 4 is better than 2
+#bool default value is false, false is off, true is on
+
+
+generalinfo:
+  gamename: "minimal testing sandbox"
+  version: "0.0.1"
+  debug: false
+
+rendersystem:
+  backend: "opengl"
+  screenwidth: 1280
+  screenheight: 720
+  screenmode: "window"
+  vsync: true
+  antialiasing: ""
+  antialiasingquality: 2
+  shadowmapping: true
+
+  sdl_img_format: "png"
+
+
+
+assetsystem:
+  rootdirectory: "."
+  
+
+
+
+
+
+
+
+
