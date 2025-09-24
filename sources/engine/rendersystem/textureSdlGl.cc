@@ -1,4 +1,4 @@
-#include "textureSdlGl.hh"
+#include "texturesdlgl.hh"
 
 TextureSdlGl::TextureSdlGl(string filepathTexture) {
         SDL_Surface *surface = IMG_Load(filepathTexture.c_str());

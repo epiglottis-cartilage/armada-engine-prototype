@@ -17,9 +17,9 @@
 #include <assimp/postprocess.h>
 
 
-#include <ShaderFinal.hh>
+#include <shaderfinal.hh>
 #include <dbgJellyfish.hh>
-#include <textureSdlGl.hh>
+#include <texturesdlgl.hh>
 
 using namespace std;
 namespace fs = std::filesystem;

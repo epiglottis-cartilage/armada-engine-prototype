@@ -1,4 +1,4 @@
-#include "Camera.hh"
+#include "camera.hh"
 
 Camera::Camera(glm::vec3 position) :
     position(position), pitchNum(0.0f), yawNum(0.0f), rollNum(0.0f), cameraDirection(glm::vec3(0.0f, 0.0f, -1.0f)),
