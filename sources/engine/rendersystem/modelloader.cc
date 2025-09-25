@@ -42,7 +42,8 @@ void Mesh::setupMesh() {
 /*
 Warning: this function will implicit call glUseProgram(shader) to use the para shader to draw the mesh
 After glDrawElements are called, glUseProgram(0) will be called by this function to clean the binding*/
-void Mesh::Draw(ShaderFinal shader) {
+void Mesh::Draw(const ShaderFinal& shader, const glm::mat4& transform) const {
+    glUseProgram(shader.getGSP());
 
     string pbrnames[] = {
         "textureBaseColor",
@@ -64,7 +65,8 @@ void Mesh::Draw(ShaderFinal shader) {
     }
     glActiveTexture(GL_TEXTURE0);
 
-    glUseProgram(shader.getGSP());
+    //apply transform
+    glUniformMatrix4fv(glGetUniformLocation(shader.getGSP(), "matrixModel"), 1, GL_FALSE, glm::value_ptr(transform));
 
     glBindVertexArray(this->VAO);
     glDrawElements(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, 0);
@@ -73,10 +75,10 @@ void Mesh::Draw(ShaderFinal shader) {
 }
 
 
-void Model::Draw(ShaderFinal shader) {
+void Model::Draw(const ShaderFinal& shader) const {
 
     for (int i = 0; i < this->meshes.size(); i++) {
-        this->meshes[i].Draw(shader);
+        this->meshes[i].Draw(shader, this->getTransform());
     }
 
 }

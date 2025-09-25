@@ -1,5 +1,10 @@
 #pragma once
 #include <string>
+#include <common.hh>
+
+NAMESPACE_BEGIN
+
+
 
 struct cfgRenderSystem {
     int screenwidth = 1280;
@@ -13,7 +18,7 @@ struct cfgRenderSystem {
 };
 
 struct cfgAssetSystem {
-    std::string assetpath = "";
+    std::string assetpath = ".";
 
 };
 
@@ -33,3 +38,4 @@ struct cfgInputSystem {
 struct cfgPhysicsSystem {
     bool placeholder = false;
 };
+NAMESPACE_END

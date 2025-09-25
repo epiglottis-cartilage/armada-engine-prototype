@@ -28,6 +28,7 @@ set(ENGINE_HEADERS_DIRS
     ${CMAKE_SOURCE_DIR}/sources/engine/inputsystem
     ${CMAKE_SOURCE_DIR}/sources/engine/audiosystem
     ${CMAKE_SOURCE_DIR}/sources/engine/physicsystem
+    ${CMAKE_SOURCE_DIR}/sources/engine/assetsystem
 )
 
 set(ENGINE_HEADERS_FILES
@@ -44,6 +45,8 @@ set(ENGINE_HEADERS_FILES
     ${CMAKE_SOURCE_DIR}/sources/engine/utils/dbgJellyfish.hh
     ${CMAKE_SOURCE_DIR}/sources/engine/utils/config.hh
     ${CMAKE_SOURCE_DIR}/sources/engine/utils/configtypes.hh
+
+    ${CMAKE_SOURCE_DIR}/sources/engine/assetsystem/assetsystem.hh
 )
 
 
@@ -57,6 +60,9 @@ set(ENGINE_SOURCES_FILES
     ${CMAKE_SOURCE_DIR}/sources/engine/rendersystem/rendersystem.cc
     ${CMAKE_SOURCE_DIR}/sources/engine/rendersystem/ShaderFinal.cc
     ${CMAKE_SOURCE_DIR}/sources/engine/rendersystem/textureSdlGl.cc
+
+
+    ${CMAKE_SOURCE_DIR}/sources/engine/assetsystem/assetsystem.cc
                        
     #camera class
     ${CMAKE_SOURCE_DIR}/sources/engine/camera/Camera.cc

@@ -1,11 +1,15 @@
 #pragma once
 
+#include <common.hh>
 #include <string>
 #include <yaml-cpp/yaml.h>
 
 #include "configtypes.hh"
 
-using namespace std;
+
+NAMESPACE_BEGIN
+
+#define CONFIG_FILE_NAME "engine.cfg"
 
 /*
 Config class handler parse engine.yaml. 
@@ -38,5 +42,7 @@ private:
     void parseConfig();
 
     YAML::Node rootNode; // 存储整个YAML的原始数据
-    std::string configPath; // 配置文件路径，用于热重载
+    string configPath; // 配置文件路径，用于热重载
 };
+
+NAMESPACE_END

@@ -9,6 +9,8 @@
 
 using namespace std;
 
+/*when using delete keyword, it will implicitly call gl remove this shader from memory.
+So to maximum the performance, please allocate this class on heap using new*/
 class CustShader {
 public:
     CustShader(GLenum shadertype, string sourceGeneralVertexPath);

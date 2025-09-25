@@ -1,5 +1,7 @@
 #include "config.hh"
 
+NAMESPACE_BEGIN
+
 void Config::parseConfig(){
     bool result = true;
 
@@ -30,3 +32,5 @@ void Config::parseConfig(){
 
 
 }
+
+NAMESPACE_END

@@ -11,6 +11,7 @@
 
 
 #include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <GL/glew.h>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -52,9 +53,11 @@ public:
         this->setupMesh();
     };
 
-    void Draw(ShaderFinal shader);
+    void Draw(const ShaderFinal& shader, const glm::mat4& transform) const;
 
 private:
+
+
     GLuint VAO, VBO, EBO;
     void setupMesh();
 };
@@ -62,33 +65,49 @@ private:
 
 class Model 
 {
-    public:
-        Model(string path)
-        {
-            this->loadModel(path);
-        }
-        void Draw(ShaderFinal shader); 
-    private:
-        vector<Mesh> meshes;
-        fs::path directory;
 
-        void loadModel(string path, bool flipUVy = false);
-        void processNode(aiNode* node, const aiScene* scene);
-        Mesh processMesh(aiMesh* mesh, const aiScene* scene);
-        vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type );
-        optional<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, string typeName);
+public:
+    Model(string path)
+    {
+        this->loadModel(path);
+    }
+    Model(fs::path path)
+    {
+        this->loadModel(path.string());
+    }
+    void Draw(const ShaderFinal& shader) const; 
+    //vaos, render relative infos.
+    vector<Mesh> getMeshes() const { return meshes; }
+    fs::path getDirectory() const { return directory; }
+    bool getShown() const { return shown; }
+    void setShown(bool shown) { this->shown = shown; }
+    glm::mat4 getTransform() const { return transform; }
+    void setTransform(glm::mat4 transform) { this->transform = transform; }
+    
+private:
+    glm::mat4 transform;
+    vector<Mesh> meshes;
+    fs::path directory;
+    bool shown = true;
 
-        static Texture loadDefaultTexture() {
+    void loadModel(string path, bool flipUVy = false);
+    void processNode(aiNode* node, const aiScene* scene);
+    Mesh processMesh(aiMesh* mesh, const aiScene* scene);
+    vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type );
+    optional<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, string typeName);
 
-            Texture texture;
-            cout << "loading default texture" << endl;
+    static Texture loadDefaultTexture() {
 
-            texture.id = TextureSdlGl{ fs::path{fs::current_path() / DEFAULT_TEXTURE_NAME}.string() }.getTextureId();
-            texture.type = "default";
-            texture.path = aiString{ DEFAULT_TEXTURE_NAME };
+        Texture texture;
+        cout << "loading default texture" << endl;
 
-            return texture;
-        }
+        texture.id = TextureSdlGl{ fs::path{fs::current_path() / DEFAULT_TEXTURE_NAME}.string() }.getTextureId();
+        texture.type = "default";
+        texture.path = aiString{ DEFAULT_TEXTURE_NAME };
+
+        return texture;
+    }
+
 };
 
 #endif

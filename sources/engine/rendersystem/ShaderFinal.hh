@@ -3,6 +3,7 @@
 
 #include "CustShader.hh"
 #include <GL/glew.h>
+#include <filesystem>
 
 /*
 represent the compiled shader program inside memory. 
@@ -14,6 +15,7 @@ class ShaderFinal {
 
 public:
     ShaderFinal(std::string sourceGeneralVertexPath, std::string sourceGeneralFragmentPath);
+    ShaderFinal(std::filesystem::path sourceGeneralVertexPath, std::filesystem::path sourceGeneralFragmentPath);
 
     ~ShaderFinal(){
         glDeleteShader(generalShader);
