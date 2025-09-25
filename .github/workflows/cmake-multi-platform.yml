@@ -51,7 +51,6 @@ jobs:
       if: matrix.os == 'windows-latest'
       uses: lukka/run-vcpkg@v11
       with:
-        vcpkgJsonDir: '${{ github.workspace }}'
         vcpkgGitCommitId: '7d75835b57e79e8c183e022d1e7c13394c6d52c1'
 
     - name: Setup Dependencies (Linux Only)
