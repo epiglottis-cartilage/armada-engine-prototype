@@ -23,7 +23,11 @@ struct cfgAssetSystem {
 };
 
 struct cfgAppContext {
-    bool debugmode = false;
+    //there are debug options
+    bool consoleoutput = false;
+    bool fileoutput = false;
+    //below options false is truncate, true is append
+    bool fileoutputappend = false;
 };
 
 struct cfgAudioSystem {

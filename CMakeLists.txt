@@ -18,6 +18,7 @@ find_package(glm CONFIG REQUIRED)
 find_package(SDL2_image CONFIG REQUIRED)
 find_package(assimp CONFIG REQUIRED)
 find_package(yaml-cpp CONFIG REQUIRED)
+find_package(spdlog CONFIG REQUIRED)
 
 set(ENGINE_HEADERS_DIRS
 
@@ -45,6 +46,7 @@ set(ENGINE_HEADERS_FILES
     ${CMAKE_SOURCE_DIR}/sources/engine/utils/dbgJellyfish.hh
     ${CMAKE_SOURCE_DIR}/sources/engine/utils/config.hh
     ${CMAKE_SOURCE_DIR}/sources/engine/utils/configtypes.hh
+    ${CMAKE_SOURCE_DIR}/sources/engine/utils/logger.hh
 
     ${CMAKE_SOURCE_DIR}/sources/engine/assetsystem/assetsystem.hh
 )
@@ -70,6 +72,8 @@ set(ENGINE_SOURCES_FILES
     #utilities, like cosole output debugger, config loader, etc
     ${CMAKE_SOURCE_DIR}/sources/engine/utils/dbgJellyfish.cc
     ${CMAKE_SOURCE_DIR}/sources/engine/utils/config.cc
+    ${CMAKE_SOURCE_DIR}/sources/engine/utils/logger.cc
+
 )
 
 set(EXAMPLES_DIR "${CMAKE_SOURCE_DIR}/sources/examples")
@@ -106,6 +110,7 @@ function(build_engine_stclib lib_name)
         glm::glm    
         assimp::assimp
         yaml-cpp::yaml-cpp
+        spdlog::spdlog
     )
 
 endfunction()
@@ -158,4 +163,6 @@ target_link_libraries(debug_sources PRIVATE
     SDL2_image::SDL2_image
     glm::glm    
     assimp::assimp
+    yaml-cpp::yaml-cpp
+    spdlog::spdlog
 )

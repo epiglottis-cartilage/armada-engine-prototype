@@ -6,9 +6,12 @@ void Config::parseConfig(){
     bool result = true;
 
 
-    YAML::Node appcontex = rootNode["generalinfo"];
-    if(appcontex){
-        cfgappcontext.debugmode = appcontex["debug"].as<bool>(cfgappcontext.debugmode);
+    YAML::Node appcontext = rootNode["generalinfo"];
+    appcontext = appcontext["debug"];
+    if(appcontext){
+        cfgappcontext.consoleoutput = appcontext["console"].as<bool>(cfgappcontext.consoleoutput);
+        cfgappcontext.fileoutput = appcontext["logfile"].as<bool>(cfgappcontext.fileoutput);
+        cfgappcontext.fileoutputappend = appcontext["logfileappend"].as<bool>(cfgappcontext.fileoutputappend);
     }
 
 

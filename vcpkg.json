@@ -7,7 +7,8 @@
     "glm",
     "glew",
     "assimp",
-    "yaml-cpp"
+    "yaml-cpp",
+    "spdlog"
 
   ]
 }

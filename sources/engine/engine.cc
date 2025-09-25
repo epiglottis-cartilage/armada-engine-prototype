@@ -7,23 +7,28 @@ NAMESPACE_BEGIN
 Engine* gameEngine;
 
 Engine::Engine(string gamename, string gameversion):
-aGamename(gamename),
-aGameversion(gameversion)
+    aGamename(gamename),
+    aGameversion(gameversion)
 {
-
-    std::filesystem::path exePath = std::filesystem::current_path() / CONFIG_FILE_NAME;
-    this->aConfig = new Config{ exePath.string() };
-
 }
 
 
+/*
+engine::init read config file from the working directory, 
+set debug config(also output log to working directory by default) and init all sub systems*/
 void Engine::init(){
+    std::filesystem::path exePath = std::filesystem::current_path() / CONFIG_FILE_NAME;
+    this->aConfig = new Config{ exePath.string() };
+
     aAppContext = new AppContext{};
     aAppContext->aIsInited = true;
     aAppContext->aShouldQuit = false;
 
+    //init all systems, assign corresponding fields for later access
     aRenderSystem = new RenderSystem{aConfig->cfgrendersystem};
     aAssetSystem = new AssetSystem{aConfig->cfgassetsystem};
+    Logger::Init();
+    aLogger = Logger::Get();
 
     aAppContext->aIsInited = true;
 //    delete this->aConfig;

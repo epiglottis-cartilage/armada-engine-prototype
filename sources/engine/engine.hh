@@ -5,11 +5,10 @@
 #include <camera.hh>
 #include <rendersystem.hh>
 #include <assetsystem.hh>
+#include <logger.hh>
 
-#include <filesystem>
 
 //namespace: fleet::xxx
-namespace fs = std::filesystem;
 
 NAMESPACE_BEGIN
 
@@ -59,6 +58,7 @@ public:
     AppContext* getAppContext() { return aAppContext; }
     RenderSystem* getRenderSystem() { return aRenderSystem; }
     AssetSystem* getAssetSystem() { return aAssetSystem; }
+    LoggerPtr getLogger() { return aLogger; }
     Camera* getCurrentCamera() { return aCurrentCamera; }
 
 private:
@@ -68,6 +68,7 @@ private:
     AppContext* aAppContext;
     RenderSystem* aRenderSystem;
     AssetSystem* aAssetSystem;
+    LoggerPtr aLogger;
     
 
     Camera* aCurrentCamera;
