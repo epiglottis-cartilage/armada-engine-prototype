@@ -31,7 +31,7 @@ class Logger {
 
 */
 public:
-    static void Init(const std::string& logfile = LOGGER_FILE_NAME, const cfgAppContext& config) {
+    static void Init( const cfgAppContext& config, const std::string& logfile = LOGGER_FILE_NAME) {
         //parse config
         bool consoleoutput = config.consoleoutput;
         bool fileoutput = config.fileoutput;

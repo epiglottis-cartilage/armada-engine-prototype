@@ -118,7 +118,7 @@ int RenderSystem::errorposition(const char* file, int line){
     {
         cout << "Error: " << errorcode << " at " << file << ":" << line << endl;
     }
-    return int{errorcode};
+    return static_cast<int>(errorcode);
 
 }
 

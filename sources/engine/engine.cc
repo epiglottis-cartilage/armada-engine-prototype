@@ -27,7 +27,7 @@ void Engine::init(){
     //init all systems, assign corresponding fields for later access
     aRenderSystem = new RenderSystem{aConfig->cfgrendersystem};
     aAssetSystem = new AssetSystem{aConfig->cfgassetsystem};
-    Logger::Init();
+    Logger::Init(aConfig->cfgappcontext);
     aLogger = Logger::Get();
 
     aAppContext->aIsInited = true;
