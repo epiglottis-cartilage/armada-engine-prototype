@@ -52,6 +52,8 @@ jobs:
       uses: lukka/run-vcpkg@v11
       with:
         vcpkgGitCommitId: '7d75835b57e79e8c183e022d1e7c13394c6d52c1'
+        runVcpkgInstall: true
+         # vcpkgJsonGlob: 'my config list is in default location!'
 
     - name: Setup Dependencies (Linux Only)
       if: matrix.os == 'debianbase-latest'
