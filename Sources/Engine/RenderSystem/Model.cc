@@ -101,7 +101,7 @@ void Model::loadModel(string path, bool flipUVy) {
 
     if(!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) 
     {
-        cout << "ERROR::ASSIMP::" << importer.GetErrorString() << endl;
+        ENGINE_ERROR("ASSIMP::%s\n", importer.GetErrorString());
         return;
     }
     this->directory = fs::path{path}.parent_path();
@@ -220,17 +220,16 @@ optional<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType typ
         aiString str;
         mat->GetTexture(type, 0, &str);
 
-        dbgJellyfish::debug_log("Model class loading texture from file system" + string{str.C_Str()});
+        ENGINE_DEBUG("Model class loading texture from file system %s\n", str.C_Str());
 
         int assimp_texture_type = static_cast<int>(type);
 
         if (str.length == 0) {
-            cout << string{ format(
-                "Performing lookup for {} {} on {} failed, returning default texture...", 
-                typeName,
-                string{mat->GetName().C_Str()},
-                assimp_texture_type
-            )} << endl;
+            ENGINE_INFO("Performing lookup for %s %s on %s failed, returning default texture...\n",
+                        typeName,
+                        string{mat->GetName().C_Str()},
+                        assimp_texture_type
+                    );
             return {};
 
         }
@@ -243,6 +242,6 @@ optional<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType typ
     return { texture };
 }
 vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type) {
-    cout << "you called a abandoned function!!!!!" << endl;
+    ENGINE_WARN("you called a abandoned function!!!!!\n");
     return {};
 }

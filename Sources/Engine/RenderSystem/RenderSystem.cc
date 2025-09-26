@@ -42,7 +42,7 @@ void RenderSystem::init(){
     SDL_Init(SDL_INIT_EVERYTHING);
     string error = {SDL_GetError()};
     if(error != ""){
-        cout << "SDL_Init Error: " << error << endl;
+        ENGINE_ERROR("SDL_Init Error: %s\n", error);
     }
 
 
@@ -51,7 +51,7 @@ void RenderSystem::init(){
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     error = {SDL_GetError()};
     if(error != ""){
-        cout << "SDL set GL attribute Error: " << error << endl;
+        ENGINE_ERROR("SDL set GL attribute Error: %s\n", error);
     }
 
 
@@ -63,18 +63,19 @@ void RenderSystem::init(){
     );
     error = {SDL_GetError()};
     if(window == NULL){
-        cout << "SDL_CreateWindow Error: " << endl;
+        ENGINE_ERROR("SDL_CreateWindow Error: \n", error);
     }
     if(error != ""){
-        cout << "SDL set GL attribute Error: " << error << endl;
+        ENGINE_ERROR("SDL set GL attribute Error: \n", error);
     }
 
     auto img_init_result = IMG_Init(this->sdl_image_flags);
 
     if(img_init_result != this->sdl_image_flags){
+        ENGINE_DEBUG("%d\n",img_init_result);
         cout << img_init_result << endl;
         error = {IMG_GetError()};
-        cout << "IMG_Init Error: " << error << endl;
+        ENGINE_ERROR("IMG_Init Error: %s\n", error);
     }
 
     this->glContext = SDL_GL_CreateContext(window);
@@ -116,7 +117,7 @@ int RenderSystem::errorposition(const char* file, int line){
     GLenum errorcode;
     while ((errorcode = glGetError()) != GL_NO_ERROR) 
     {
-        cout << "Error: " << errorcode << " at " << file << ":" << line << endl;
+        ENGINE_ERROR("Error: %u at %s:%s\n", errorcode, file, line);
     }
     return static_cast<int>(errorcode);
 

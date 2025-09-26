@@ -5,6 +5,7 @@
 #include <optional>
 #include <GL/glew.h>
 #include <filesystem>
+#include <Logger.hh>
 
 using namespace std;
 

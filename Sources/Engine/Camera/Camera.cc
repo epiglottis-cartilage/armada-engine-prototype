@@ -19,20 +19,13 @@ void Camera::syncCameraAngleData(
         if(abs(yawoffset) < deadZoneY)
             yawoffset = 0.0f;
     }
-    
-    #ifdef DEBUG
-    std::cout << "pitch: " << pitchoffset << " yaw: " << yawoffset << " roll: " << rolloffset << std::endl;
-    #endif
+    ENGINE_DEBUG("pitch: %.4f yaw: %.4f roll: %.4f\n", pitchoffset, yawoffset, rolloffset);
     pitchNum += pitchoffset * sensitivity.y;
-    #ifdef DEBUG
-    std::cout << "pitchNum: " << pitchNum << std::endl;
-    #endif
+    ENGINE_DEBUG("pitchNum: %.4f\n", pitchNum);
 
     if(pitchNum > PITCHUP_LIMIT) pitchNum = PITCHUP_LIMIT;
     if(pitchNum < PITCHDOWN_LIMIT) pitchNum = PITCHDOWN_LIMIT;
-    #ifdef DEBUG
-    std::cout << "pitchNum After Convert: " << pitchNum << std::endl;
-    #endif
+    ENGINE_DEBUG("pitchNum After Convert: %.4f\n", pitchNum);
     yawNum += yawoffset * sensitivity.x;
     yawNum = fmod(yawNum, 360.0f);
     rollNum += rolloffset * sensitivity.z;
@@ -72,19 +65,15 @@ glm::mat4 Camera::updateCamera(){
     );
     cameraDirection = glm::normalize(cameraDirection);
 
-    #ifdef DEBUG
-    std::cout << "cameraDirection: " << cameraDirection.x << " " << cameraDirection.y << " " << cameraDirection.z << std::endl;
-    #endif
+    ENGINE_DEBUG("cameraDirection: %.4f %.4f %.4f\n", cameraDirection.x, cameraDirection.y, cameraDirection.z);
 
     cameraUp = glm::vec3(
         cos(glm::radians(pitchNum + 90)) * sin(glm::radians(yawNum )),
         sin(glm::radians(pitchNum + 90)),
         -cos(glm::radians(pitchNum + 90)) * cos(glm::radians(yawNum))
     );
-    
-    #ifdef DEBUG
-    std::cout << "cameraUp: " << cameraUp.x << " " << cameraUp.y << " " << cameraUp.z << std::endl;
-    #endif
+
+    ENGINE_DEBUG("cameraUp: %.4f %.4f %.4f\n", cameraUp.x, cameraUp.y, cameraUp.z);
 
     glm::mat4 matrixView = glm::lookAt(position, position + cameraDirection, cameraUp);
     return matrixView;

@@ -5,6 +5,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <SDL2/SDL.h>
 #include <iostream>
+#include <Logger.hh>
 
 #define PITCHUP_LIMIT 75.0f
 #define PITCHDOWN_LIMIT -75.0f
