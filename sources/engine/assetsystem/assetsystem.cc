@@ -1,4 +1,4 @@
-#include <assetsystem.hh>
+#include <AssetSystem.hh>
 
 NAMESPACE_BEGIN
 

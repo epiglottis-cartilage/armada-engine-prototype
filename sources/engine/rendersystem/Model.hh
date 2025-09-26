@@ -18,7 +18,7 @@
 #include <assimp/postprocess.h>
 
 
-#include <shaderfinal.hh>
+#include <Shader.hh>
 #include <dbgJellyfish.hh>
 #include <texturesdlgl.hh>
 

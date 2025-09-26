@@ -4,11 +4,11 @@
 
 
 
-#include <common.hh>
-#include <modelloader.hh>
-#include <configtypes.hh>
-#include <ShaderFinal.hh>
-#include <textureSdlGl.hh>
+#include <Common.hh>
+#include <Model.hh>
+#include <ConfigTypes.hh>
+#include <Shader.hh>
+#include <Texture.hh>
 
 
 #include <glm/glm.hpp>

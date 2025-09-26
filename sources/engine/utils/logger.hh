@@ -1,6 +1,6 @@
 #pragma once
 
-#include <common.hh>
+#include <Common.hh>
 
 
 #include <memory>
@@ -9,7 +9,7 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/async.h>
 
-#include <configtypes.hh>
+#include <ConfigTypes.hh>
 
 
 NAMESPACE_BEGIN

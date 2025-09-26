@@ -1,7 +1,7 @@
 #pragma once
 
-#include <common.hh>
-#include <configtypes.hh>
+#include <Common.hh>
+#include <ConfigTypes.hh>
 
 NAMESPACE_BEGIN
 

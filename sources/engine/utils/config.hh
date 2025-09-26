@@ -1,10 +1,10 @@
 #pragma once
 
-#include <common.hh>
+#include <Common.hh>
 #include <string>
 #include <yaml-cpp/yaml.h>
 
-#include "configtypes.hh"
+#include "ConfigTypes.hh"
 
 
 NAMESPACE_BEGIN

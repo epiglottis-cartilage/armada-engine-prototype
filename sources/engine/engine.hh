@@ -1,11 +1,11 @@
 #pragma once
 
-#include <common.hh>
-#include <config.hh>
-#include <camera.hh>
-#include <rendersystem.hh>
-#include <assetsystem.hh>
-#include <logger.hh>
+#include <Common.hh>
+#include <Config.hh>
+#include <Camera.hh>
+#include <RenderSystem.hh>
+#include <AssetSystem.hh>
+#include <Logger.hh>
 
 
 //namespace: fleet::xxx

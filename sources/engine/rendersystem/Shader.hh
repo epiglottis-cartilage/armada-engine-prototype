@@ -1,7 +1,7 @@
 #ifndef SPCUST_HH
 #define SPCUST_HH
 
-#include "CustShader.hh"
+#include "OpenglShader.hh"
 #include <GL/glew.h>
 #include <filesystem>
 

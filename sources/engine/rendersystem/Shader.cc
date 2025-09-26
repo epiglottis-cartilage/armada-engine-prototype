@@ -1,4 +1,4 @@
-#include "shaderfinal.hh"
+#include "Shader.hh"
 
 
 ShaderFinal::ShaderFinal(std::string sourceGeneralVertexPath, std::string sourceGeneralFragmentPath) {
