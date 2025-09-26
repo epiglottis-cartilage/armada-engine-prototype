@@ -1,5 +1,5 @@
-#include <engine.hh>
-#include <main.hh>
+#include <Engine.hh>
+#include <Main.hh>
 
 #define suppose_to_have_function_here
 

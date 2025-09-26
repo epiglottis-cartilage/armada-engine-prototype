@@ -22,61 +22,61 @@ find_package(spdlog CONFIG REQUIRED)
 
 set(ENGINE_HEADERS_DIRS
 
-    ${CMAKE_SOURCE_DIR}/sources/engine
-    ${CMAKE_SOURCE_DIR}/sources/engine/rendersystem
-    ${CMAKE_SOURCE_DIR}/sources/engine/camera
-    ${CMAKE_SOURCE_DIR}/sources/engine/utils
-    ${CMAKE_SOURCE_DIR}/sources/engine/inputsystem
-    ${CMAKE_SOURCE_DIR}/sources/engine/audiosystem
-    ${CMAKE_SOURCE_DIR}/sources/engine/physicsystem
-    ${CMAKE_SOURCE_DIR}/sources/engine/assetsystem
+    ${CMAKE_SOURCE_DIR}/Sources/Engine
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/Camera
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/Utils
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/InputSystem
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/AudioSystem
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/PhysicSystem
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/AssetSystem
 )
 
 set(ENGINE_HEADERS_FILES
-    ${CMAKE_SOURCE_DIR}/sources/engine/common.hh
-    ${CMAKE_SOURCE_DIR}/sources/engine/engine.hh
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/Common.hh
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/Engine.hh
 
-    ${CMAKE_SOURCE_DIR}/sources/engine/rendersystem/CustShader.hh
-    ${CMAKE_SOURCE_DIR}/sources/engine/rendersystem/modelloader.hh
-    ${CMAKE_SOURCE_DIR}/sources/engine/rendersystem/rendersystem.hh
-    ${CMAKE_SOURCE_DIR}/sources/engine/rendersystem/ShaderFinal.hh
-    ${CMAKE_SOURCE_DIR}/sources/engine/rendersystem/textureSdlGl.hh
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/OpenglShader.hh
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Model.hh
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/RenderSystem.hh
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Shader.hh
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Texture.hh
 
-    ${CMAKE_SOURCE_DIR}/sources/engine/camera/Camera.hh
-    ${CMAKE_SOURCE_DIR}/sources/engine/utils/dbgJellyfish.hh
-    ${CMAKE_SOURCE_DIR}/sources/engine/utils/config.hh
-    ${CMAKE_SOURCE_DIR}/sources/engine/utils/configtypes.hh
-    ${CMAKE_SOURCE_DIR}/sources/engine/utils/logger.hh
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/Camera/Camera.hh
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/Utils/Debugger.hh
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/Utils/Config.hh
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/Utils/ConfigTypes.hh
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/Utils/Logger.hh
 
-    ${CMAKE_SOURCE_DIR}/sources/engine/assetsystem/assetsystem.hh
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/AssetSystem/AssetSystem.hh
 )
 
 
 set(ENGINE_SOURCES_FILES 
     #engine main
-    ${CMAKE_SOURCE_DIR}/sources/engine/engine.cc
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/Engine.cc
                        
-    #rendersystem,core, essential
-    ${CMAKE_SOURCE_DIR}/sources/engine/rendersystem/CustShader.cc
-    ${CMAKE_SOURCE_DIR}/sources/engine/rendersystem/modelloader.cc
-    ${CMAKE_SOURCE_DIR}/sources/engine/rendersystem/rendersystem.cc
-    ${CMAKE_SOURCE_DIR}/sources/engine/rendersystem/ShaderFinal.cc
-    ${CMAKE_SOURCE_DIR}/sources/engine/rendersystem/textureSdlGl.cc
+    #rendersystem,core, essentiaE
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Shader.cc
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Model.cc
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/RenderSystem.cc
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Shader.cc
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Texture.cc
 
 
-    ${CMAKE_SOURCE_DIR}/sources/engine/assetsystem/assetsystem.cc
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/AssetSystem/AssetSystem.cc
                        
     #camera class
-    ${CMAKE_SOURCE_DIR}/sources/engine/camera/Camera.cc
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/Camera/Camera.cc
                        
     #utilities, like cosole output debugger, config loader, etc
-    ${CMAKE_SOURCE_DIR}/sources/engine/utils/dbgJellyfish.cc
-    ${CMAKE_SOURCE_DIR}/sources/engine/utils/config.cc
-    ${CMAKE_SOURCE_DIR}/sources/engine/utils/logger.cc
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/Utils/Debugger.cc
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/Utils/Config.cc
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/Utils/Logger.cc
 
 )
 
-set(EXAMPLES_DIR "${CMAKE_SOURCE_DIR}/sources/examples")
+set(EXAMPLES_DIR "${CMAKE_SOURCE_DIR}/Sources/Examples")
 
 include_directories(${INCLUDE_DIRECTORIES} ${ENGINE_HEADERS_DIRS})
 
@@ -144,9 +144,9 @@ function(add_example example_name)
 endfunction()
 
 
-add_example(sandbox)
+add_example(Sandbox)
 
-copy_resources(sandbox resources/defaulttexture.png)
+copy_resources(Sandbox resources/defaulttexture.png)
 
 
 

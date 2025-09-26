@@ -19,8 +19,8 @@
 
 
 #include <Shader.hh>
-#include <dbgJellyfish.hh>
-#include <texturesdlgl.hh>
+#include <Debugger.hh>
+#include <Texture.hh>
 
 using namespace std;
 namespace fs = std::filesystem;

@@ -1,5 +1,4 @@
-#ifndef SPCUST_HH
-#define SPCUST_HH
+#pragma once
 
 #include "OpenglShader.hh"
 #include <GL/glew.h>
@@ -29,5 +28,3 @@ private:
 
 
 
-
-#endif

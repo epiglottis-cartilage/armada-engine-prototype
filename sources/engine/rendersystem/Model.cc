@@ -1,7 +1,7 @@
 ﻿#include "Model.hh"
 
 
-#include <texturesdlgl.hh>
+#include <Texture.hh>
 
 
 
