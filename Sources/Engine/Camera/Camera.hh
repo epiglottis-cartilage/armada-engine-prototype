@@ -1,5 +1,6 @@
-#ifndef CAMERA_HH
-#define CAMERA_HH
+#pragma once
+
+#include <Common.hh>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -7,12 +8,16 @@
 #include <iostream>
 #include <Logger.hh>
 
+NAMESPACE_BEGIN
+
+
 #define PITCHUP_LIMIT 75.0f
 #define PITCHDOWN_LIMIT -75.0f
 
 class Camera{
 public:
     Camera(glm::vec3 position);
+    Camera(glm::vec3 position, float angle);
     ~Camera() = default;
     
     
@@ -24,27 +29,36 @@ public:
         float pitchoffset, float yawoffset, float rolloffset
     );
 
-    void syncCameraPositionData(float deltaTime, glm::vec3 direction);
 
-    //update camera according to the parameters, and return the view matrix
-    glm::mat4 updateCamera();   
-
-    //x is yaw , y is pitch, z is roll
-    void setCameraSensitivity(glm::vec3 sensitivity){
-        sensitivity = sensitivity;
-    }
-    void setCameraSpeed(float newCameraSpeed){
-        cameraSpeed = newCameraSpeed;
+    void setCameraPosition(glm::vec3 newPosition){
+        this->position = newPosition;
     }
 
-    glm::vec3 getCameraPosition(){
-        return position;
+    void setCameraLookat(glm::vec3 target){
+        cameraDirection = glm::normalize(target - position);
+
     }
+
+    void setCameraUp(glm::vec3 newUp){
+        cameraUp = newUp;
+    }
+
+    void setCameraViewMatrix(glm::mat4 newView){viewMatrix = newView;}
+    void setCameraFOV(float newFov);
+
+    glm::vec3 getCameraPosition(){return position;}
+    glm::vec3 getCameraLookat(){return cameraDirection;}
+    glm::vec3 getCameraUp(){return cameraUp;}
+    glm::mat4 getViewMatrix(){return viewMatrix;}
+    glm::mat4 getProjectionMatrix(){return projectionMatrix;}
 
 private:
     glm::vec3 position;
     glm::vec3 cameraDirection;
     glm::vec3 cameraUp;
+
+    glm::mat4 viewMatrix;
+    glm::mat4 projectionMatrix;
 
     float pitchNum, yawNum, rollNum;
     glm::vec3 sensitivity;
@@ -53,4 +67,4 @@ private:
     float deadZoneX, deadZoneY;
 };
 
-#endif
+NAMESPACE_END

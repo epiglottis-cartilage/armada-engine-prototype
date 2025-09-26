@@ -1,11 +1,16 @@
 #pragma once
-#include <string>
+
+#include <Common.hh>
+
 #include <fstream>
 #include <iostream>
 #include <optional>
 #include <GL/glew.h>
 #include <filesystem>
 #include <Logger.hh>
+
+
+NAMESPACE_BEGIN
 
 using namespace std;
 
@@ -40,3 +45,4 @@ private:
 
 
 
+NAMESPACE_END

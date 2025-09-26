@@ -4,13 +4,23 @@
 #include <Config.hh>
 #include <Camera.hh>
 #include <RenderSystem.hh>
+#include <StageManager.hh>
 #include <AssetSystem.hh>
 #include <Logger.hh>
+#include <functional>
+#include <glm/glm.hpp>
 
 
 //namespace: fleet::xxx
 
+
+
 NAMESPACE_BEGIN
+
+using namespace std;
+
+using EngineCallbackFunction = std::function <void(float)>;
+
 
 class AppContext {
 
@@ -49,9 +59,12 @@ public:
 
     void init();
 
+    Camera* engineCreateCamera(glm::vec3 position, float angle);
+
+    void setCurrentCamera(Camera* camera) { aCurrentCamera = camera; }
     
 
-    void run();
+    void run(EngineCallbackFunction gamelogic);
     void shutdown();
 
 
@@ -60,6 +73,7 @@ public:
     AssetSystem* getAssetSystem() { return aAssetSystem; }
     LoggerPtr getLogger() { return aLogger; }
     Camera* getCurrentCamera() { return aCurrentCamera; }
+    StateManager* getStateManager() { return aStateManager; }
 
 private:
 
@@ -68,6 +82,7 @@ private:
     AppContext* aAppContext;
     RenderSystem* aRenderSystem;
     AssetSystem* aAssetSystem;
+    StateManager* aStateManager;
     LoggerPtr aLogger;
     
 

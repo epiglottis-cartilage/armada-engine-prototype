@@ -4,6 +4,7 @@
 #include <Texture.hh>
 
 
+NAMESPACE_BEGIN
 
 
 
@@ -245,3 +246,5 @@ vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type)
     ENGINE_WARN("you called a abandoned function!!!!!\n");
     return {};
 }
+
+NAMESPACE_END

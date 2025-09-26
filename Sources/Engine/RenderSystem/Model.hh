@@ -1,5 +1,7 @@
-﻿#ifndef MODELLOADER_HH
-#define MODELLOADER_HH
+﻿#pragma once
+
+#include <Common.hh>
+
 
 #define DEFAULT_TEXTURE_NAME "defaulttexture.png"
 
@@ -23,7 +25,8 @@
 #include <Logger.hh>
 
 using namespace std;
-namespace fs = std::filesystem;
+
+NAMESPACE_BEGIN
 
 struct Vertex
 {
@@ -83,12 +86,15 @@ public:
     void setShown(bool shown) { this->shown = shown; }
     glm::mat4 getTransform() const { return transform; }
     void setTransform(glm::mat4 transform) { this->transform = transform; }
+    ShaderFinal* getShader() const { return shader; }
+    void setShader(ShaderFinal* shader) { this->shader = shader; }
     
 private:
-    glm::mat4 transform;
+    glm::mat4 transform = glm::mat4(1.0f);
     vector<Mesh> meshes;
     fs::path directory;
     bool shown = true;
+    ShaderFinal* shader;
 
     void loadModel(string path, bool flipUVy = false);
     void processNode(aiNode* node, const aiScene* scene);
@@ -110,4 +116,4 @@ private:
 
 };
 
-#endif
+NAMESPACE_END

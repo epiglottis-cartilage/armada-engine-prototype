@@ -1,5 +1,7 @@
 #include "Texture.hh"
 
+NAMESPACE_BEGIN
+
 TextureSdlGl::TextureSdlGl(string filepathTexture) {
         SDL_Surface *surface = IMG_Load(filepathTexture.c_str());
         if(surface == NULL){
@@ -66,3 +68,4 @@ TextureSdlGl::TextureSdlGl(string filepathTexture) {
 
 
 
+NAMESPACE_END

@@ -6,6 +6,7 @@
 #include <iostream>
 #include <vector>
 #include <optional>
+#include <memory>
 
 #define NAMESPACE_BEGIN namespace fleet {
 #define NAMESPACE_END }
@@ -17,6 +18,7 @@ typedef std::string string;
 
 
 using std::vector;
+using std::shared_ptr;
 
 namespace fs = std::filesystem;
 
