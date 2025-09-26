@@ -1,5 +1,6 @@
 #include "Shader.hh"
 
+NAMESPACE_BEGIN
 
 ShaderFinal::ShaderFinal(std::string sourceGeneralVertexPath, std::string sourceGeneralFragmentPath) {
     CustShader* tmpvertshader = new CustShader(GL_VERTEX_SHADER, sourceGeneralVertexPath);
@@ -25,3 +26,4 @@ ShaderFinal::ShaderFinal(std::filesystem::path sourceGeneralVertexPath, std::fil
     delete tmpvertshader;
     delete tmpfragshader;
 }
+NAMESPACE_END

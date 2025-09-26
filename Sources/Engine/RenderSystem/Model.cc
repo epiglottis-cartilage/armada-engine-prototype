@@ -4,6 +4,7 @@
 #include <Texture.hh>
 
 
+NAMESPACE_BEGIN
 
 
 
@@ -246,3 +247,5 @@ vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type)
     cout << "you called a abandoned function!!!!!" << endl;
     return {};
 }
+
+NAMESPACE_END

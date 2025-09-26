@@ -30,6 +30,8 @@ set(ENGINE_HEADERS_DIRS
     ${CMAKE_SOURCE_DIR}/Sources/Engine/AudioSystem
     ${CMAKE_SOURCE_DIR}/Sources/Engine/PhysicSystem
     ${CMAKE_SOURCE_DIR}/Sources/Engine/AssetSystem
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/ECSSystem
+
 )
 
 set(ENGINE_HEADERS_FILES
@@ -49,6 +51,10 @@ set(ENGINE_HEADERS_FILES
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Utils/Logger.hh
 
     ${CMAKE_SOURCE_DIR}/Sources/Engine/AssetSystem/AssetSystem.hh
+
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/ECSSystem/Entity.hh
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/ECSSystem/StageManager.hh
+
 )
 
 
@@ -74,6 +80,8 @@ set(ENGINE_SOURCES_FILES
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Utils/Config.cc
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Utils/Logger.cc
 
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/ECSSystem/Entity.cc
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/ECSSystem/StageManager.cc
 )
 
 set(EXAMPLES_DIR "${CMAKE_SOURCE_DIR}/Sources/Examples")
@@ -147,6 +155,7 @@ endfunction()
 add_example(Sandbox)
 
 copy_resources(Sandbox resources/defaulttexture.png)
+copy_resources(Sandbox engine.cfg)
 
 
 

@@ -1,5 +1,5 @@
-#ifndef TEXTURESDLGL_HH
-#define TEXTURESDLGL_HH
+#pragma once
+#include <Common.hh>
 #include <iostream>
 #include <string>
 #include <GL/glew.h>
@@ -9,6 +9,7 @@
 
 using namespace std;
 
+NAMESPACE_BEGIN
 class TextureSdlGl {
 
 public:
@@ -27,4 +28,4 @@ private:
 
 
 
-#endif // TEXTURESDLGL_HH
+NAMESPACE_END

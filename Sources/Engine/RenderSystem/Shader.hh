@@ -1,9 +1,12 @@
 #pragma once
 
+#include <Common.hh>
+
 #include "OpenglShader.hh"
 #include <GL/glew.h>
 #include <filesystem>
 
+NAMESPACE_BEGIN
 /*
 represent the compiled shader program inside memory. 
 pass a vertex location and a fragment location to assmbly a ShaderFinal
@@ -28,3 +31,4 @@ private:
 
 
 
+NAMESPACE_END

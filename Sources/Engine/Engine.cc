@@ -12,6 +12,10 @@ Engine::Engine(string gamename, string gameversion):
 {
 }
 
+Camera* Engine::engineCreateCamera(glm::vec3 position, float angle){
+    Camera* newCamera = new Camera{position, angle};
+    return newCamera;
+}
 
 /*
 engine::init read config file from the working directory, 
@@ -29,6 +33,10 @@ void Engine::init(){
     aAssetSystem = new AssetSystem{aConfig->cfgassetsystem};
     Logger::Init(aConfig->cfgappcontext);
     aLogger = Logger::Get();
+    aStateManager = new StateManager{};
+
+    //TODO: Add ECS and remove below line
+    aRenderSystem->updatestatmanager(aStateManager);
 
     aAppContext->aIsInited = true;
 //    delete this->aConfig;
@@ -36,21 +44,42 @@ void Engine::init(){
 
 
 
-void Engine::run(){
+/*
+this method make sure that game logic is running under 60Hz*/
+void Engine::run(EngineCallbackFunction gamelogic){
     auto engineContext = getAppContext();
     while(!engineContext->aShouldQuit){
         //game loop
 
+        const float dt = 1.0f / 60.0f;
+        Uint64 previoustime = SDL_GetTicks64();
+        Uint64 accumulator = 0.0f;
+        //update game logic, will try best to run in 60 Hz
+        while(accumulator < dt){
+
+            //update game physics, etc
+            //update game physics
+            //update game logic
+            gamelogic(dt);
+            accumulator -= dt;
+        }
+
+
         //calculate delta
 
         //process Input
-        //update game physics
-        //update game logic
         //render frame(game, ui)
+        this->aRenderSystem->prerender();
         this->aRenderSystem->renderframe();
+        this->aRenderSystem->postrender();
         
         //delta accmulate
+        Uint64 currenttime = SDL_GetTicks64();
+        accumulator += currenttime - previoustime;
+        previoustime = currenttime;
     }
+
+    //deal with some resources shutdown here
 
 }
 

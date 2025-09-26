@@ -1,5 +1,6 @@
 ﻿#include <OpenglShader.hh>
 
+NAMESPACE_BEGIN
 using namespace std;
 
 CustShader::CustShader(GLenum shadertype, string sourceGeneralVertexPath){
@@ -80,3 +81,4 @@ optional<GLuint> CustShader::shaderLink(CustShader vertexShader, CustShader frag
 
 
 
+NAMESPACE_END

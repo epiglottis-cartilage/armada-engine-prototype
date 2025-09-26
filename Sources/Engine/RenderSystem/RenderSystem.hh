@@ -19,6 +19,8 @@
 #include <GL/glew.h>
 #include <SDL2/SDL_opengl.h>
 
+//coupling to ECS currently......but same as Ogre!
+#include <StageManager.hh>
 
 NAMESPACE_BEGIN
 
@@ -42,8 +44,11 @@ public:
     void submit(const Model* model, const ShaderFinal* shader);
     /*submit a render request on model, using the transform in parameter*/
     void submit(const Model* model, const ShaderFinal* shader, const glm::mat4& transform);
-    void renderframe();
+    void updatestatmanager(StateManager* stateManager);
 
+    void prerender();
+    void renderframe();
+    void postrender();
 
 
 private:
@@ -60,10 +65,12 @@ private:
     bool vsync_on;
     int sdl_image_flags;
 
+    
     SDL_Window* window;
     //SDL_GLContext is already void* pointer.......although I hate such usage
     SDL_GLContext glContext;
 
+    StateManager* stateManager;
 
     vector<RenderCommand> cmdQueue;
 

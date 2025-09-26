@@ -1,4 +1,5 @@
 #include <Engine.hh>
+#include <glm/glm.hpp>
 #include <Main.hh>
 
 #define suppose_to_have_function_here
@@ -11,16 +12,16 @@ int main(int argc, char** argv){
     gameengine->init();
 
     fs::path modeldir = gameengine->getAssetSystem()->getModelDir();
-    Model* testingmodel = new Model{modeldir / "backpack.obj"};
+    fleet::Model* testingmodel = new fleet::Model{modeldir / "backpack.obj"};
 
     fs::path shaderdir = gameengine->getAssetSystem()->getShaderDir();
-    ShaderFinal* unishader = new ShaderFinal{shaderdir / "universeVertexShader.vert", shaderdir / "fragmentshader.frag"};
+    fleet::ShaderFinal* unishader = new fleet::ShaderFinal{shaderdir / "universeVertexShader.vert", shaderdir / "fragmentshader.frag"};
 
-    auto renderer = gameengine->getRenderSystem();
-    renderer->submit(testingmodel, unishader);
+    fleet::Camera* camera = gameengine->engineCreateCamera(glm::vec3(0.0f, 0.0f, 3.0f), 90.0f);
+    gameengine->setCurrentCamera(camera);
 
     
-    gameengine->run();
+    gameengine->run([](float) {});
     gameengine->shutdown();
 
     return 0;

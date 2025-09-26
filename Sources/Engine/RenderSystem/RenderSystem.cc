@@ -1,5 +1,6 @@
 #include <RenderSystem.hh>
 
+
 NAMESPACE_BEGIN
 
 RenderSystem::RenderSystem(cfgRenderSystem config)
@@ -34,6 +35,7 @@ void RenderSystem::parseconfig(cfgRenderSystem config){
 }
 
 void RenderSystem::init(){
+
 
 
 //    this->glContext = new SDL_GLContext ;
@@ -122,6 +124,9 @@ int RenderSystem::errorposition(const char* file, int line){
 
 }
 
+void RenderSystem::updatestatmanager(StateManager* stateManager){
+    this->stateManager = stateManager;
+}
 
 
 //Rendering Command System
@@ -147,6 +152,20 @@ void RenderSystem::executecommand(const RenderCommand& cmd){
 }
 
 
+void RenderSystem::prerender(){
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    auto rendertargets = this->stateManager->getEntities();
+    for(const auto& rendertarget: rendertargets){
+        auto model = rendertarget.second->getModel();
+        submit(model, model->getShader());
+    }
+}
+
+void RenderSystem::postrender(){
+    SDL_GL_SwapWindow(this->window);
+}
 
 //Processing rendering command
 void RenderSystem::renderframe(){
