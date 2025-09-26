@@ -3,8 +3,8 @@
 NAMESPACE_BEGIN
 
 
-//i comment this line on purpose just to test my assertion--below line is complete unnecessary
-//std::shared_ptr<spdlog::logger> Logger::logger;
+//why this line is needed???
+std::shared_ptr<spdlog::logger> Logger::logger;
 
 
 
