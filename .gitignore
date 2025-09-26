@@ -2,6 +2,10 @@
 build/
 tmp/
 vcpkg_installed/
+CMakeFiles/
+*.cmake
+CMakeCache.txt
+Makefile
 .vs/
 out/
 vcpkg-configuration.json
