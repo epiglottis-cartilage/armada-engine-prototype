@@ -43,7 +43,6 @@ set(ENGINE_HEADERS_FILES
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Texture.hh
 
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Camera/Camera.hh
-    ${CMAKE_SOURCE_DIR}/Sources/Engine/Utils/Debugger.hh
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Utils/Config.hh
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Utils/ConfigTypes.hh
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Utils/Logger.hh
@@ -69,8 +68,7 @@ set(ENGINE_SOURCES_FILES
     #camera class
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Camera/Camera.cc
                        
-    #utilities, like cosole output debugger, config loader, etc
-    ${CMAKE_SOURCE_DIR}/Sources/Engine/Utils/Debugger.cc
+    #utilities, like cosole output, config loader, etc
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Utils/Config.cc
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Utils/Logger.cc
 
