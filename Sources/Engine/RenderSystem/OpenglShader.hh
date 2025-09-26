@@ -1,5 +1,4 @@
-#ifndef CustShader_hh
-#define CustShader_hh
+#pragma once
 #include <string>
 #include <fstream>
 #include <iostream>
@@ -40,5 +39,3 @@ private:
 
 
 
-
-#endif

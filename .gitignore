@@ -6,5 +6,4 @@ vcpkg_installed/
 out/
 vcpkg-configuration.json
 CMakeSettings.json
-resources/
 dirtrees.txt
