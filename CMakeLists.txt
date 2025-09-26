@@ -57,7 +57,7 @@ set(ENGINE_SOURCES_FILES
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Engine.cc
                        
     #rendersystem,core, essentiaE
-    ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Shader.cc
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/OpenglShader.cc
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Model.cc
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/RenderSystem.cc
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Shader.cc
