@@ -21,8 +21,8 @@
 
 
 #include <Shader.hh>
-#include <Debugger.hh>
 #include <Texture.hh>
+#include <Logger.hh>
 
 using namespace std;
 
@@ -105,7 +105,7 @@ private:
     static Texture loadDefaultTexture() {
 
         Texture texture;
-        cout << "loading default texture" << endl;
+        ENGINE_DEBUG("loading default texture\n");
 
         texture.id = TextureSdlGl{ fs::path{fs::current_path() / DEFAULT_TEXTURE_NAME}.string() }.getTextureId();
         texture.type = "default";

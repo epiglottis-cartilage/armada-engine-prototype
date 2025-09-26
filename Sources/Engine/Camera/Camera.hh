@@ -6,6 +6,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <SDL2/SDL.h>
 #include <iostream>
+#include <Logger.hh>
 
 NAMESPACE_BEGIN
 

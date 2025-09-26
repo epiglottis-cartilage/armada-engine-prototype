@@ -9,34 +9,12 @@ CustShader::CustShader(GLenum shadertype, string sourceGeneralVertexPath){
     GLint success;
     
 
-	#ifdef DEBUG
-    cout << "shader path: " << endl;
-    cout << sourceGeneralVertexPath << endl;
-    namespace fs = std::filesystem;
-	// 检查文件是否存在并可访问
-	if (!fs::exists(sourceGeneralVertexPath)) {
-		std::cerr << "Error: shader file does not exist -> " 
-				  << sourceGeneralVertexPath << std::endl;
-		//throw std::runtime_error("Shader file not found");
-	}
-	if (!fs::is_regular_file(sourceGeneralVertexPath)) {
-		std::cerr << "Error: shader path is not a regular file -> "
-				  << sourceGeneralVertexPath << std::endl;
-		//throw std::runtime_error("Shader path invalid");
-	}
-
-	// 现在安全地打开文件
-	#endif
-
     ifstream file(sourceGeneralVertexPath);
 
-	#ifdef DEBUG
-		if (!file.is_open()) {
-			std::cerr << "Error: failed to open shader file -> " 
-					  << sourceGeneralVertexPath << std::endl;
-			//throw std::runtime_error("Shader file cannot be opened");
-		}
-	#endif
+    if (!file.is_open()) {
+        ENGINE_WARN("Error: failed to open shader file %s\n", sourceGeneralVertexPath);
+        //throw std::runtime_error("Shader file cannot be opened");
+    }
 
 
     string content((istreambuf_iterator<char>(file)), 
@@ -52,7 +30,7 @@ CustShader::CustShader(GLenum shadertype, string sourceGeneralVertexPath){
     glGetShaderiv(generalShader, GL_COMPILE_STATUS, &success);
     if (!success) {
         glGetShaderInfoLog(generalShader, 512, NULL, shaderInfoLog);
-        std::cerr << "Shader compilation failed:\n" << shaderInfoLog << std::endl;
+        ENGINE_ERROR("Shader compilation failed:\n%s\n", shaderInfoLog);
     }
 };
 optional<GLuint> CustShader::shaderLink(CustShader vertexShader, CustShader fragmentShader){
@@ -67,7 +45,7 @@ optional<GLuint> CustShader::shaderLink(CustShader vertexShader, CustShader frag
     if (!cust_errorcode) {
         GLchar infoLog[512];
         glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
-        std::cerr << "Shader program linking failed:\n" << infoLog << std::endl;
+        ENGINE_ERROR("Shader program linking failed:\n%s\n", infoLog);
         glDeleteProgram(shaderProgram);
         return {};
     }

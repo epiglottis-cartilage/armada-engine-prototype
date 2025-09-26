@@ -7,6 +7,7 @@
 #include <optional>
 #include <GL/glew.h>
 #include <filesystem>
+#include <Logger.hh>
 
 
 NAMESPACE_BEGIN
