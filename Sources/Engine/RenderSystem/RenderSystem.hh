@@ -50,6 +50,7 @@ public:
     int errorposition(const char* file, int line);
 
     void updatestatmanager(StateManager* stateManager);
+    ShaderManager* getShaderManager() const { return shaderManager; }
 
     /*Noticed: this method will update the aCurrentCamera's viewmatrix field*/
     void prerender(RenderContext* context);

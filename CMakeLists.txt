@@ -43,6 +43,7 @@ set(ENGINE_HEADERS_FILES
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/RenderSystem.hh
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Shader.hh
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Texture.hh
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/ShaderManager.hh
 
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Camera/Camera.hh
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Utils/Config.hh
@@ -67,6 +68,7 @@ set(ENGINE_SOURCES_FILES
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/RenderSystem.cc
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Shader.cc
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Texture.cc
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/ShaderManager.cc
 
 
     ${CMAKE_SOURCE_DIR}/Sources/Engine/AssetSystem/AssetSystem.cc

@@ -1,4 +1,5 @@
 #include <Engine.hh>
+#include <ShaderManager.hh>
 #include <glm/glm.hpp>
 #include <Main.hh>
 
@@ -18,9 +19,14 @@ int main(int argc, char** argv){
     fs::path modeldir = gameengine->getAssetSystem()->getModelDir();
     fs::path modelfile = modeldir / "backpack.obj";
 
-
+    fleet::Shader* generalshader = new fleet::Shader{
+        gameengine->getAssetSystem()->getShaderDir() / "universeVertexShader.vert",
+        gameengine->getAssetSystem()->getShaderDir() / "fragmentshader.frag"
+    };
+    gameengine->getRenderSystem()->getShaderManager()->bindUBO(fleet::UBOType::Camera, generalshader);
 
     fleet::Model* testingmodel = new fleet::Model{modelfile};
+    testingmodel->setShader(generalshader);
 
     EntityPtr testingmodelptr = std::make_shared<fleet::Entity>(testingmodel);
     gameengine->getStateManager()->addEntity(testingmodelptr);

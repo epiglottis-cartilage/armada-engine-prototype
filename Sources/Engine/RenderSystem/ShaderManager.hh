@@ -22,8 +22,8 @@ enum class UBOType{
 
 class ShaderManager{
 public:
-    ShaderManager() = default;
-    ~ShaderManager() = default;
+    ShaderManager() ;
+    ~ShaderManager();
 
     void bindUBO(UBOType type, Shader* shader);
     vector<GLuint> getUBOCamera() const { return uboCamera; }
