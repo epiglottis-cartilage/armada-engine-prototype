@@ -2,8 +2,12 @@
 layout (location = 0) in vec3 position;
 
 uniform mat4 matrixModel;
-uniform mat4 matrixView;
-uniform mat4 matrixProjection;
+
+layout (std140) uniform CameraMatrices
+{
+    mat4 matrixProjection;
+    mat4 matrixView;
+};
 
 void main()
 {

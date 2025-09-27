@@ -16,9 +16,15 @@ public:
     Entity(){
         id = nextId++;
     };
-    ~Entity();
+    ~Entity(){
+        model = nullptr;
+    }
 
     Entity(Model* m) : model(m) {
+        id = nextId++;
+    }
+
+    Entity(Model* m, const glm::mat4& mat) : model(m), transform(mat) {
         id = nextId++;
     }
 
@@ -56,7 +62,7 @@ private:
     Model* model;
 
     //todo: move the model matrix from Model class to here!
-    glm::mat4 transform;
+    glm::mat4 transform = glm::mat4(1.0f);
     
 
 };

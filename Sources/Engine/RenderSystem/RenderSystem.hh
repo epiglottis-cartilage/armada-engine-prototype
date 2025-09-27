@@ -5,11 +5,13 @@
 
 
 #include <Common.hh>
-#include <Model.hh>
 #include <ConfigTypes.hh>
 #include <Shader.hh>
 #include <Texture.hh>
 #include <Logger.hh>
+#include <Camera.hh>
+#include <Model.hh>
+#include <ShaderManager.hh>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -24,9 +26,16 @@
 
 NAMESPACE_BEGIN
 
+struct RenderContext {
+    Camera* aCurrentCamera;
+    float deltatime;
+
+
+};
+
 struct RenderCommand {
     const Model* model;
-    const ShaderFinal* shader;
+    const Shader* shader;
     glm::mat4 transform;
     
 };
@@ -40,22 +49,26 @@ public:
 
     int errorposition(const char* file, int line);
 
-    /*submit a render request on model, using model's transform*/
-    void submit(const Model* model, const ShaderFinal* shader);
-    /*submit a render request on model, using the transform in parameter*/
-    void submit(const Model* model, const ShaderFinal* shader, const glm::mat4& transform);
     void updatestatmanager(StateManager* stateManager);
 
-    void prerender();
-    void renderframe();
-    void postrender();
+    /*Noticed: this method will update the aCurrentCamera's viewmatrix field*/
+    void prerender(RenderContext* context);
+    void renderframe(RenderContext* context);
+    void postrender(RenderContext* context);
 
 
 private:
     void init();
     void parseconfig(cfgRenderSystem config);
 
+    /*submit a render request on model, using model's transform*/
+    void submit(const Model* model, const Shader* shader);
+    /*submit a render request on model, using the transform in parameter*/
+    void submit(const Model* model, const Shader* shader, const glm::mat4& transform);
     void executecommand(const RenderCommand& command);
+
+    void drawmesh(const Mesh& mesh, const Shader& shader, const glm::mat4& transform) const;
+    void drawmodel(const Model& model, const Shader& shader, const glm::mat4& transform) const;
 
     cfgRenderSystem config;
 
@@ -71,6 +84,7 @@ private:
     SDL_GLContext glContext;
 
     StateManager* stateManager;
+    ShaderManager* shaderManager;
 
     vector<RenderCommand> cmdQueue;
 

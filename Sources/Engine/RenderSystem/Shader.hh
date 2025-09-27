@@ -7,26 +7,34 @@
 #include <filesystem>
 
 NAMESPACE_BEGIN
+
+
+enum class ShaderType{
+    General = 0,
+    PBR = 1,
+};
+
+
 /*
 represent the compiled shader program inside memory. 
-pass a vertex location and a fragment location to assmbly a ShaderFinal
+pass a vertex location and a fragment location to assmbly a Shader
 original shader memory will be free if assmbly successful
 */
-class ShaderFinal {
+class Shader {
 
 
 public:
-    ShaderFinal(std::string sourceGeneralVertexPath, std::string sourceGeneralFragmentPath);
-    ShaderFinal(std::filesystem::path sourceGeneralVertexPath, std::filesystem::path sourceGeneralFragmentPath);
+    Shader(std::string sourceGeneralVertexPath, std::string sourceGeneralFragmentPath);
+    Shader(std::filesystem::path sourceGeneralVertexPath, std::filesystem::path sourceGeneralFragmentPath);
 
-    ~ShaderFinal(){
+    ~Shader(){
         glDeleteShader(generalShader);
     }   
     GLuint getGSP() const { return generalShader; }
 
 private:
     GLuint generalShader;
-
+    ShaderType shaderType = ShaderType::General;
 };
 
 

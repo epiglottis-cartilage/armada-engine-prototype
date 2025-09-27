@@ -34,6 +34,7 @@ void RenderSystem::parseconfig(cfgRenderSystem config){
     }
 }
 
+/*On run, a RenderSystem will implicitly create a ShaderManager on init()*/
 void RenderSystem::init(){
 
 
@@ -106,6 +107,8 @@ void RenderSystem::init(){
         cout << "SDL generate GL context or GL init Error: " << error << endl;
     }
     #endif
+
+    this->shaderManager = new ShaderManager{};
 }
 
 RenderSystem::~RenderSystem(){
@@ -129,16 +132,8 @@ void RenderSystem::updatestatmanager(StateManager* stateManager){
     this->stateManager = stateManager;
 }
 
-
 //Rendering Command System
-void RenderSystem::submit(const Model* model, const ShaderFinal* shader){
-    if(!model->getShown()){
-        return;
-    }
-    RenderCommand cmd{model, shader, model->getTransform()};
-    this->cmdQueue.push_back(cmd);
-}
-void RenderSystem::submit(const Model* model, const ShaderFinal* shader, const glm::mat4& transform){
+void RenderSystem::submit(const Model* model, const Shader* shader, const glm::mat4& transform){
     if(!model->getShown()){
         return;
     }
@@ -147,29 +142,45 @@ void RenderSystem::submit(const Model* model, const ShaderFinal* shader, const g
 }
 
 
-
 void RenderSystem::executecommand(const RenderCommand& cmd){
-    cmd.model->Draw(*cmd.shader);
+    this->drawmodel(*cmd.model, *cmd.shader, cmd.transform);
 }
 
 
-void RenderSystem::prerender(){
+void RenderSystem::prerender(RenderContext* context){
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    Camera* camera = context->aCurrentCamera;
+    camera->setCameraViewMatrix(
+        glm::lookAt(
+            camera->getCameraPosition(),
+            camera->getCameraPosition() + camera->getCameraLookat(),
+            camera->getCameraUp()
+        )
+    );
+
+    //gltransform the camera matrix
+    glBindBuffer(GL_UNIFORM_BUFFER, this->shaderManager->getUBOCamera()[0]);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(camera->getCameraLookat()));
+    glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(camera->getProjectionMatrix()));
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+
+    //gltransform the transform matrix
     auto rendertargets = this->stateManager->getEntities();
     for(const auto& rendertarget: rendertargets){
         auto model = rendertarget.second->getModel();
-        submit(model, model->getShader());
+        submit(model, model->getShader(), rendertarget.second->getTransform());
     }
 }
 
-void RenderSystem::postrender(){
+void RenderSystem::postrender(RenderContext* context){
     SDL_GL_SwapWindow(this->window);
 }
 
 //Processing rendering command
-void RenderSystem::renderframe(){
+void RenderSystem::renderframe(RenderContext* context){
     for(RenderCommand cmd: this->cmdQueue){
         //executing Render Command
         this->executecommand(cmd);
@@ -179,7 +190,46 @@ void RenderSystem::renderframe(){
 }
 
 
+/*This method implicitly active the shader in second params,
+transform the transform matrix in third parm to the active shader,
+and then run gl drawcalls*/
+void RenderSystem::drawmesh(const Mesh& mesh, const Shader& shader, const glm::mat4& transform) const{
+    glUseProgram(shader.getGSP());
 
+    string pbrnames[] = {
+        "textureBaseColor",
+        "textureRoughness",
+        "textureMetalic",
+        "textureNormal",
+        "textureAmbientOcclusion",
+    };
+
+    for (GLuint i = 0; i < mesh.textures.size(); i++) {
+        glActiveTexture(GL_TEXTURE0 + i);
+
+        glUniform1i(
+            glGetUniformLocation(shader.getGSP(), pbrnames[static_cast<int>(i)].c_str()),
+            i
+        );
+
+        glBindTexture(GL_TEXTURE_2D, mesh.textures[i].id);
+    }
+    glActiveTexture(GL_TEXTURE0);
+
+    //apply transform
+    glUniformMatrix4fv(glGetUniformLocation(shader.getGSP(), "matrixModel"), 1, GL_FALSE, glm::value_ptr(transform));
+
+    glBindVertexArray(mesh.getVAO());
+    glDrawElements(GL_TRIANGLES, mesh.indices.size(), GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+    glUseProgram(0);
+}
+
+void RenderSystem::drawmodel(const Model& model, const Shader& shader, const glm::mat4& transform) const{
+    for (int i = 0; i < model.getMeshes().size(); i++) {
+        this->drawmesh(model.getMeshes()[i], shader, transform);
+    }
+}
 
 NAMESPACE_END
 

@@ -9,6 +9,7 @@ NAMESPACE_BEGIN
 #define SHADERS_DIR "shaders"
 #define RESOURCES_DIR "resources"
 
+
 /*
 contains all assets directories 
 */
@@ -23,6 +24,11 @@ public:
     const fs::path& getShaderDir() const { return shaderDir; }
     const fs::path& getModelDir() const { return ModelDir; }
 
+     // Tester method: check if file or directory exists
+     static bool exists(const fs::path& path);
+
+     // Tester method: get absolute file path string
+     static string getAbsPathString(const fs::path& path);
 
 private:
     fs::path resourceRootDir;

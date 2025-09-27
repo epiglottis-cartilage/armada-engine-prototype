@@ -5,6 +5,7 @@
 #include <Camera.hh>
 #include <RenderSystem.hh>
 #include <StageManager.hh>
+#include <ShaderManager.hh>
 #include <AssetSystem.hh>
 #include <Logger.hh>
 #include <functional>
@@ -70,6 +71,7 @@ public:
 
     AppContext* getAppContext() { return aAppContext; }
     RenderSystem* getRenderSystem() { return aRenderSystem; }
+    RenderContext* getRenderContext() { return aRenderContext; }
     AssetSystem* getAssetSystem() { return aAssetSystem; }
     LoggerPtr getLogger() { return aLogger; }
     Camera* getCurrentCamera() { return aCurrentCamera; }
@@ -80,6 +82,7 @@ private:
     string aGamename;
     string aGameversion;
     AppContext* aAppContext;
+    RenderContext* aRenderContext;
     RenderSystem* aRenderSystem;
     AssetSystem* aAssetSystem;
     StateManager* aStateManager;

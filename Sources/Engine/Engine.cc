@@ -21,7 +21,10 @@ Camera* Engine::engineCreateCamera(glm::vec3 position, float angle){
 engine::init read config file from the working directory, 
 set debug config(also output log to working directory by default) and init all sub systems*/
 void Engine::init(){
-    std::filesystem::path exePath = std::filesystem::current_path() / CONFIG_FILE_NAME;
+    fs::path exePath = std::filesystem::current_path() / CONFIG_FILE_NAME;
+
+    ENGINE_VALIDLOCATION(exePath);
+
     this->aConfig = new Config{ exePath.string() };
 
     aAppContext = new AppContext{};
@@ -30,13 +33,17 @@ void Engine::init(){
 
     //init all systems, assign corresponding fields for later access
     aRenderSystem = new RenderSystem{aConfig->cfgrendersystem};
+    aRenderContext = new RenderContext{};
+
     aAssetSystem = new AssetSystem{aConfig->cfgassetsystem};
     Logger::Init(aConfig->cfgappcontext);
     aLogger = Logger::Get();
     aStateManager = new StateManager{};
 
+
     //TODO: Add ECS and remove below line
     aRenderSystem->updatestatmanager(aStateManager);
+
 
     aAppContext->aIsInited = true;
 //    delete this->aConfig;
@@ -68,10 +75,21 @@ void Engine::run(EngineCallbackFunction gamelogic){
         //calculate delta
 
         //process Input
+        this->aCurrentCamera->ProcessInputUpdateCamera(dt);
+
         //render frame(game, ui)
-        this->aRenderSystem->prerender();
-        this->aRenderSystem->renderframe();
-        this->aRenderSystem->postrender();
+        this->aRenderContext->aCurrentCamera = this->aCurrentCamera;
+        this->aRenderContext->deltatime = dt;
+
+        this->aRenderSystem->prerender(
+            aRenderContext
+        );
+        this->aRenderSystem->renderframe(
+            aRenderContext
+        );
+        this->aRenderSystem->postrender(
+            aRenderContext
+        );
         
         //delta accmulate
         Uint64 currenttime = SDL_GetTicks64();
@@ -84,6 +102,8 @@ void Engine::run(EngineCallbackFunction gamelogic){
 }
 
 void Engine::shutdown(){
+    delete this->aRenderSystem;
+
 }
 
 NAMESPACE_END

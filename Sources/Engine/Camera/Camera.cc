@@ -46,93 +46,114 @@ Camera::Camera(glm::vec3 position, float angle) :
 }
 
 
-void Camera::syncCameraAngleData(
-    float pitchoffset, float yawoffset, float rolloffset
-){
+void Camera::ProcessInputUpdateCamera(float dt){
+    SDL_Event e;
+    float hoffset = 0.0f, voffset = 0.0f;
 
-    if(enableDeadZone){
-        if(abs(pitchoffset) < deadZoneX)
-            pitchoffset = 0.0f;
-        if(abs(yawoffset) < deadZoneY)
-            yawoffset = 0.0f;
+    // Process SDL events for camera speed and mouse movement
+    while(SDL_PollEvent(&e)){
+        switch (e.type) {
+            case SDL_KEYDOWN:
+                switch (e.key.keysym.sym) {
+                    case SDLK_UP:
+                        cameraSpeed += 0.1f;
+                        break;
+                    case SDLK_DOWN:
+                        cameraSpeed -= 0.1f;
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            case SDL_MOUSEMOTION:
+                hoffset = e.motion.xrel;
+                voffset = -e.motion.yrel;
+                break;
+            default:
+                break;
+        }
     }
-    ENGINE_DEBUG("pitch: %.4f yaw: %.4f roll: %.4f\n", pitchoffset, yawoffset, rolloffset);
-    pitchNum += pitchoffset * sensitivity.y;
-    ENGINE_DEBUG("pitchNum: %.4f\n", pitchNum);
 
-    if(pitchNum > PITCHUP_LIMIT) pitchNum = PITCHUP_LIMIT;
-    if(pitchNum < PITCHDOWN_LIMIT) pitchNum = PITCHDOWN_LIMIT;
-    ENGINE_DEBUG("pitchNum After Convert: %.4f\n", pitchNum);
-    yawNum += yawoffset * sensitivity.x;
-    yawNum = fmod(yawNum, 360.0f);
-    rollNum += rolloffset * sensitivity.z;
+    // Keyboard state for camera movement
+    const Uint8* keystates = SDL_GetKeyboardState(NULL);
+    glm::vec3 moveDirection(0.0f);
+    if(keystates[SDL_SCANCODE_W]){ moveDirection += glm::vec3(0.0f, 0.0f, -1.0f); }
+    if(keystates[SDL_SCANCODE_S]){ moveDirection += glm::vec3(0.0f, 0.0f, 1.0f); }
+    if(keystates[SDL_SCANCODE_A]){ moveDirection += glm::vec3(-1.0f, 0.0f, 0.0f); }
+    if(keystates[SDL_SCANCODE_D]){ moveDirection += glm::vec3(1.0f, 0.0f, 0.0f); }
+    if(keystates[SDL_SCANCODE_SPACE]){ moveDirection += glm::vec3(0.0f, 1.0f, 0.0f); }
+    if(keystates[SDL_SCANCODE_LCTRL]){ moveDirection += glm::vec3(0.0f, -1.0f, 0.0f); }
 
+    // Move camera using its own method and fields
+    if (glm::length(moveDirection) > 0.0f) {
+        moveDirection = glm::normalize(moveDirection);
+        position += cameraSpeed * dt * moveDirection;
+        // Update camera direction if needed (e.g., WASD moves along direction)
+    }
 
-//    updateCamera();
+    // Update camera angles using mouse offsets
+    if (hoffset != 0.0f || voffset != 0.0f) {
+        // Apply sensitivity and deadzone
+        float pitchOffset = voffset * sensitivity.y;
+        float yawOffset = hoffset * sensitivity.x;
 
+        if (enableDeadZone) {
+            if (abs(pitchOffset) < deadZoneX) pitchOffset = 0.0f;
+            if (abs(yawOffset) < deadZoneY) yawOffset = 0.0f;
+        }
+
+        pitchNum += pitchOffset;
+        pitchNum = glm::clamp(pitchNum, PITCHDOWN_LIMIT, PITCHUP_LIMIT);
+        yawNum += yawOffset;
+        yawNum = fmod(yawNum, 360.0f);
+    }
+
+    // Calculate new direction from pitch and yaw
+    glm::vec3 front;
+    front.x = cos(glm::radians(yawNum)) * cos(glm::radians(pitchNum));
+    front.y = sin(glm::radians(pitchNum));
+    front.z = sin(glm::radians(yawNum)) * cos(glm::radians(pitchNum));
+    cameraDirection = glm::normalize(front);
+
+    // Update view matrix
+    viewMatrix = glm::lookAt(position, position + cameraDirection, cameraUp);
+    // Optionally update projection matrix if FOV changes
+    // projectionMatrix = ...
+    return;
 }
 
-//void Camera::syncCameraPositionData(
-//    float deltaTime, glm::vec3 direction
-//){
-////    position += direction * deltaTime * cameraSpeed;
-//    if(direction.x > 0)
-//        position += glm::cross(cameraDirection, cameraUp) * deltaTime * cameraSpeed;
-//    else if(direction.x < 0)
-//        position -= glm::cross(cameraDirection, cameraUp) * deltaTime * cameraSpeed;
-//    else if(direction.y > 0)
-//        position += cameraUp * deltaTime * cameraSpeed;
-//    else if(direction.y < 0)
-//        position -= cameraUp * deltaTime * cameraSpeed;
-//    else if(direction.z > 0)
-//        position -= cameraDirection * deltaTime * cameraSpeed;
-//    else if(direction.z < 0)
-//        position += cameraDirection * deltaTime * cameraSpeed;
-//
-////    position += cameraDirection * deltaTime * cameraSpeed;
-//    updateCamera();
-//}
 
-//update the Camera using the value saved in xxxNum. 
-//This function is often called after syncCameraPositionData or syncCameraAngleData, 
-//glm::mat4 Camera::updateCamera(){
+
+
+
+
+
+
+//void Camera::syncCameraAngleData(
+//    float pitchoffset, float yawoffset, float rolloffset
+//){
 //
-//    cameraDirection = glm::vec3(
-//        cos(glm::radians(pitchNum)) * sin(glm::radians(yawNum)), 
-//        sin(glm::radians(pitchNum)),
-//        -cos(glm::radians(pitchNum)) * cos(glm::radians(yawNum))
-//    );
-//    cameraDirection = glm::normalize(cameraDirection);
+//    if(enableDeadZone){
+//        if(abs(pitchoffset) < deadZoneX)
+//            pitchoffset = 0.0f;
+//        if(abs(yawoffset) < deadZoneY)
+//            yawoffset = 0.0f;
+//    }
+//    ENGINE_DEBUG("pitch: %.4f yaw: %.4f roll: %.4f\n", pitchoffset, yawoffset, rolloffset);
+//    pitchNum += pitchoffset * sensitivity.y;
+//    ENGINE_DEBUG("pitchNum: %.4f\n", pitchNum);
 //
-//    ENGINE_DEBUG("cameraDirection: %.4f %.4f %.4f\n", cameraDirection.x, cameraDirection.y, cameraDirection.z);
+//    if(pitchNum > PITCHUP_LIMIT) pitchNum = PITCHUP_LIMIT;
+//    if(pitchNum < PITCHDOWN_LIMIT) pitchNum = PITCHDOWN_LIMIT;
+//    ENGINE_DEBUG("pitchNum After Convert: %.4f\n", pitchNum);
+//    yawNum += yawoffset * sensitivity.x;
+//    yawNum = fmod(yawNum, 360.0f);
+//    rollNum += rolloffset * sensitivity.z;
 //
-//    cameraUp = glm::vec3(
-//        cos(glm::radians(pitchNum + 90)) * sin(glm::radians(yawNum )),
-//        sin(glm::radians(pitchNum + 90)),
-//        -cos(glm::radians(pitchNum + 90)) * cos(glm::radians(yawNum))
-//    );
 //
-//    ENGINE_DEBUG("cameraUp: %.4f %.4f %.4f\n", cameraUp.x, cameraUp.y, cameraUp.z);
-//
-//    glm::mat4 matrixView = glm::lookAt(position, position + cameraDirection, cameraUp);
-//    return matrixView;
-//
+//    updateCamera();
+
 //}
 
 
 NAMESPACE_END
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

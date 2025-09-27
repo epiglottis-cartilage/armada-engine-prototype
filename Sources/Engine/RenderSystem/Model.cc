@@ -40,49 +40,6 @@ void Mesh::setupMesh() {
 
 }
 
-/*
-Warning: this function will implicit call glUseProgram(shader) to use the para shader to draw the mesh
-After glDrawElements are called, glUseProgram(0) will be called by this function to clean the binding*/
-void Mesh::Draw(const ShaderFinal& shader, const glm::mat4& transform) const {
-    glUseProgram(shader.getGSP());
-
-    string pbrnames[] = {
-        "textureBaseColor",
-        "textureRoughness",
-        "textureMetalic",
-        "textureNormal",
-        "textureAmbientOcclusion",
-    };
-
-    for (GLuint i = 0; i < this->textures.size(); i++) {
-        glActiveTexture(GL_TEXTURE0 + i);
-
-        glUniform1i(
-            glGetUniformLocation(shader.getGSP(), pbrnames[static_cast<int>(i)].c_str()),
-            i
-        );
-
-        glBindTexture(GL_TEXTURE_2D, this->textures[i].id);
-    }
-    glActiveTexture(GL_TEXTURE0);
-
-    //apply transform
-    glUniformMatrix4fv(glGetUniformLocation(shader.getGSP(), "matrixModel"), 1, GL_FALSE, glm::value_ptr(transform));
-
-    glBindVertexArray(this->VAO);
-    glDrawElements(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
-    glUseProgram(0);
-}
-
-
-void Model::Draw(const ShaderFinal& shader) const {
-
-    for (int i = 0; i < this->meshes.size(); i++) {
-        this->meshes[i].Draw(shader, this->getTransform());
-    }
-
-}
 
 /*
 flipUVy is False by default, which means no flip happens.

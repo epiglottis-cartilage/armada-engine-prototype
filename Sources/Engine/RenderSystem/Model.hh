@@ -56,7 +56,9 @@ public:
         this->setupMesh();
     };
 
-    void Draw(const ShaderFinal& shader, const glm::mat4& transform) const;
+//    void Draw(const Shader& shader, const glm::mat4& transform) const;
+
+    GLuint getVAO() const { return this->VAO; }
 
 private:
 
@@ -76,25 +78,30 @@ public:
     }
     Model(fs::path path)
     {
+        ENGINE_VALIDLOCATION(path);
         this->loadModel(path.string());
     }
-    void Draw(const ShaderFinal& shader) const; 
+//    void Draw(const Shader& shader) const; 
     //vaos, render relative infos.
     vector<Mesh> getMeshes() const { return meshes; }
+
     fs::path getDirectory() const { return directory; }
+
     bool getShown() const { return shown; }
     void setShown(bool shown) { this->shown = shown; }
+
     glm::mat4 getTransform() const { return transform; }
     void setTransform(glm::mat4 transform) { this->transform = transform; }
-    ShaderFinal* getShader() const { return shader; }
-    void setShader(ShaderFinal* shader) { this->shader = shader; }
+
+    Shader* getShader() const { return shader; }
+    void setShader(Shader* shader) { this->shader = shader; }
     
 private:
     glm::mat4 transform = glm::mat4(1.0f);
     vector<Mesh> meshes;
     fs::path directory;
     bool shown = true;
-    ShaderFinal* shader;
+    Shader* shader;
 
     void loadModel(string path, bool flipUVy = false);
     void processNode(aiNode* node, const aiScene* scene);
