@@ -68,55 +68,56 @@ void Camera::syncCameraAngleData(
     rollNum += rolloffset * sensitivity.z;
 
 
-    updateCamera();
+//    updateCamera();
+
 }
 
-void Camera::syncCameraPositionData(
-    float deltaTime, glm::vec3 direction
-){
-//    position += direction * deltaTime * cameraSpeed;
-    if(direction.x > 0)
-        position += glm::cross(cameraDirection, cameraUp) * deltaTime * cameraSpeed;
-    else if(direction.x < 0)
-        position -= glm::cross(cameraDirection, cameraUp) * deltaTime * cameraSpeed;
-    else if(direction.y > 0)
-        position += cameraUp * deltaTime * cameraSpeed;
-    else if(direction.y < 0)
-        position -= cameraUp * deltaTime * cameraSpeed;
-    else if(direction.z > 0)
-        position -= cameraDirection * deltaTime * cameraSpeed;
-    else if(direction.z < 0)
-        position += cameraDirection * deltaTime * cameraSpeed;
-
-//    position += cameraDirection * deltaTime * cameraSpeed;
-    updateCamera();
-}
+//void Camera::syncCameraPositionData(
+//    float deltaTime, glm::vec3 direction
+//){
+////    position += direction * deltaTime * cameraSpeed;
+//    if(direction.x > 0)
+//        position += glm::cross(cameraDirection, cameraUp) * deltaTime * cameraSpeed;
+//    else if(direction.x < 0)
+//        position -= glm::cross(cameraDirection, cameraUp) * deltaTime * cameraSpeed;
+//    else if(direction.y > 0)
+//        position += cameraUp * deltaTime * cameraSpeed;
+//    else if(direction.y < 0)
+//        position -= cameraUp * deltaTime * cameraSpeed;
+//    else if(direction.z > 0)
+//        position -= cameraDirection * deltaTime * cameraSpeed;
+//    else if(direction.z < 0)
+//        position += cameraDirection * deltaTime * cameraSpeed;
+//
+////    position += cameraDirection * deltaTime * cameraSpeed;
+//    updateCamera();
+//}
 
 //update the Camera using the value saved in xxxNum. 
 //This function is often called after syncCameraPositionData or syncCameraAngleData, 
-glm::mat4 Camera::updateCamera(){
-
-    cameraDirection = glm::vec3(
-        cos(glm::radians(pitchNum)) * sin(glm::radians(yawNum)), 
-        sin(glm::radians(pitchNum)),
-        -cos(glm::radians(pitchNum)) * cos(glm::radians(yawNum))
-    );
-    cameraDirection = glm::normalize(cameraDirection);
-
-    ENGINE_DEBUG("cameraDirection: %.4f %.4f %.4f\n", cameraDirection.x, cameraDirection.y, cameraDirection.z);
-
-    cameraUp = glm::vec3(
-        cos(glm::radians(pitchNum + 90)) * sin(glm::radians(yawNum )),
-        sin(glm::radians(pitchNum + 90)),
-        -cos(glm::radians(pitchNum + 90)) * cos(glm::radians(yawNum))
-    );
-
-    ENGINE_DEBUG("cameraUp: %.4f %.4f %.4f\n", cameraUp.x, cameraUp.y, cameraUp.z);
-
-    glm::mat4 matrixView = glm::lookAt(position, position + cameraDirection, cameraUp);
-    return matrixView;
-
-}
+//glm::mat4 Camera::updateCamera(){
+//
+//    cameraDirection = glm::vec3(
+//        cos(glm::radians(pitchNum)) * sin(glm::radians(yawNum)), 
+//        sin(glm::radians(pitchNum)),
+//        -cos(glm::radians(pitchNum)) * cos(glm::radians(yawNum))
+//    );
+//    cameraDirection = glm::normalize(cameraDirection);
+//
+//    ENGINE_DEBUG("cameraDirection: %.4f %.4f %.4f\n", cameraDirection.x, cameraDirection.y, cameraDirection.z);
+//
+//    cameraUp = glm::vec3(
+//        cos(glm::radians(pitchNum + 90)) * sin(glm::radians(yawNum )),
+//        sin(glm::radians(pitchNum + 90)),
+//        -cos(glm::radians(pitchNum + 90)) * cos(glm::radians(yawNum))
+//    );
+//
+//    ENGINE_DEBUG("cameraUp: %.4f %.4f %.4f\n", cameraUp.x, cameraUp.y, cameraUp.z);
+//
+//    glm::mat4 matrixView = glm::lookAt(position, position + cameraDirection, cameraUp);
+//    return matrixView;
+//
+//}
 
 
 NAMESPACE_END
