@@ -60,6 +60,7 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y \
+          ccache \
           libsdl2-dev \
           libsdl2-image-dev \
           libglew-dev \
