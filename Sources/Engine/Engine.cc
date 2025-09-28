@@ -27,25 +27,41 @@ void Engine::init(){
 
     this->aConfig = new Config{ exePath.string() };
 
+    ENGINE_INFO("Config Loaded, now printing some fields:\n{}", aConfig->cfgassetsystem.assetpath);
+
     aAppContext = new AppContext{};
     aAppContext->aIsInited = true;
     aAppContext->aShouldQuit = false;
+
+    ENGINE_INFO("AppContext create success\n");
+
+    Logger::Init(aConfig->cfgappcontext);
+    aLogger = Logger::Get();
+
+    ENGINE_INFO("Logger create success\n");
 
     //init all systems, assign corresponding fields for later access
     aRenderSystem = new RenderSystem{aConfig->cfgrendersystem};
     aRenderContext = new RenderContext{};
 
+    ENGINE_INFO("RenderSystem create success\n");
+
     aAssetSystem = new AssetSystem{aConfig->cfgassetsystem};
-    Logger::Init(aConfig->cfgappcontext);
-    aLogger = Logger::Get();
+
+    ENGINE_INFO("AssetSystem create success\n");
+
+
     aStateManager = new StateManager{};
 
+    ENGINE_INFO(" StateManager create success\n");
 
     //TODO: Add ECS and remove below line
     aRenderSystem->updatestatmanager(aStateManager);
 
 
     aAppContext->aIsInited = true;
+
+    ENGINE_INFO("Engine init success\n");
 //    delete this->aConfig;
 }
 

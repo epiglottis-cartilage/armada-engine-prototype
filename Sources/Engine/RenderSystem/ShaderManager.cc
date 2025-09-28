@@ -4,11 +4,11 @@
 NAMESPACE_BEGIN
 
 ShaderManager::ShaderManager(){
-    this->uboCamera = vector<GLuint>{};
-    uboCamera.push_back(0);
+    this->uboBindings = vector<GLuint>{};
+    uboBindings.push_back(0);
     // Create the UBOs
-    glGenBuffers(1, &uboCamera[0]);
-    glBindBuffer(GL_UNIFORM_BUFFER, uboCamera[0]);
+    glGenBuffers(1, &uboBindings[0]);
+    glBindBuffer(GL_UNIFORM_BUFFER, uboBindings[0]);
     glBufferData(GL_UNIFORM_BUFFER, 2* sizeof(glm::mat4), nullptr, GL_STATIC_DRAW);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 

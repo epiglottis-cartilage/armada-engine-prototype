@@ -3,7 +3,7 @@
 NAMESPACE_BEGIN
 
 
-//why this line is needed???
+//init the static ptr
 std::shared_ptr<spdlog::logger> Logger::logger;
 
 

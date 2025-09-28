@@ -19,9 +19,19 @@ class Config {
 public:
     /*
      */
-    Config(string path){
+    Config(string path)
+    {
+        cfgrendersystem = cfgRenderSystem();
+        cfgassetsystem = cfgAssetSystem();
+        cfgappcontext = cfgAppContext();
+        cfgaudiosystem = cfgAudioSystem();
+        cfginputsystem = cfgInputSystem();
+        cfgphysicsystem = cfgPhysicsSystem();
+
         loadConfig(path);
         configPath = path;
+
+        parseConfig();
     }
 
     cfgRenderSystem cfgrendersystem;

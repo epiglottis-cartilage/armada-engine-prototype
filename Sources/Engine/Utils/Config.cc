@@ -24,7 +24,7 @@ void Config::parseConfig(){
 
 
 
-        cfgrendersystem.sdlimg_format = rendersystem["sdlimg_format"].as<std::string>(cfgrendersystem.sdlimg_format);
+        cfgrendersystem.sdlimg_format = rendersystem["sdl_img_format"].as<std::string>(cfgrendersystem.sdlimg_format);
     }
 
     YAML::Node assetsystem = rootNode["assetsystem"];

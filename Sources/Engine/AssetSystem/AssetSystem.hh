@@ -31,11 +31,13 @@ public:
      static string getAbsPathString(const fs::path& path);
 
 private:
-    fs::path resourceRootDir;
-    fs::path shaderDir;
+    fs::path resourceRootDir;//should be /resources
+    fs::path shaderDir;//should be /resources/shaders
     /*this is the parent dir of all models. every models file are suppose to be put inside a directory with same name as model file.
-    For example: backpack.obj should locate in ${ModelDir}/backpack/backpack.obj*/
-    fs::path ModelDir;
+    For example: backpack.obj should locate in ${ModelDir}/backpack/backpack.obj
+    should be /resources/models
+    */
+    fs::path ModelDir; 
     /*Currently all textures should be located at the same directory where the model files use them*/
     fs::path TextureDir;
     

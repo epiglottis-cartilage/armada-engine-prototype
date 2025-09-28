@@ -5,7 +5,6 @@
 #include <Camera.hh>
 #include <RenderSystem.hh>
 #include <StageManager.hh>
-#include <ShaderManager.hh>
 #include <AssetSystem.hh>
 #include <Logger.hh>
 #include <functional>

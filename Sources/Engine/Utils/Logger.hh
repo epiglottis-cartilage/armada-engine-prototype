@@ -22,7 +22,8 @@ NAMESPACE_BEGIN
 #define ENGINE_WARN(...) spdlog::warn(__VA_ARGS__)
 #define ENGINE_ERROR(...) spdlog::error(__VA_ARGS__)
 
-#define ENGINE_VALIDLOCATION(file_or_location) ENGINE_INFO("Loading Asset: {}\nAbsolute Path: {}\nAccessible: {}", file_or_location.string(), fs::absolute(file_or_location).string(), fs::exists(file_or_location))
+#define ENGINE_VALIDLOCATION(file_or_location) 
+//ENGINE_INFO("Loading Asset: {}\nAbsolute Path: {}\nAccessible: {}", file_or_location.string(), fs::absolute(file_or_location).string(), fs::exists(file_or_location))
 
 using LoggerPtr = std::shared_ptr<spdlog::logger>;
 /*
