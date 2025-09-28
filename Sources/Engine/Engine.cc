@@ -63,6 +63,7 @@ void Engine::init(){
 
     ENGINE_INFO("Engine init success\n");
 //    delete this->aConfig;
+    ENGINE_INFO("parse some config: {}", aConfig->cfgassetsystem.assetpath);
 }
 
 
@@ -71,8 +72,13 @@ void Engine::init(){
 this method make sure that game logic is running under 60Hz*/
 void Engine::run(EngineCallbackFunction gamelogic){
     auto engineContext = getAppContext();
+    ENGINE_INFO("Engine run start\n");
+    ENGINE_INFO("app context content: {} {}", engineContext->aShouldQuit, engineContext->aIsInited);
+    ENGINE_INFO("Engine run start\n");
     while(!engineContext->aShouldQuit){
         //game loop
+
+        ENGINE_INFO("one Engine loop start\n");
 
         const float dt = 1.0f / 60.0f;
         Uint64 previoustime = SDL_GetTicks64();
@@ -90,13 +96,18 @@ void Engine::run(EngineCallbackFunction gamelogic){
 
         //calculate delta
 
+        ENGINE_INFO("updating camera");
         //process Input
-        this->aCurrentCamera->ProcessInputUpdateCamera(dt);
+        if(this->aCurrentCamera != nullptr){
+            aCurrentCamera->ProcessInputUpdateCamera(dt);
 
         //render frame(game, ui)
         this->aRenderContext->aCurrentCamera = this->aCurrentCamera;
+
+        }
         this->aRenderContext->deltatime = dt;
 
+        ENGINE_INFO("rendering");
         this->aRenderSystem->prerender(
             aRenderContext
         );
@@ -111,6 +122,7 @@ void Engine::run(EngineCallbackFunction gamelogic){
         Uint64 currenttime = SDL_GetTicks64();
         accumulator += currenttime - previoustime;
         previoustime = currenttime;
+        ENGINE_INFO("one Engine loop end\n");
     }
 
     //deal with some resources shutdown here

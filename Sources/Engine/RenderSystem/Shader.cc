@@ -14,7 +14,9 @@ Shader::Shader(std::string sourceGeneralVertexPath, std::string sourceGeneralFra
     delete tmpfragshader;
 }
 
-Shader::Shader(std::filesystem::path sourceGeneralVertexPath, std::filesystem::path sourceGeneralFragmentPath) {
+Shader::Shader(fs::path sourceGeneralVertexPath, fs::path sourceGeneralFragmentPath) {
+    ENGINE_INFO("Loading shader from path: {} \n valid: {}", sourceGeneralVertexPath.string(), fs::exists(sourceGeneralVertexPath));
+    ENGINE_INFO("Loading shader from path: {} \n valid: {}", sourceGeneralFragmentPath.string(), fs::exists(sourceGeneralFragmentPath));
 
     CustShader* tmpvertshader = new CustShader(GL_VERTEX_SHADER, sourceGeneralVertexPath.string());
     CustShader* tmpfragshader = new CustShader(GL_FRAGMENT_SHADER, sourceGeneralFragmentPath.string());

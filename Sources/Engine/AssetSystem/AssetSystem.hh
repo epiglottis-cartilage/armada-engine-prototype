@@ -2,6 +2,7 @@
 
 #include <Common.hh>
 #include <ConfigTypes.hh>
+#include <Logger.hh>
 
 NAMESPACE_BEGIN
 
