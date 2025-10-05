@@ -7,6 +7,9 @@
 #include <SDL2/SDL.h>
 #include <iostream>
 #include <Logger.hh>
+#include <functional>
+
+//delete this once event listener is done
 
 NAMESPACE_BEGIN
 
@@ -56,6 +59,9 @@ public:
     glm::vec3 getCameraUp(){return cameraUp;}
     glm::mat4 getViewMatrix(){return viewMatrix;}
     glm::mat4 getProjectionMatrix(){return projectionMatrix;}
+
+    //delete this once event listener is done
+    std::function<void ()> onExitCalled;
 
 private:
     glm::vec3 position;

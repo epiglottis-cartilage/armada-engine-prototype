@@ -73,6 +73,16 @@ public:
         spdlog::flush_on(spdlog::level::warn);   // warn 及以上立即 flush
     }
 
+    static void Shutdown() {
+    if (logger) {
+        ENGINE_INFO("Shutting down logger...");
+        logger->flush();
+        spdlog::drop_all();     // 清空注册的 logger
+        spdlog::shutdown();     // 停止后台线程并释放资源
+        logger.reset();
+    }
+}
+
     static std::shared_ptr<spdlog::logger>& Get() { return logger; }
 
 private:

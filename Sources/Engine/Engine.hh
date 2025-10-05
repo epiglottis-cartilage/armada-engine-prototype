@@ -92,7 +92,7 @@ private:
 
     
     Config* aConfig;
-    void parseConfig(fs::path configpath);
+//    void parseConfig(fs::path configpath);
 
 };
 

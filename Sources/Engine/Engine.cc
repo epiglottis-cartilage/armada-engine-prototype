@@ -14,6 +14,9 @@ Engine::Engine(string gamename, string gameversion):
 
 Camera* Engine::engineCreateCamera(glm::vec3 position, float angle){
     Camera* newCamera = new Camera{position, angle};
+    newCamera->onExitCalled = [this]() {
+        this->aAppContext->aShouldQuit = true;
+    };
     return newCamera;
 }
 
@@ -130,8 +133,14 @@ void Engine::run(EngineCallbackFunction gamelogic){
 }
 
 void Engine::shutdown(){
+    delete this->aConfig;
+    delete this->aAppContext;
+    delete this->aAssetSystem;
+    delete this->aStateManager;
+    delete this->aRenderContext;
     delete this->aRenderSystem;
-
+    ENGINE_INFO("Engine shutdown success\n");
+    Logger::Shutdown();
 }
 
 NAMESPACE_END

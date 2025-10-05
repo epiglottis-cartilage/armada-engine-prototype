@@ -31,5 +31,9 @@ string AssetSystem::getAbsPathString(const fs::path& path) {
     return fs::absolute(path).string();
 }
 
+AssetSystem::~AssetSystem() {
+//    ENGINE_INFO("AssetSystem destroyed");
+}
+
 NAMESPACE_END
 

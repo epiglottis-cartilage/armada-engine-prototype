@@ -19,6 +19,7 @@ Camera::Camera(glm::vec3 position) :
     enableDeadZone(true), 
     deadZoneX(2.0f), 
     deadZoneY(2.0f)
+//    engineAppContext(nullptr)
 {
     SDL_SetRelativeMouseMode(SDL_TRUE);
 }
@@ -41,6 +42,7 @@ Camera::Camera(glm::vec3 position, float angle) :
     enableDeadZone(true), 
     deadZoneX(2.0f), 
     deadZoneY(2.0f)
+//    engineAppContext(nullptr)
 {
     SDL_SetRelativeMouseMode(SDL_TRUE);
 }
@@ -69,6 +71,11 @@ void Camera::ProcessInputUpdateCamera(float dt){
             case SDL_MOUSEMOTION:
                 hoffset = e.motion.xrel;
                 voffset = -e.motion.yrel;
+                break;
+
+            case SDL_QUIT:
+//                this->engineAppContext->aShouldQuit = true;
+                this->onExitCalled();
                 break;
             default:
                 break;
