@@ -9,8 +9,8 @@ uniform mat4 matrixModel;
 
 layout (std140) uniform CameraMatrices
 {
-    mat4 matrixProjection;
     mat4 matrixView;
+    mat4 matrixProjection;
 };
 
 void main()

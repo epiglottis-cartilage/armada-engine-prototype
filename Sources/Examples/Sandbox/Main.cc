@@ -17,7 +17,7 @@ int main(int argc, char** argv){
     gameengine->init();
 
     fs::path modeldir = gameengine->getAssetSystem()->getModelDir();
-    fs::path modelfile = modeldir / "backpack.obj";
+    fs::path modelfile = modeldir / "backpack" / "backpack.obj";
 
     fleet::Shader* generalshader = new fleet::Shader{
         gameengine->getAssetSystem()->getShaderDir() / "universeVertexShader.vert",

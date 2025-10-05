@@ -74,6 +74,8 @@ class Model
 public:
     Model(string path)
     {
+        fs::path p = fs::path{path};
+        ENGINE_INFO("loading model: {}\nValid: {}", p.string(), fs::exists(p));
         this->loadModel(path);
     }
     Model(fs::path path)

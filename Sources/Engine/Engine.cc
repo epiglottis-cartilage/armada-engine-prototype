@@ -81,7 +81,7 @@ void Engine::run(EngineCallbackFunction gamelogic){
     while(!engineContext->aShouldQuit){
         //game loop
 
-        ENGINE_INFO("one Engine loop start\n");
+//        ENGINE_INFO("one Engine loop start\n");
 
         const float dt = 1.0f / 60.0f;
         Uint64 previoustime = SDL_GetTicks64();
@@ -99,8 +99,8 @@ void Engine::run(EngineCallbackFunction gamelogic){
 
         //calculate delta
 
-        ENGINE_INFO("updating camera");
-        //process Input
+//        ENGINE_INFO("updating camera");
+        //process Input, update camera current status
         if(this->aCurrentCamera != nullptr){
             aCurrentCamera->ProcessInputUpdateCamera(dt);
 
@@ -110,7 +110,8 @@ void Engine::run(EngineCallbackFunction gamelogic){
         }
         this->aRenderContext->deltatime = dt;
 
-        ENGINE_INFO("rendering");
+//        ENGINE_INFO("rendering");
+        //transmit camera data, etc
         this->aRenderSystem->prerender(
             aRenderContext
         );
@@ -125,7 +126,7 @@ void Engine::run(EngineCallbackFunction gamelogic){
         Uint64 currenttime = SDL_GetTicks64();
         accumulator += currenttime - previoustime;
         previoustime = currenttime;
-        ENGINE_INFO("one Engine loop end\n");
+//        ENGINE_INFO("one Engine loop end\n");
     }
 
     //deal with some resources shutdown here
