@@ -84,7 +84,7 @@ void Engine::run(EngineCallbackFunction gamelogic){
         Uint64 previoustime = SDL_GetTicks64();
         Uint64 accumulator = 0.0f;
         //update game logic, will try best to run in 60 Hz
-        while(accumulator < dt){
+        while(accumulator >= dt){
 
             //update game physics, etc
             //update game physics
