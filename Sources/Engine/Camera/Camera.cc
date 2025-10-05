@@ -52,6 +52,7 @@ void Camera::ProcessInputUpdateCamera(float dt){
 
     // Process SDL events for camera speed and mouse movement
     while(SDL_PollEvent(&e)){
+        ENGINE_INFO("Processing SDL event for camera\n");
         switch (e.type) {
             case SDL_KEYDOWN:
                 switch (e.key.keysym.sym) {
