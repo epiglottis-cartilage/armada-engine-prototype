@@ -22,6 +22,8 @@ Camera::Camera(glm::vec3 position) :
 //    engineAppContext(nullptr)
 {
     SDL_SetRelativeMouseMode(SDL_TRUE);
+    SDL_GetRelativeMouseState(NULL, NULL); // 清空残留数据
+
 }
 
 Camera::Camera(glm::vec3 position, float angle) :
@@ -45,6 +47,8 @@ Camera::Camera(glm::vec3 position, float angle) :
 //    engineAppContext(nullptr)
 {
     SDL_SetRelativeMouseMode(SDL_TRUE);
+    SDL_GetRelativeMouseState(NULL, NULL); // 清空残留数据
+
 }
 
 
@@ -56,6 +60,13 @@ void Camera::ProcessInputUpdateCamera(float dt){
     while(SDL_PollEvent(&e)){
 //        ENGINE_INFO("Processing SDL event for camera\n");
         switch (e.type) {
+
+            //in sdl, x is from left to right, y is from top to bottom
+            case SDL_MOUSEMOTION:
+                hoffset = e.motion.xrel;
+                voffset = -e.motion.yrel;
+                break;
+
             case SDL_KEYDOWN:
                 switch (e.key.keysym.sym) {
                     case SDLK_UP:
@@ -67,10 +78,6 @@ void Camera::ProcessInputUpdateCamera(float dt){
                     default:
                         break;
                 }
-                break;
-            case SDL_MOUSEMOTION:
-                hoffset = e.motion.xrel;
-                voffset = -e.motion.yrel;
                 break;
 
             case SDL_QUIT:
@@ -84,20 +91,20 @@ void Camera::ProcessInputUpdateCamera(float dt){
 
     // Keyboard state for camera movement
     const Uint8* keystates = SDL_GetKeyboardState(NULL);
-    glm::vec3 moveDirection(0.0f);
-    if(keystates[SDL_SCANCODE_W]){ moveDirection += glm::vec3(0.0f, 0.0f, -1.0f); }
-    if(keystates[SDL_SCANCODE_S]){ moveDirection += glm::vec3(0.0f, 0.0f, 1.0f); }
-    if(keystates[SDL_SCANCODE_A]){ moveDirection += glm::vec3(-1.0f, 0.0f, 0.0f); }
-    if(keystates[SDL_SCANCODE_D]){ moveDirection += glm::vec3(1.0f, 0.0f, 0.0f); }
-    if(keystates[SDL_SCANCODE_SPACE]){ moveDirection += glm::vec3(0.0f, 1.0f, 0.0f); }
-    if(keystates[SDL_SCANCODE_LCTRL]){ moveDirection += glm::vec3(0.0f, -1.0f, 0.0f); }
+    glm::vec3 forward = glm::normalize(cameraDirection);
+    glm::vec3 right = glm::normalize(glm::cross(forward, cameraUp));
+    glm::vec3 up = cameraUp;
 
-    // Move camera using its own method and fields
-    if (glm::length(moveDirection) > 0.0f) {
-        moveDirection = glm::normalize(moveDirection);
-        position += cameraSpeed * dt * moveDirection;
-        // Update camera direction if needed (e.g., WASD moves along direction)
-    }
+    glm::vec3 moveDirection(0.0f);
+    if(keystates[SDL_SCANCODE_W]) moveDirection += forward;
+    if(keystates[SDL_SCANCODE_S]) moveDirection -= forward;
+    if(keystates[SDL_SCANCODE_A]) moveDirection -= right;
+    if(keystates[SDL_SCANCODE_D]) moveDirection += right;
+    if(keystates[SDL_SCANCODE_SPACE]) moveDirection += up;
+    if(keystates[SDL_SCANCODE_LCTRL]) moveDirection -= up;
+
+    if (glm::length(moveDirection) > 0.0f)
+        position += glm::normalize(moveDirection) * cameraSpeed * dt;
 
     // Update camera angles using mouse offsets
     if (hoffset != 0.0f || voffset != 0.0f) {
@@ -106,8 +113,8 @@ void Camera::ProcessInputUpdateCamera(float dt){
         float yawOffset = hoffset * sensitivity.x;
 
         if (enableDeadZone) {
-            if (abs(pitchOffset) < deadZoneX) pitchOffset = 0.0f;
-            if (abs(yawOffset) < deadZoneY) yawOffset = 0.0f;
+            if (fabs(pitchOffset) < deadZoneY) pitchOffset = 0.0f;
+            if (fabs(yawOffset) < deadZoneX) yawOffset = 0.0f;
         }
 
         pitchNum += pitchOffset;
