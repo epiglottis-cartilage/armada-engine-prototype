@@ -17,6 +17,14 @@ NAMESPACE_BEGIN
 #define PITCHUP_LIMIT 75.0f
 #define PITCHDOWN_LIMIT -75.0f
 
+/*
+this class should be instanced using `Engine::engineCreateCamera()`. it will give you a default FPS camera.
+Currently camera instance need init since it rely on some OpenGL things.
+using Engine::initCamera(camera_to_init) will init the camera. It need to be called once
+the view matrix and projection matrix is updated per frame inside Camera::ProcessInputUpdateCamera(float dt) function.
+To set current camera, use Engine::setCurrentCamera(camera). You only need to call this once.
+The active camera is always the last one using above method.
+*/
 class Camera{
 public:
     Camera(glm::vec3 position);

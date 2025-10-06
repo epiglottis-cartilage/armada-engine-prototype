@@ -2,6 +2,7 @@
 
 
 #include <Texture.hh>
+#include <cstddef>
 
 
 NAMESPACE_BEGIN
@@ -59,13 +60,23 @@ void Model::loadModel(string path, bool flipUVy) {
 
     if(!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) 
     {
-        ENGINE_ERROR("ASSIMP::%s\n", importer.GetErrorString());
+        ENGINE_ERROR("ASSIMP::{}\n", importer.GetErrorString());
         return;
     }
     this->directory = fs::path{path}.parent_path();
 
     this->processNode(scene->mRootNode, scene);
 
+    //found and process potential gl errors
+    GLenum err = glGetError();
+    if(err == GL_NO_ERROR) {
+        ENGINE_INFO("Model loaded successfully: {}\n", this->directory.string());
+        return;
+    }
+    while(err != GL_NO_ERROR) {
+        ENGINE_ERROR("Model loading GL error: {}\n", err);
+        err = glGetError();
+    }
 }
 
 
@@ -104,11 +115,16 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
             mesh->mVertices[i].z,
         };
 
-        vertex.Normal = {
-            mesh->mNormals[i].x,
-            mesh->mNormals[i].y,
-            mesh->mNormals[i].z,
-        };
+        if (mesh->HasNormals()) {
+            ENGINE_INFO("mesh has normals\n");
+            vertex.Normal = {
+                mesh->mNormals[i].x,
+                mesh->mNormals[i].y,
+                mesh->mNormals[i].z,
+            };
+        } else {
+            vertex.Normal = glm::vec3(0.0f);
+        }
 
         //#######????######### what does this do
         if (mesh->mTextureCoords[0]) // Does the mesh contain texture coordinates?
@@ -144,12 +160,22 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
         Texture diffuseMap;
 
         optional<Texture> lookupresult = this->loadMaterialTextures(material, aiTextureType_BASE_COLOR, "Base");
-        if (!lookupresult)
-            lookupresult = this->loadMaterialTextures(material, aiTextureType_DIFFUSE, "Base");
-        if (!lookupresult)
+        if (!lookupresult) {
+            ENGINE_WARN("Base color map not found, trying diffuse map...\n");
+            lookupresult = this->loadMaterialTextures(material, aiTextureType_DIFFUSE, "Diffuse");
+        }
+        if (!lookupresult) {
+            ENGINE_WARN("diffuse color map not found, trying default map...\n");
             lookupresult = loadDefaultTexture();
+        }
 
-        diffuseMap = *lookupresult;
+        // at this point lookupresult should have a value (either from material or default)
+        if (lookupresult){
+            ENGINE_INFO("texture loaded: {}\n", string{lookupresult->path.C_Str()});
+            diffuseMap = *lookupresult;
+        }
+        else
+            ENGINE_ERROR("Failed to load any diffuse/default texture for model\n");
         textures.push_back(diffuseMap);
 
 //        vector<Texture> specularMaps = this->loadMaterialTextures(material,
@@ -178,12 +204,12 @@ optional<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType typ
         aiString str;
         mat->GetTexture(type, 0, &str);
 
-        ENGINE_DEBUG("Model class loading texture from file system %s\n", str.C_Str());
+        ENGINE_DEBUG("Model class loading texture from file system {}\n", string{str.C_Str()});
 
         int assimp_texture_type = static_cast<int>(type);
 
         if (str.length == 0) {
-            ENGINE_INFO("Performing lookup for %s %s on %s failed, returning default texture...\n",
+            ENGINE_INFO("Performing lookup for {} on model texture {}\n of assimp texture type {} failed, returning empty texture...\n",
                         typeName,
                         string{mat->GetName().C_Str()},
                         assimp_texture_type

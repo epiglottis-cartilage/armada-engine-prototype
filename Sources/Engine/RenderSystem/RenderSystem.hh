@@ -47,7 +47,12 @@ public:
     RenderSystem(cfgRenderSystem config);
     ~RenderSystem();
 
-    int errorposition(const char* file, int line);
+    /*if logger is on, this method report all OpenGL error to logger untill no error. 
+    Noticed that currently this method always return 0*/
+    int errorposition(
+        const char* file=__FILE__,
+         int line=__LINE__
+    );
 
     void updatestatmanager(StateManager* stateManager);
     ShaderManager* getShaderManager() const { return shaderManager; }
@@ -57,6 +62,9 @@ public:
     void renderframe(RenderContext* context);
     void postrender(RenderContext* context);
 
+    void initcamera(Camera* camera) {
+//        this->shaderManager->bindUBO(camera);
+    }
 
 private:
     void init();

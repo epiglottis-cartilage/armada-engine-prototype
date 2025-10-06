@@ -10,3 +10,4 @@ Makefile
 out/
 CMakeSettings.json
 dirtrees.txt
+docs/

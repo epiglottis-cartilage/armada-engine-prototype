@@ -117,7 +117,7 @@ private:
         ENGINE_DEBUG("loading default texture\n");
 
         texture.id = TextureSdlGl{ fs::path{fs::current_path() / DEFAULT_TEXTURE_NAME}.string() }.getTextureId();
-        texture.type = "default";
+        texture.type = "Default";
         texture.path = aiString{ DEFAULT_TEXTURE_NAME };
 
         return texture;

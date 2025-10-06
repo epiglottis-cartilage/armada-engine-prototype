@@ -25,8 +25,10 @@ public:
     ShaderManager() ;
     ~ShaderManager();
 
-    void bindUBO(UBOType type, Shader* shader);
-    vector<GLuint> getUBOCamera() const { return uboBindings; }
+
+
+    void bindUBO(Shader* shader, UBOType type=UBOType::Camera);
+    vector<GLuint> getUBOBinding() const { return uboBindings; }
 
 
 private:

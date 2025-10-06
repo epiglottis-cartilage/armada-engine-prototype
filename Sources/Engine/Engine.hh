@@ -61,7 +61,7 @@ public:
 
     Camera* engineCreateCamera(glm::vec3 position, float angle);
 
-    void setCurrentCamera(Camera* camera) { aCurrentCamera = camera; }
+    void setCurrentCamera(Camera* camera) { aCurrentCamera = camera;aRenderContext->aCurrentCamera = camera; }
     
 
     void run(EngineCallbackFunction gamelogic);

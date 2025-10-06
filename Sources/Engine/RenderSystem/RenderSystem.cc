@@ -119,13 +119,16 @@ RenderSystem::~RenderSystem(){
 
 int RenderSystem::errorposition(const char* file, int line){
 
-    GLenum errorcode;
-    while ((errorcode = glGetError()) != GL_NO_ERROR) 
-    {
-        ENGINE_ERROR("Error: %u at %s:%s\n", errorcode, file, line);
+    GLuint errorcode = glGetError();
+    if(errorcode == GL_NO_ERROR){
+        ENGINE_INFO("No GL error occur");
+        return 0;
     }
-    return static_cast<int>(errorcode);
-
+    while(errorcode != GL_NO_ERROR){
+        ENGINE_ERROR("GL error occur! Error code: {} at {}:{}", errorcode, file, line);
+        errorcode = glGetError();
+    }
+    return 0;
 }
 
 void RenderSystem::updatestatmanager(StateManager* stateManager){
@@ -152,16 +155,9 @@ void RenderSystem::prerender(RenderContext* context){
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     Camera* camera = context->aCurrentCamera;
-//    camera->setCameraViewMatrix(
-//        glm::lookAt(
-//            camera->getCameraPosition(),
-//            camera->getCameraPosition() + camera->getCameraLookat(),
-//            camera->getCameraUp()
-//        )
-//    );
 
     //gltransform the camera matrix
-    glBindBuffer(GL_UNIFORM_BUFFER, this->shaderManager->getUBOCamera()[0]);
+    glBindBuffer(GL_UNIFORM_BUFFER, this->shaderManager->getUBOBinding()[0]);
     glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(camera->getViewMatrix()));
     glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(camera->getProjectionMatrix()));
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
@@ -175,11 +171,6 @@ void RenderSystem::prerender(RenderContext* context){
     }
 }
 
-void RenderSystem::postrender(RenderContext* context){
-    SDL_GL_SwapWindow(this->window);
-}
-
-//Processing rendering command
 void RenderSystem::renderframe(RenderContext* context){
     for(RenderCommand cmd: this->cmdQueue){
         //executing Render Command
@@ -188,6 +179,12 @@ void RenderSystem::renderframe(RenderContext* context){
     //clear rendering command
     this->cmdQueue.clear();
 }
+
+void RenderSystem::postrender(RenderContext* context){
+    SDL_GL_SwapWindow(this->window);
+}
+
+//Processing rendering command
 
 
 /*This method implicitly active the shader in second params,
