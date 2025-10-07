@@ -56,6 +56,9 @@ public:
 
     void setCameraViewMatrix(glm::mat4 newView){viewMatrix = newView;}
     void setCameraFOV(float newFov);
+    void setCameraSensitivity(glm::vec3 newSensitivity){
+        this->sensitivity = newSensitivity;
+    }
 
     /*this is a temperal solution, because Listener based Event system Unfinished leads to Input manager un-implement, 
     I don't have better choice*/

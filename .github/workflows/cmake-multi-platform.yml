@@ -33,16 +33,37 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    # Windows: 用 vcpkg 安装依赖并缓存
+    - name: Cache vcpkg installed packages
+      if: matrix.os == 'windows-latest'
+      uses: actions/cache@v3
+      with:
+        path: ${{ runner.cache-dir }}/vcpkg/installed
+        key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          ${{ runner.os }}-vcpkg-
+
     - name: Setup vcpkg (Windows only)
       if: matrix.os == 'windows-latest'
       uses: lukka/run-vcpkg@v11
       with:
         vcpkgGitCommitId: '7d75835b57e79e8c183e022d1e7c13394c6d52c1'
+        vcpkgDirectory: ${{ runner.cache-dir }}/vcpkg
         runVcpkgInstall: true
-        vcpkgDirectory: ${{ runner.cache-dir }}/vcpkg  # 缓存到 runner 缓存目录
-        # 启用 vcpkg 缓存（lukka/run-vcpkg 自带缓存逻辑）
-        additionalCachedPaths: ${{ runner.cache-dir }}/vcpkg/installed
+        # Disable internal caching since we’re doing it ourselves
+        doNotCache: true
+
+
+#    # Windows: 用 vcpkg 安装依赖并缓存
+#    - name: Setup vcpkg (Windows only)
+#      if: matrix.os == 'windows-latest'
+#      uses: lukka/run-vcpkg@v11
+#      with:
+#        vcpkgGitCommitId: '7d75835b57e79e8c183e022d1e7c13394c6d52c1'
+#        runVcpkgInstall: true
+#        vcpkgDirectory: ${{ runner.cache-dir }}/vcpkg  # 缓存到 runner 缓存目录
+#        # 启用 vcpkg 缓存（lukka/run-vcpkg 自带缓存逻辑）
+#        additionalCachedPaths: ${{ runner.cache-dir }}/vcpkg/installed
+
 
     # Linux: 用 apt 安装依赖并缓存
     - name: Cache Linux dependencies
@@ -105,4 +126,4 @@ jobs:
       with:
         name: sandbox-${{ matrix.os }}
         path: |
-          ${{ steps.strings.outputs.build-output-dir }}/sandbox/${{ matrix.build_type }}/*
+          ${{ steps.strings.outputs.build-output-dir }}/Sandbox/${{ matrix.build_type }}/*

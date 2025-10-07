@@ -95,11 +95,26 @@ include_directories(${INCLUDE_DIRECTORIES} ${ENGINE_HEADERS_DIRS})
 # 通用函数：为某个 target 添加资源复制规则
 function(copy_resources target)
     foreach(resource IN LISTS ARGN)
-        add_custom_command(TARGET ${target} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                "${CMAKE_SOURCE_DIR}/${resource}"
-                $<TARGET_FILE_DIR:${target}>/
-        )
+        set(src "${CMAKE_SOURCE_DIR}/${resource}")
+        set(dst "$<TARGET_FILE_DIR:${target}>/")
+
+        if (IS_DIRECTORY "${src}")
+            # Copy directory recursively
+            add_custom_command(TARGET ${target} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_directory
+                    "${src}"
+                    "${dst}/${resource}"
+                COMMENT "Copying directory ${resource} -> ${dst}/${resource}"
+            )
+        else()
+            # Copy single file
+            add_custom_command(TARGET ${target} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    "${src}"
+                    "${dst}"
+                COMMENT "Copying file ${resource} -> ${dst}"
+            )
+        endif()
     endforeach()
 endfunction()
 ####################################### static libraries #######################################
@@ -156,22 +171,14 @@ add_example(Sandbox)
 
 copy_resources(Sandbox resources/defaulttexture.png)
 copy_resources(Sandbox engine.cfg)
+copy_resources(Sandbox resources)
 
 
 
 
 ########WINDOWS DEBUG ZONE###########
-#set(debug_sourcesfile "${CMAKE_SOURCE_DIR}/sources/examples/debug_sources/*.cc")
-
-add_example(debug_sources)
-target_link_libraries(debug_sources PRIVATE 
-    OpenGL::GL
-    GLEW::GLEW
-    SDL2::SDL2
-    SDL2::SDL2main
-    SDL2_image::SDL2_image
+set(debug_sourcesfile "${CMAKE_SOURCE_DIR}/Sources/Examples/debugtest/test.cc")
+add_executable(debugtest  ${debug_sourcesfile})
+target_link_libraries(debugtest PUBLIC 
     glm::glm    
-    assimp::assimp
-    yaml-cpp::yaml-cpp
-    spdlog::spdlog
 )
