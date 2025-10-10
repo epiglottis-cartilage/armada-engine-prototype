@@ -1,9 +1,9 @@
 # Armada Engine
 
-A modern cpp20 game engine focused on FPS/TPS game development.
+A Easy-to-use OOP rendering framework. Currently converting its architecture to fits a game engine.
 
 ## Overview & Introductions
-Armada Engine (fleet engine) is a personal project aimed at building a high-performance game engine tailored for first-person and third-person shooter titles. 
+Armada Engine (fleet engine) is my personal project aimed at building a high-performance game engine tailored for first-person and third-person shooter titles. 
 
 ### Current Features
 - **Modern C++ Foundation**: Built with C++20 and later standards
