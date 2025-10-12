@@ -29,11 +29,15 @@ void RenderSystem::parseconfig(cfgRenderSystem config){
     this->windowWidth = config.screenwidth;
     this->windowHeight = config.screenheight;
 
-    if(config.sdlimg_format == "png"){
-        this->sdl_image_flags = IMG_INIT_PNG;
-    }else if(config.sdlimg_format == "jpg"){
-        this->sdl_image_flags = IMG_INIT_JPG;
-    }
+//    if(config.sdlimg_format == "png"){
+//        this->sdl_image_flags = IMG_INIT_PNG;
+//    }
+//    if(config.sdlimg_format == "jpg"){
+//        this->sdl_image_flags = IMG_INIT_JPG;
+//    }
+    this->sdl_image_flags = IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF | IMG_INIT_WEBP | IMG_INIT_JXL | IMG_INIT_AVIF ;
+
+
 }
 
 /*On run, a RenderSystem will implicitly create a ShaderManager on init()*/
@@ -77,10 +81,10 @@ void RenderSystem::init(){
     auto img_init_result = IMG_Init(this->sdl_image_flags);
 
     if(img_init_result != this->sdl_image_flags){
-        ENGINE_DEBUG("%d\n",img_init_result);
+        ENGINE_DEBUG("{}\n",img_init_result);
         cout << img_init_result << endl;
         error = {IMG_GetError()};
-        ENGINE_ERROR("IMG_Init Error: %s\n", error);
+        ENGINE_ERROR("IMG_Init Error: {}\n", error);
     }
 
     this->glContext = SDL_GL_CreateContext(window);

@@ -15,41 +15,63 @@ int main(int argc, char** argv){
     gameengine->init();
 
 
+    
+
+    fleet::Shader* phongShader = gameengine->getRenderSystem()->getShaderManager()->getOrCreate("Phong");
+
+    
+
+
     //always get dir using asset system
     fs::path modeldir = gameengine->getAssetSystem()->getModelDir();
     fs::path modelfile = modeldir / "fense" / "fense.obj";
 
-
-    fleet::Shader* phongShader = gameengine->getRenderSystem()->getShaderManager()->getOrCreate("Phong");
-
-
     //use path if possible to accesss new features
-    fleet::Model* testingmodel = new fleet::Model{modelfile};
+    fleet::Model* woodfense = new fleet::Model{modelfile};
     //bind shader to model
-    auto generalshader = phongShader;
-    testingmodel->setShader(generalshader);
+    woodfense->setShader(phongShader);
 
-    fleet::Model* testingmodel2 = new fleet::Model(modeldir / "fense2" / "fense.obj");
-    testingmodel2->setShader(generalshader);
+    fleet::Model* ironfense = new fleet::Model(modeldir / "fense2" / "fense.obj");
+    ironfense->setShader(phongShader);
 
-//    fleet::Model* testingmodel3 = new fleet::Model(modeldir / "Rock_Terrain3_SF" / "Rock_Terrain3_SF.obj");
-//    testingmodel3->setShader(generalshader);
+    fleet::Model* terrain = new fleet::Model(modeldir / "Rock_Terrain3_SF" / "Rock_Terrain3_SF.obj");
+    terrain->setShader(phongShader);
 
+    fleet::Model* heli = new fleet::Model(modeldir / "mi35m" / "MI-35M.obj");
+    heli->setShader(phongShader);
+
+    
 
     //add model to stage manager to display
-    EntityPtr testingmodelptr = std::make_shared<fleet::Entity>(testingmodel);
-    gameengine->getStateManager()->addEntity(testingmodelptr);
+    EntityPtr woodfenseptr = std::make_shared<fleet::Entity>(woodfense);
+    gameengine->getStateManager()->addEntity(woodfenseptr);
     auto model1transform = glm::translate(glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f)), glm::vec3(0.0f, 0.0f, -5.0f));
-    testingmodelptr->setTransform(model1transform);
+    woodfenseptr->setTransform(model1transform);
 
-    EntityPtr testingmodelptr2 = std::make_shared<fleet::Entity>(testingmodel2);
-    gameengine->getStateManager()->addEntity(testingmodelptr2);
+    EntityPtr ironfenseptr = std::make_shared<fleet::Entity>(ironfense);
+    gameengine->getStateManager()->addEntity(ironfenseptr);
     auto model2transform = glm::translate(glm::mat4(1.0f), glm::vec3(2.0f, 0.0f, -5.0f));
-    testingmodelptr2->setTransform(model2transform);
+    ironfenseptr->setTransform(model2transform);
 
-//    EntityPtr testingmodelptr3 = std::make_shared<fleet::Entity>(testingmodel3);
-//    gameengine->getStateManager()->addEntity(testingmodelptr3);
+    EntityPtr terrainptr = std::make_shared<fleet::Entity>(terrain);
+    gameengine->getStateManager()->addEntity(terrainptr);
  
+
+    EntityPtr heliptr = std::make_shared<fleet::Entity>(heli);
+    gameengine->getStateManager()->addEntity(heliptr);
+    auto helitransform = glm::translate(
+        glm::rotate(
+            glm::rotate(
+                glm::mat4(1.0f), glm::radians(20.0f), glm::vec3(1.0f, 0.0f, 0.0f)
+            ),
+            glm::radians(45.0f), 
+            glm::vec3(0.0f, 1.0f, 0.0f)
+        )
+        , 
+        glm::vec3(2.0f, 5.0f, -10.0f)
+    );
+    heliptr->setTransform(helitransform);
+    
 
     fleet::Camera* camera = gameengine->engineCreateCamera(glm::vec3(0.0f, 0.0f, 3.0f), 70.0f);
     //bind active camera to viewport
@@ -57,6 +79,7 @@ int main(int argc, char** argv){
     camera->setCameraSensitivity(glm::vec3(1.0f));
 
     
+
 
     //now enter actual game main loop.
     gameengine->run([](float) {});
