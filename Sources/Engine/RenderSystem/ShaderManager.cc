@@ -3,6 +3,8 @@
 
 NAMESPACE_BEGIN
 
+
+
 /*
 TODO: create a camera init method, 
 move these steps to dedicate camera init, 
@@ -29,39 +31,15 @@ ShaderManager::ShaderManager(){
         ENGINE_ERROR("GL error occur! Error code: {}", err);
         err = glGetError();
     }
+
+    
+    //should I use such init????????
+    ShaderFactory::instance().registerType("Phong", [](const fs::path& shaderdir) { return std::make_unique<PhongShader>(shaderdir); });
+    //examples::
+//    ShaderFactory::instance().registerType("PBR", [] { return std::make_unique<PBRShader>(); });
+//    ShaderFactory::instance().registerType("Skybox", [] { return std::make_unique<SkyboxShader>(); });
+
 }
-
-void ShaderManager::bindUBO( Shader* shader, UBOType type){
-    GLuint uniformBlockIndex = glGetUniformBlockIndex(shader->getGSP(), UBOCAMERA);
-    if(uniformBlockIndex == GL_INVALID_INDEX){
-        ENGINE_ERROR("Cannot find uniform block %s in shader\n", UBOCAMERA);
-        return;
-    }
-
-
-    if(type == UBOType::Camera){
-        glUniformBlockBinding(shader->getGSP(), uniformBlockIndex, static_cast<GLuint>(UBOType::Camera));
-
-        ENGINE_INFO("Shader Manager now binding UBO Camera block to shader\n");
-        GLuint err = glGetError();
-        if (err == GL_NO_ERROR)
-            ENGINE_INFO("No GL error occur");
-        while(err != GL_NO_ERROR){
-            ENGINE_ERROR("GL error occur! Error code: {}", err);
-            err = glGetError();
-        }
-    }else{
-        ENGINE_ERROR("Cannot find ubo name %s\n", UBOCAMERA);
-    }
-    //up to now shader block is bind to binding point, 
-    //but binding point still not connect to ubo in-mem block yet!
-    return;
-}
-
-
-
-
-
 
 
 NAMESPACE_END

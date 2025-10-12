@@ -23,8 +23,11 @@
 
 //coupling to ECS currently......but same as Ogre!
 #include <StageManager.hh>
+#include <AssetSystem.hh>
 
 NAMESPACE_BEGIN
+
+#define SHADERDIR "shaders"
 
 struct RenderContext {
     Camera* aCurrentCamera;
@@ -44,7 +47,7 @@ class FLEET_API RenderSystem {
 
 
 public:
-    RenderSystem(cfgRenderSystem config);
+    RenderSystem(cfgRenderSystem config, AssetSystem* assetManager);
     ~RenderSystem();
 
     /*if logger is on, this method report all OpenGL error to logger untill no error. 
@@ -80,6 +83,7 @@ private:
     void drawmodel(const Model& model, const Shader& shader, const glm::mat4& transform) const;
 
     cfgRenderSystem config;
+    AssetSystem* assetManagerPtr;
 
     int windowWidth;
     int windowHeight;
@@ -101,9 +105,6 @@ private:
     glm::mat4 projection;
     glm::mat4 view;
     glm::mat4 modelMatrix;
-    
-
-
 };
 
 

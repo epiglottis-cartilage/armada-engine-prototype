@@ -20,26 +20,35 @@ int main(int argc, char** argv){
     fs::path modelfile = modeldir / "fense" / "fense.obj";
 
 
-    fs::path shaderdir = gameengine->getAssetSystem()->getShaderDir();
-    fleet::Shader* generalshader = new fleet::Shader{
-        shaderdir / "universeVertexShader.vert",
-        shaderdir / "fragmentshader.frag"
-    };
-    //Shader instance create api will be re-write in next big release, this is a temporary usage.
-    gameengine->getRenderSystem()->getShaderManager()->bindUBO(generalshader);
-
+    fleet::Shader* phongShader = gameengine->getRenderSystem()->getShaderManager()->getOrCreate("Phong");
 
 
     //use path if possible to accesss new features
     fleet::Model* testingmodel = new fleet::Model{modelfile};
     //bind shader to model
+    auto generalshader = phongShader;
     testingmodel->setShader(generalshader);
+
+    fleet::Model* testingmodel2 = new fleet::Model(modeldir / "fense2" / "fense.obj");
+    testingmodel2->setShader(generalshader);
+
+//    fleet::Model* testingmodel3 = new fleet::Model(modeldir / "Rock_Terrain3_SF" / "Rock_Terrain3_SF.obj");
+//    testingmodel3->setShader(generalshader);
 
 
     //add model to stage manager to display
     EntityPtr testingmodelptr = std::make_shared<fleet::Entity>(testingmodel);
     gameengine->getStateManager()->addEntity(testingmodelptr);
+    auto model1transform = glm::translate(glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f)), glm::vec3(0.0f, 0.0f, -5.0f));
+    testingmodelptr->setTransform(model1transform);
 
+    EntityPtr testingmodelptr2 = std::make_shared<fleet::Entity>(testingmodel2);
+    gameengine->getStateManager()->addEntity(testingmodelptr2);
+    auto model2transform = glm::translate(glm::mat4(1.0f), glm::vec3(2.0f, 0.0f, -5.0f));
+    testingmodelptr2->setTransform(model2transform);
+
+//    EntityPtr testingmodelptr3 = std::make_shared<fleet::Entity>(testingmodel3);
+//    gameengine->getStateManager()->addEntity(testingmodelptr3);
  
 
     fleet::Camera* camera = gameengine->engineCreateCamera(glm::vec3(0.0f, 0.0f, 3.0f), 70.0f);

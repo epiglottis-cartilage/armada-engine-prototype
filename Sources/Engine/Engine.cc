@@ -43,15 +43,16 @@ void Engine::init(){
 
     ENGINE_INFO("Logger create success\n");
 
+    aAssetSystem = new AssetSystem{aConfig->cfgassetsystem};
+
+    ENGINE_INFO("AssetSystem create success\n");
+
     //init all systems, assign corresponding fields for later access
-    aRenderSystem = new RenderSystem{aConfig->cfgrendersystem};
+    aRenderSystem = new RenderSystem{aConfig->cfgrendersystem, this->aAssetSystem};
     aRenderContext = new RenderContext{};
 
     ENGINE_INFO("RenderSystem create success\n");
 
-    aAssetSystem = new AssetSystem{aConfig->cfgassetsystem};
-
-    ENGINE_INFO("AssetSystem create success\n");
 
 
     aStateManager = new StateManager{};

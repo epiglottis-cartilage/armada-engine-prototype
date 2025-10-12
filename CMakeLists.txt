@@ -24,6 +24,7 @@ set(ENGINE_HEADERS_DIRS
 
     ${CMAKE_SOURCE_DIR}/Sources/Engine
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Shaders
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Camera
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Utils
     ${CMAKE_SOURCE_DIR}/Sources/Engine/InputSystem
@@ -38,12 +39,15 @@ set(ENGINE_HEADERS_FILES
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Common.hh
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Engine.hh
 
-    ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/OpenglShader.hh
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Model.hh
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/RenderSystem.hh
-    ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Shader.hh
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Texture.hh
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/ShaderManager.hh
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/ShaderFactory.hh
+
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Shaders/Shader.hh
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Shaders/PhongShader.hh
+
 
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Camera/Camera.hh
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Utils/Config.hh
@@ -63,12 +67,14 @@ set(ENGINE_SOURCES_FILES
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Engine.cc
                        
     #rendersystem,core, essentiaE
-    ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/OpenglShader.cc
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Model.cc
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/RenderSystem.cc
-    ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Shader.cc
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Texture.cc
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/ShaderManager.cc
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/ShaderFactory.cc
+
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Shaders/Shader.cc
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Shaders/PhongShader.cc
 
 
     ${CMAKE_SOURCE_DIR}/Sources/Engine/AssetSystem/AssetSystem.cc

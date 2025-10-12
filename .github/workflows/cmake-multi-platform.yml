@@ -37,7 +37,7 @@ jobs:
       if: matrix.os == 'windows-latest'
       uses: actions/cache@v3
       with:
-        path: ${{ runner.cache-dir }}/vcpkg/installed
+        path: ${{ runner.workspace }}/vcpkg_cache
         key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
         restore-keys: |
           ${{ runner.os }}-vcpkg-
@@ -47,10 +47,9 @@ jobs:
       uses: lukka/run-vcpkg@v11
       with:
         vcpkgGitCommitId: '7d75835b57e79e8c183e022d1e7c13394c6d52c1'
-        vcpkgDirectory: ${{ runner.cache-dir }}/vcpkg
+        vcpkgDirectory: ${{ runner.workspace }}/vcpkg_cache
         runVcpkgInstall: true
         # Disable internal caching since we’re doing it ourselves
-        doNotCache: true
 
 
 #    # Windows: 用 vcpkg 安装依赖并缓存

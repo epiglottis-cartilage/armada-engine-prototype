@@ -3,9 +3,11 @@
 
 NAMESPACE_BEGIN
 
-RenderSystem::RenderSystem(cfgRenderSystem config)
+RenderSystem::RenderSystem(cfgRenderSystem config, AssetSystem* assetManager)
 {
     this->parseconfig(config);
+    this->assetManagerPtr = assetManager;
+    //init will use asset manager inside!
     this->init();
 }
 
@@ -97,17 +99,18 @@ void RenderSystem::init(){
 
     glEnable(GL_DEPTH_TEST);
 
-    #ifdef DEBUG
-    cout << "code execute to init_win_and_gl end" <<endl;
+    ENGINE_INFO("code execute to init_win_and_gl end");
     while((errorClass = glGetError()) != GL_NO_ERROR){
-        cout << "errorClass: " << errorClass << endl;
+        ENGINE_ERROR("GL error occur! Error code: {}", errorClass);
     }
     error = {SDL_GetError()};
     if(error != ""){
-        cout << "SDL generate GL context or GL init Error: " << error << endl;
+        ENGINE_ERROR("SDL set GL attribute Error: {}", error);
     }
-    #endif
 
+    ENGINE_INFO("Register Phong Shader to ShaderFactory");
+    ShaderFactory::init(this->assetManagerPtr->getShaderDir() );
+    ENGINE_INFO("Creating ShaderManager...");
     this->shaderManager = new ShaderManager{};
 }
 
@@ -191,7 +194,7 @@ void RenderSystem::postrender(RenderContext* context){
 transform the transform matrix in third parm to the active shader,
 and then run gl drawcalls*/
 void RenderSystem::drawmesh(const Mesh& mesh, const Shader& shader, const glm::mat4& transform) const{
-    glUseProgram(shader.getGSP());
+    glUseProgram(shader.getID());
 
     string pbrnames[] = {
         "textureBaseColor",
@@ -205,7 +208,7 @@ void RenderSystem::drawmesh(const Mesh& mesh, const Shader& shader, const glm::m
         glActiveTexture(GL_TEXTURE0 + i);
 
         glUniform1i(
-            glGetUniformLocation(shader.getGSP(), pbrnames[static_cast<int>(i)].c_str()),
+            glGetUniformLocation(shader.getID(), pbrnames[static_cast<int>(i)].c_str()),
             i
         );
 
@@ -214,7 +217,8 @@ void RenderSystem::drawmesh(const Mesh& mesh, const Shader& shader, const glm::m
     glActiveTexture(GL_TEXTURE0);
 
     //apply transform
-    glUniformMatrix4fv(glGetUniformLocation(shader.getGSP(), "matrixModel"), 1, GL_FALSE, glm::value_ptr(transform));
+//    glUniformMatrix4fv(glGetUniformLocation(shader.getID(), "matrixModel"), 1, GL_FALSE, glm::value_ptr(transform));
+    shader.setUniform("matrixModel", transform);
 
     glBindVertexArray(mesh.getVAO());
     glDrawElements(GL_TRIANGLES, mesh.indices.size(), GL_UNSIGNED_INT, 0);

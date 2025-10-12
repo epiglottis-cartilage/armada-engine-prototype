@@ -106,6 +106,7 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
     vector<GLuint> indices;
     vector<Texture> textures;
 
+    ENGINE_INFO("Processing mesh: {}, vertices: {}\n", string{mesh->mName.C_Str()}, mesh->mNumVertices);
     for (GLuint i = 0; i < mesh->mNumVertices; i++)
     {
         Vertex vertex;
@@ -116,7 +117,6 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
         };
 
         if (mesh->HasNormals()) {
-            ENGINE_INFO("mesh has normals\n");
             vertex.Normal = {
                 mesh->mNormals[i].x,
                 mesh->mNormals[i].y,
