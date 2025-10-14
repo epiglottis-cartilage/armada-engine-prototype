@@ -28,13 +28,19 @@ using namespace std;
 
 NAMESPACE_BEGIN
 
+enum class TextureType{
+    BASE_COLOR,
+    ROUGHNESS,
+    METALIC,
+    NORMAL,
+    AMBIENT_OCCLUSION,
+};
 struct Vertex
 {
     glm::vec3 Position;
     glm::vec3 Normal;
     glm::vec2 TexCoords;
 };
-
 
 struct Texture
 {
@@ -43,69 +49,77 @@ struct Texture
     aiString path;
 };
 
-class Mesh
-{
-public:
-    vector<Vertex> vertices;
-    vector<GLuint> indices;
-    vector<Texture> textures;
-
-    Mesh(vector<Vertex> vertices, vector<GLuint> indices, vector<Texture> texture) :
-        vertices(vertices), indices(indices), textures(texture), VAO(0), VBO(0), EBO(0)
-    {
-        this->setupMesh();
-    };
-
-//    void Draw(const Shader& shader, const glm::mat4& transform) const;
-
-    GLuint getVAO() const { return this->VAO; }
-
-private:
-
-
-    GLuint VAO, VBO, EBO;
-    void setupMesh();
-};
-
-
 class Model 
 {
-
 public:
+    class Material
+    {
+    public:
+        vector<Texture> textures;
+    };
+    class Mesh
+    {
+    public:
+        vector<Vertex> vertices;
+        vector<GLuint> indices;
+        int materialIndex;
+
+
+        Mesh(vector<Vertex> vertices, vector<GLuint> indices, int texture) :
+            vertices(vertices), indices(indices), materialIndex(texture), VAO(0), VBO(0), EBO(0)
+        {
+            this->setupMesh();
+        };
+
+    //    void Draw(const Shader& shader, const glm::mat4& transform) const;
+        GLuint getVAO() const { return this->VAO; }
+        Model* getParentUsedForTexture() const { return this->parent_usedfortexture; }
+    private:
+        Model* parent_usedfortexture;
+        GLuint VAO, VBO, EBO;
+        void setupMesh();
+    };
+
+
     Model(string path)
     {
+        ENGINE_INFO("DEPRECATE METHOD: Model(string path)");
         fs::path p = fs::path{path};
         ENGINE_INFO("loading model: {}\nValid: {}", p.string(), fs::exists(p));
         this->loadModel(path);
     }
+
     Model(fs::path path)
     {
+
         ENGINE_VALIDLOCATION(path);
+        if(path.extension() != fs::path{".glb"} || path.extension() != fs::path{".gltf"}){
+            ENGINE_ERROR("you are loading a model file with non glb/gltf extension, make sure assimp support it\n");
+            return;
+        }
         this->loadModel(path.string());
     }
 //    void Draw(const Shader& shader) const; 
     //vaos, render relative infos.
     vector<Mesh> getMeshes() const { return meshes; }
-
     fs::path getDirectory() const { return directory; }
-
-    bool getShown() const { return shown; }
-    void setShown(bool shown) { this->shown = shown; }
-
     glm::mat4 getTransform() const { return transform; }
     void setTransform(glm::mat4 transform) { this->transform = transform; }
-
     Shader* getShader() const { return shader; }
     void setShader(Shader* shader) { this->shader = shader; }
+    vector<Material> getMaterials() const { return materials; }
     
 private:
     glm::mat4 transform = glm::mat4(1.0f);
     vector<Mesh> meshes;
+    vector<Material> materials;
     fs::path directory;
-    bool shown = true;
+    
     Shader* shader;
 
+    void PBRload(aiMaterial* aimat, const aiScene* scene);
     void loadModel(string path, bool flipUVy = false);
+    void loadMaterials(const aiScene* scene);
     void processNode(aiNode* node, const aiScene* scene);
     Mesh processMesh(aiMesh* mesh, const aiScene* scene);
     vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type );

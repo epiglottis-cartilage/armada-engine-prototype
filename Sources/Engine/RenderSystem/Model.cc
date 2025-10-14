@@ -9,7 +9,7 @@ NAMESPACE_BEGIN
 
 
 
-void Mesh::setupMesh() {
+void Model::Mesh::setupMesh() {
 	glGenVertexArrays(1, &this->VAO);
     glGenBuffers(1, &this->VBO);
     glGenBuffers(1, &this->EBO);
@@ -41,6 +41,50 @@ void Mesh::setupMesh() {
 
 }
 
+void Model::PBRload(aiMaterial* aimat, const aiScene* scene) {
+    //push constructed Material into this->materials vector
+    Model::Material* mat = {};
+
+    TextureType::BASE_COLOR;
+    Texture diffuse_or_alberto;
+    aiString texturename;
+    aimat->GetTexture(aiTextureType_BASE_COLOR, 0, &texturename);
+
+    ENGINE_INFO("Base color texture name: {}\n", texturename.C_Str());
+
+    if(texturename.length == 0) {
+        ENGINE_WARN("No base color texture found in material, trying diffuse...\n");
+        aimat->GetTexture(aiTextureType_DIFFUSE, 0, &texturename);
+        //TODO: add default texture loading here
+    }//try another one
+
+    if(texturename.C_Str()[0] == '*') {
+        ENGINE_INFO("base texture is inmem, now loaading...");
+        aiTexture* inmem = scene->mTextures[(std::stoi(std::string{texturename.C_Str()}) + 1)];
+        diffuse_or_alberto.id = TextureSdlGl{inmem}.getTextureId();
+    }
+
+    //TODO: finish normal, roughness, metalic, ao
+
+    mat->textures.push_back(diffuse_or_alberto);
+}
+
+void Model::loadMaterials(const aiScene* scene) {
+    //resize the material vectors to size of actual materials
+    this->materials.resize(scene->mNumMaterials);
+
+    //for each materials, load the textures
+    for (GLuint i = 0; i < scene->mNumMaterials; i++) {
+        //got the ai mat, then throw it to pbrload. pbrload will construct the Material and push it to this->materials
+        aiMaterial* aiMat = scene->mMaterials[i];
+
+        //!!!this will modify the material vector field of this class!!!
+        Model::PBRload(aiMat, scene);
+
+    }
+}
+
+
 
 /*
 flipUVy is False by default, which means no flip happens.
@@ -55,6 +99,7 @@ void Model::loadModel(string path, bool flipUVy) {
         load_params = aiProcess_Triangulate ;
     }
 
+    //assimp load the model into memory
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(path, load_params); 
 
@@ -65,7 +110,12 @@ void Model::loadModel(string path, bool flipUVy) {
     }
     this->directory = fs::path{path}.parent_path();
 
+    ENGINE_INFO("Model now loading materials");
+    this->loadMaterials(scene);
+
+    ENGINE_INFO("Model now processin nodes");
     this->processNode(scene->mRootNode, scene);
+
 
     //found and process potential gl errors
     GLenum err = glGetError();
@@ -82,6 +132,7 @@ void Model::loadModel(string path, bool flipUVy) {
 
 void Model::processNode(aiNode* node, const aiScene* scene)
 {
+    //forward iterating
     // 添加当前节点中的所有Mesh
     for(int i = 0; i < node->mNumMeshes; i++)
     {
@@ -100,11 +151,10 @@ void Model::processNode(aiNode* node, const aiScene* scene)
 /*
 convert assimp format mesh to engine format mesh
 */
-Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
+Model::Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 {
     vector<Vertex> vertices;
     vector<GLuint> indices;
-    vector<Texture> textures;
 
     ENGINE_INFO("Processing mesh: {}, vertices: {}\n", string{mesh->mName.C_Str()}, mesh->mNumVertices);
     for (GLuint i = 0; i < mesh->mNumVertices; i++)
@@ -127,6 +177,8 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
         }
 
         //#######????######### what does this do
+        //load the first group of texture uv. 99% of the case it is alberto/basecolor. 
+        //in case of second group existing, the [1] group is often light map, [2] is detail overlays, [3] is procedural mapping, ......
         if (mesh->mTextureCoords[0]) // Does the mesh contain texture coordinates?
         {
             glm::vec2 vec;
@@ -148,46 +200,15 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
             indices.push_back(face.mIndices[j]);
     }
 
-    // 处理材质 (PBR)
+
+    int material_index_tmp = 0;
+    // copy the material index
     if (mesh->mMaterialIndex >= 0)
     {
-        aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-
-//        vector<Texture> OGdiffuseMaps = this->loadMaterialTextures(material,
-//            aiTextureType_DIFFUSE, "texture_diffuse");
-//        textures.insert(textures.end(), OGdiffuseMaps.begin(), OGdiffuseMaps.end());
-
-        Texture diffuseMap;
-
-        optional<Texture> lookupresult = this->loadMaterialTextures(material, aiTextureType_BASE_COLOR, "Base");
-        if (!lookupresult) {
-            ENGINE_WARN("Base color map not found, trying diffuse map...\n");
-            lookupresult = this->loadMaterialTextures(material, aiTextureType_DIFFUSE, "Diffuse");
-        }
-        if (!lookupresult) {
-            ENGINE_WARN("diffuse color map not found, trying default map...\n");
-            lookupresult = loadDefaultTexture();
-        }
-
-        // at this point lookupresult should have a value (either from material or default)
-        if (lookupresult){
-            ENGINE_INFO("texture loaded: {}\n", string{lookupresult->path.C_Str()});
-            diffuseMap = *lookupresult;
-        }
-        else
-            ENGINE_ERROR("Failed to load any diffuse/default texture for model\n");
-        textures.push_back(diffuseMap);
-
-//        vector<Texture> specularMaps = this->loadMaterialTextures(material,
-//            aiTextureType_SPECULAR, "texture_specular");
-//        textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
-
-//        Texture specularMap = this->loadMaterialTextures(material, aiTextureType_DIFFUSE_ROUGHNESS, "Rough");
-//        textures.push_back(specularMap);
-
+        material_index_tmp = mesh->mMaterialIndex;
     }
 
-    return Mesh{vertices, indices, textures};
+    return Mesh{vertices, indices, material_index_tmp};
 }
 
 

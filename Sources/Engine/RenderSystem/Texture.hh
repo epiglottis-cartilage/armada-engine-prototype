@@ -8,6 +8,9 @@
 #include <SDL2/SDL_opengl.h>
 #include <Logger.hh>
 
+//decoupling possible? 
+#include <assimp/Texture.h>
+
 using namespace std;
 
 NAMESPACE_BEGIN
@@ -18,6 +21,8 @@ public:
     GLuint getTextureId() {
         return textureId;
     }
+    TextureSdlGl(const aiTexture* inmemptr);
+
 
     ~TextureSdlGl() {
     }

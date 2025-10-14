@@ -144,9 +144,9 @@ void RenderSystem::updatestatmanager(StateManager* stateManager){
 
 //Rendering Command System
 void RenderSystem::submit(const Model* model, const Shader* shader, const glm::mat4& transform){
-    if(!model->getShown()){
-        return;
-    }
+//    if(!model->getShown()){
+//        return;
+//    }
     RenderCommand cmd{model, shader, transform};
     this->cmdQueue.push_back(cmd);
 }
@@ -197,7 +197,7 @@ void RenderSystem::postrender(RenderContext* context){
 /*This method implicitly active the shader in second params,
 transform the transform matrix in third parm to the active shader,
 and then run gl drawcalls*/
-void RenderSystem::drawmesh(const Mesh& mesh, const Shader& shader, const glm::mat4& transform) const{
+void RenderSystem::drawmesh(const Model::Mesh& mesh, const Shader& shader, const glm::mat4& transform) const{
     glUseProgram(shader.getID());
 
     string pbrnames[] = {
@@ -208,15 +208,15 @@ void RenderSystem::drawmesh(const Mesh& mesh, const Shader& shader, const glm::m
         "textureAmbientOcclusion",
     };
 
-    for (GLuint i = 0; i < mesh.textures.size(); i++) {
-        glActiveTexture(GL_TEXTURE0 + i);
+    Model* parentmodel = mesh.getParentUsedForTexture();
 
+    for (GLuint i = 0; i < parentmodel->getMaterials()[mesh.materialIndex].textures.size(); i++) {
+        glActiveTexture(GL_TEXTURE0 + i);
         glUniform1i(
             glGetUniformLocation(shader.getID(), pbrnames[static_cast<int>(i)].c_str()),
             i
         );
-
-        glBindTexture(GL_TEXTURE_2D, mesh.textures[i].id);
+        glBindTexture(GL_TEXTURE_2D, parentmodel->getMaterials()[mesh.materialIndex].textures[i].id);
     }
     glActiveTexture(GL_TEXTURE0);
 

@@ -34,8 +34,8 @@ int main(int argc, char** argv){
     fleet::Model* ironfense = new fleet::Model(modeldir / "fense2" / "fense.obj");
     ironfense->setShader(phongShader);
 
-    fleet::Model* terrain = new fleet::Model(modeldir / "Rock_Terrain3_SF" / "Rock_Terrain3_SF.obj");
-    terrain->setShader(phongShader);
+//    fleet::Model* terrain = new fleet::Model(modeldir / "Rock_Terrain3_SF" / "Rock_Terrain3_SF.obj");
+//    terrain->setShader(phongShader);
 
     fleet::Model* heli = new fleet::Model(modeldir / "mi35m" / "MI-35M.obj");
     heli->setShader(phongShader);
@@ -53,8 +53,8 @@ int main(int argc, char** argv){
     auto model2transform = glm::translate(glm::mat4(1.0f), glm::vec3(2.0f, 0.0f, -5.0f));
     ironfenseptr->setTransform(model2transform);
 
-    EntityPtr terrainptr = std::make_shared<fleet::Entity>(terrain);
-    gameengine->getStateManager()->addEntity(terrainptr);
+//    EntityPtr terrainptr = std::make_shared<fleet::Entity>(terrain);
+//    gameengine->getStateManager()->addEntity(terrainptr);
  
 
     EntityPtr heliptr = std::make_shared<fleet::Entity>(heli);
