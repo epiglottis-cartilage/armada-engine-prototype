@@ -141,4 +141,57 @@ void Engine::shutdown(){
     Logger::Shutdown();
 }
 
+
+
 NAMESPACE_END
+
+
+
+// (1) plain debug array new
+void* operator new[](std::size_t size,
+                     const char* /*name*/,
+                     int         /*flags*/,
+                     unsigned    /*debugFlags*/,
+                     const char* /*file*/,
+                     int         /*line*/)
+{
+    return ::operator new[](size);
+}
+
+// (2) aligned debug array new  <-- the one the linker is asking for
+void* operator new[](std::size_t size,
+                     std::size_t alignment,
+                     std::size_t /*alignmentOffset*/,
+                     const char* /*name*/,
+                     int         /*flags*/,
+                     unsigned    /*debugFlags*/,
+                     const char* /*file*/,
+                     int         /*line*/)
+{
+    // C++17 aligned new
+    return ::operator new[](size, std::align_val_t(alignment));
+}
+
+// matching deletes (required)
+void operator delete[](void* ptr,
+                       const char* /*name*/,
+                       int         /*flags*/,
+                       unsigned    /*debugFlags*/,
+                       const char* /*file*/,
+                       int         /*line*/) noexcept
+{
+    ::operator delete[](ptr);
+}
+
+void operator delete[](void* ptr,
+                       std::size_t /*size*/,
+                       std::size_t /*alignment*/,
+                       std::size_t /*alignmentOffset*/,
+                       const char* /*name*/,
+                       int         /*flags*/,
+                       unsigned    /*debugFlags*/,
+                       const char* /*file*/,
+                       int         /*line*/) noexcept
+{
+    ::operator delete[](ptr);
+}

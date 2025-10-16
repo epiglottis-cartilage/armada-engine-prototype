@@ -11,6 +11,7 @@
 #define NAMESPACE_BEGIN namespace fleet {
 #define NAMESPACE_END }
 
+;
 
 #define FLEET_API
 
@@ -22,4 +23,5 @@ using std::vector;
 using std::shared_ptr;
 
 namespace fs = std::filesystem;
+////globaly replace new with EASTL version
 

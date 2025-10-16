@@ -25,6 +25,9 @@
 #include <StageManager.hh>
 #include <AssetSystem.hh>
 
+//using EASTL for render command queue
+#include <EASTL/vector.h>
+
 NAMESPACE_BEGIN
 
 #define SHADERDIR "shaders"
@@ -99,7 +102,7 @@ private:
     StateManager* stateManager;
     ShaderManager* shaderManager;
 
-    vector<RenderCommand> cmdQueue;
+    eastl::vector<RenderCommand> cmdQueue;
 
 
     glm::mat4 projection;
