@@ -1,0 +1,6 @@
+[submodule "Sources/Thirdparty/EAstl"]
+	path = Sources/Thirdparty/EAstl
+	url = https://github.com/electronicarts/EASTL.git
+[submodule "Sources/Thirdparty/EAbase"]
+	path = Sources/Thirdparty/EAbase
+	url = https://github.com/electronicarts/EABase.git

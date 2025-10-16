@@ -125,4 +125,5 @@ jobs:
       with:
         name: sandbox-${{ matrix.os }}
         path: |
-          ${{ steps.strings.outputs.build-output-dir }}/Sandbox/${{ matrix.build_type }}/*
+          ${{ github.workspace }}/build/Sandbox/Release/*   # for Windows
+          ${{ github.workspace }}/build/Sandbox/*           # for Linux

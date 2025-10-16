@@ -10,6 +10,18 @@ if(UNIX)
     set(CMAKE_CXX_COMPILER_LAUNCHER ccache)
 endif()
 
+# config EASTL
+add_subdirectory(${CMAKE_SOURCE_DIR}/Sources/Thirdparty/EAstl)
+
+# search headers, this function is intended for eabase&stl only.
+function(collect_headers result_var base_dir)
+    file(GLOB_RECURSE collected_headers
+        "${base_dir}/*.h"
+        "${base_dir}/*.hh"
+        "${base_dir}/*.hpp"
+    )
+    set(${result_var} ${collected_headers} PARENT_SCOPE)
+endfunction()
 
 find_package(SDL2 CONFIG REQUIRED)
 find_package(OpenGL REQUIRED)
@@ -125,10 +137,15 @@ function(copy_resources target)
 endfunction()
 ####################################### static libraries #######################################
 
+#collect_headers(EABASE_HEADERS ${EABASE_ROOT_DIR}/include/Common/)
+#collect_headers(EASTL_HEADERS ${EASTL_ROOT_DIR}/include/)
+
 #compile engine as a static lib, althought I have no idea if this helps something....
 function(build_engine_stclib lib_name)
 
-    add_library(${lib_name} STATIC ${ENGINE_SOURCES_FILES} ${ENGINE_HEADERS_FILES})
+    add_library(${lib_name} STATIC ${ENGINE_SOURCES_FILES} ${ENGINE_HEADERS_FILES}
+#    ${EABASE_HEADERS} ${EASTL_HEADERS}
+    )
     target_link_libraries(${lib_name} PUBLIC
 
         OpenGL::GL
@@ -140,6 +157,9 @@ function(build_engine_stclib lib_name)
         assimp::assimp
         yaml-cpp::yaml-cpp
         spdlog::spdlog
+
+        # Modified stl
+        EASTL
     )
 
 endfunction()

@@ -7,6 +7,10 @@
 #include <memory>
 #include <string>
 
+//experimental eastl integration
+#include <EASTL/unordered_map.h>
+#include <EASTL/string.h>
+
 NAMESPACE_BEGIN
 
 /*Access the unique ShaderFactory using `ShaderFactory& xxx = ShaderFactory::instance()
@@ -25,19 +29,19 @@ public:
         return factory;
     }
 
-    void registerType(const std::string& name, Creator createFn) {
+    void registerType(const string& name, Creator createFn) {
         creators[name] = std::move(createFn);
     }
 
     // return a shader, created by the callback function inside `creators` map, with the type `name`
-    std::unique_ptr<Shader> create(const std::string& name) const {
+    std::unique_ptr<Shader> create(const string& name) const {
         if (auto it = creators.find(name); it != creators.end())
             return it->second(shaderDirectory);
         throw std::runtime_error("ShaderFactory: Unknown shader type: " + name);
     }
 
 private:
-    std::unordered_map<std::string, Creator> creators;
+    std::unordered_map<string, Creator> creators;
     static fs::path shaderDirectory;
 
 };
