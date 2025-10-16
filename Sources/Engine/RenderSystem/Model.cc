@@ -101,13 +101,31 @@ void Model::loadModel(string path, bool flipUVy) {
 
     //assimp load the model into memory
     Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile(path, load_params); 
+    const aiScene* scene;
+    try{
+
+        scene = importer.ReadFile(path, load_params); 
+        if(!scene) {
+            ENGINE_ERROR("ASSIMP::{}\n", importer.GetErrorString());
+            return;
+        }
+    } catch (const DeadlyImportError& e) {
+        ENGINE_ERROR("Assimp deadly error: {}\n", e.what());
+    } catch (const std::exception& e) {
+        ENGINE_ERROR("Assimp unknown error: {}\n", e.what());
+    } catch (...) {
+        ENGINE_ERROR("Assimp unknown error: {}\n", "Unknown error");
+        return;
+    }
+    ENGINE_DEBUG("debug here");
 
     if(!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) 
     {
         ENGINE_ERROR("ASSIMP::{}\n", importer.GetErrorString());
         return;
     }
+    ENGINE_DEBUG("debug here");
+    ENGINE_DEBUG("path debug: {}", path);
     this->directory = fs::path{path}.parent_path();
 
     ENGINE_INFO("Model now loading materials");

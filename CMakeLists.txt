@@ -186,5 +186,5 @@ copy_resources(Sandbox resources)
 set(debug_sourcesfile "${CMAKE_SOURCE_DIR}/Sources/Examples/debugtest/test.cc")
 add_executable(debugtest  ${debug_sourcesfile})
 target_link_libraries(debugtest PUBLIC 
-    glm::glm    
+    assimp::assimp
 )

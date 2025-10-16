@@ -18,6 +18,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include <assimp/Exceptional.h>
 
 
 #include <Shader.hh>
@@ -93,10 +94,14 @@ public:
     {
 
         ENGINE_VALIDLOCATION(path);
-        if(path.extension() != fs::path{".glb"} || path.extension() != fs::path{".gltf"}){
+
+
+        if(path.extension() != fs::path{".glb"} && path.extension() != fs::path{".gltf"}){
             ENGINE_ERROR("you are loading a model file with non glb/gltf extension, make sure assimp support it\n");
             return;
         }
+        ENGINE_DEBUG("path after extension judge: {}", path.string());
+
         this->loadModel(path.string());
     }
 //    void Draw(const Shader& shader) const; 
