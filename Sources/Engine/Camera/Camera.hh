@@ -55,6 +55,7 @@ public:
     }
 
     void setCameraViewMatrix(glm::mat4 newView){viewMatrix = newView;}
+    void setCameraProjectionMatrix(glm::mat4 newProj){projectionMatrix = newProj;}
     void setCameraFOV(float newFov);
     void setCameraSensitivity(glm::vec3 newSensitivity){
         this->sensitivity = newSensitivity;
@@ -70,6 +71,7 @@ public:
     glm::vec3 getCameraUp(){return cameraUp;}
     glm::mat4 getViewMatrix(){return viewMatrix;}
     glm::mat4 getProjectionMatrix(){return projectionMatrix;}
+
 
     //delete this once event listener is done
     std::function<void ()> onExitCalled;

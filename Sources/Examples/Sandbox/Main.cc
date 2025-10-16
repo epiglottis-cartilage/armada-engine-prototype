@@ -31,8 +31,8 @@ int main(int argc, char** argv){
     //bind shader to model
     apc->setShader(phongShader);
 
-//    fleet::Model* terrain = new fleet::Model(modeldir / "terrain_dristibute_gn.glb");
-//    terrain->setShader(phongShader);
+    fleet::Model* terrain = new fleet::Model(modeldir / "terraintest.glb");
+    terrain->setShader(phongShader);
 
     fleet::Model* cvchelmet = new fleet::Model(modeldir / "cvchelmet.glb");
     cvchelmet->setShader(phongShader);
@@ -45,18 +45,19 @@ int main(int argc, char** argv){
     //add model to stage manager to display
     EntityPtr apcptr = std::make_shared<fleet::Entity>(apc);
     gameengine->getStateManager()->addEntity(apcptr);
-    auto model1transform = glm::translate(glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f)), glm::vec3(0.0f, 0.0f, -5.0f));
+    auto model1transform = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    model1transform = glm::translate(model1transform, glm::vec3(5.0f));
     apcptr->setTransform(model1transform);
 
-//    EntityPtr terrainptr = std::make_shared<fleet::Entity>(terrain);
-//    gameengine->getStateManager()->addEntity(terrainptr);
-//    auto model2transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -5.0f, -5.0f));
-//    terrainptr->setTransform(model2transform);
+    EntityPtr terrainptr = std::make_shared<fleet::Entity>(terrain);
+    gameengine->getStateManager()->addEntity(terrainptr);
+    auto model2transform = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    terrainptr->setTransform(model2transform);
 
     EntityPtr helmetptr = std::make_shared<fleet::Entity>(cvchelmet);
     gameengine->getStateManager()->addEntity(helmetptr);
     auto helmettransform = glm::scale(
-        glm::mat4(1.0f), glm::vec3(0.2f)
+        glm::mat4(1.0f), glm::vec3(0.01f)
     );
     helmetptr->setTransform(helmettransform);
  
@@ -74,6 +75,9 @@ int main(int argc, char** argv){
     
 
     fleet::Camera* camera = gameengine->engineCreateCamera(glm::vec3(0.0f, 0.0f, 3.0f), 70.0f);
+    camera->setCameraProjectionMatrix(
+        glm::perspective(glm::radians(70.0f), 16.0f/9.0f, 0.1f, 1000.0f)
+    );
     //bind active camera to viewport
     gameengine->setCurrentCamera(camera);
     camera->setCameraSensitivity(glm::vec3(1.0f));
