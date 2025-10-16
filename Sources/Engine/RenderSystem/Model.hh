@@ -46,8 +46,8 @@ struct Vertex
 struct Texture
 {
     GLuint id;
-    string type;
-    aiString path;
+    string type = {};
+    aiString path = {};
 };
 
 class Model 
@@ -66,8 +66,10 @@ public:
         int materialIndex;
 
 
-        Mesh(vector<Vertex> vertices, vector<GLuint> indices, int texture) :
-            vertices(vertices), indices(indices), materialIndex(texture), VAO(0), VBO(0), EBO(0)
+        Mesh(vector<Vertex> vertices, vector<GLuint> indices, int texture, Model* parentmodel) :
+            vertices(vertices), indices(indices), materialIndex(texture),
+            parent_usedfortexture(parentmodel),
+            VAO(0), VBO(0), EBO(0)
         {
             this->setupMesh();
         };
@@ -82,15 +84,15 @@ public:
     };
 
 
-    Model(string path)
+    Model(string path, bool flipuv=true)
     {
         ENGINE_INFO("DEPRECATE METHOD: Model(string path)");
         fs::path p = fs::path{path};
         ENGINE_INFO("loading model: {}\nValid: {}", p.string(), fs::exists(p));
-        this->loadModel(path);
+        this->loadModel(path, flipuv);
     }
 
-    Model(fs::path path)
+    Model(fs::path path, bool flipuv=true)
     {
 
         ENGINE_VALIDLOCATION(path);
@@ -102,7 +104,7 @@ public:
         }
         ENGINE_DEBUG("path after extension judge: {}", path.string());
 
-        this->loadModel(path.string());
+        this->loadModel(path.string(), flipuv);
     }
 //    void Draw(const Shader& shader) const; 
     //vaos, render relative infos.
@@ -122,7 +124,7 @@ private:
     
     Shader* shader;
 
-    void PBRload(aiMaterial* aimat, const aiScene* scene);
+    Material PBRload(aiMaterial* aimat, const aiScene* scene);
     void loadModel(string path, bool flipUVy = false);
     void loadMaterials(const aiScene* scene);
     void processNode(aiNode* node, const aiScene* scene);

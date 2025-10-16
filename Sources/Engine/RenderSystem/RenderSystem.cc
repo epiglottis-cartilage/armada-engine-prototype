@@ -35,7 +35,7 @@ void RenderSystem::parseconfig(cfgRenderSystem config){
 //    if(config.sdlimg_format == "jpg"){
 //        this->sdl_image_flags = IMG_INIT_JPG;
 //    }
-    this->sdl_image_flags = IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF | IMG_INIT_WEBP | IMG_INIT_JXL | IMG_INIT_AVIF ;
+    this->sdl_image_flags = IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF | IMG_INIT_WEBP  ;
 
 
 }
@@ -232,7 +232,8 @@ void RenderSystem::drawmesh(const Model::Mesh& mesh, const Shader& shader, const
 
 void RenderSystem::drawmodel(const Model& model, const Shader& shader, const glm::mat4& transform) const{
     for (int i = 0; i < model.getMeshes().size(); i++) {
-        this->drawmesh(model.getMeshes()[i], shader, transform);
+        Model::Mesh mesh = model.getMeshes()[i];
+        this->drawmesh(mesh, shader, transform);
     }
 }
 

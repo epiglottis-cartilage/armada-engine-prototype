@@ -70,6 +70,11 @@ int main(int argc, char** argv){
         , 
         glm::vec3(2.0f, 5.0f, -10.0f)
     );
+    helitransform = glm::rotate(
+        glm::mat4(1.0f),
+        glm::radians(-90.0f),
+        glm::vec3(1.0f, 0.0f, 0.0f)
+    );
     heliptr->setTransform(helitransform);
     
 

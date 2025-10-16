@@ -1,4 +1,3 @@
-#pragma once
 #include <PhongShader.hh>
 
 NAMESPACE_BEGIN

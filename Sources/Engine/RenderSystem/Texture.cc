@@ -1,4 +1,4 @@
-#include "Texture.hh"
+#include <Texture.hh>
 
 NAMESPACE_BEGIN
 
@@ -89,6 +89,12 @@ TextureSdlGl::TextureSdlGl(string filepathTexture) {
             );
 
         }
+        auto sdl_error = IMG_GetError();
+        if (string{sdl_error} != "") {
+            ENGINE_ERROR("Creating SDL_Surface from aiTexture* Error: {}\n", string{sdl_error});
+        } else {
+            ENGINE_DEBUG("SDL_Surface created from aiTexture* successfully\n");
+        }
 //what is this?????
 //        //load from compressed format
 //        if (inmemptr->mFormatHint != "rgba8888" && inmemptr->mFormatHint != "argb8888") {
@@ -120,6 +126,13 @@ TextureSdlGl::TextureSdlGl(string filepathTexture) {
         ENGINE_DEBUG("Current Exec Pos: Inside TextureSdlGl::TextureSdlGl(const aiTexture* inmemptr)"
                      "After load an image as SDL_Surface and before convert it to GL texture\n");
 
+        //convert to rgba32 format
+        surface = SDL_ConvertSurfaceFormat(surface, SDL_PIXELFORMAT_RGBA32, 0);
+        if (surface == NULL){
+            ENGINE_ERROR("Safely convert raw SDL_Surface into rgba32 SDL_Surface Error: {}\n", SDL_GetError());
+            return;
+        }
+
         glTexImage2D(GL_TEXTURE_2D,
             0,
             GL_RGBA,
@@ -131,14 +144,15 @@ TextureSdlGl::TextureSdlGl(string filepathTexture) {
             surface->pixels
         );
 
-        ENGINE_DEBUG("Current Exec Pos: Inside TextureSdlGl::TextureSdlGl(string filepathTexture)"
-        "After convert SDL surface to GL texture"
-        "if you see this, it means SDL_Surface has been successfully converted to GL texture\n");
 
         GLenum errorClass;
         while((errorClass = glGetError()) != GL_NO_ERROR){
             ENGINE_ERROR("SDL surface to GL texture Error: %u\n", errorClass);
         }
+
+        ENGINE_DEBUG("Current Exec Pos: Inside TextureSdlGl::TextureSdlGl(string filepathTexture)"
+        "After convert SDL surface to GL texture"
+        "if you see this, it means SDL_Surface has been successfully converted to GL texture\n");
 
         glGenerateMipmap(GL_TEXTURE_2D);
 

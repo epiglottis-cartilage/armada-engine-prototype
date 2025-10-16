@@ -1,4 +1,4 @@
-﻿#include "Model.hh"
+﻿#include <Model.hh>
 
 
 #include <Texture.hh>
@@ -41,9 +41,48 @@ void Model::Mesh::setupMesh() {
 
 }
 
-void Model::PBRload(aiMaterial* aimat, const aiScene* scene) {
+Model::Material Model::PBRload(aiMaterial* aimat, const aiScene* scene) {
     //push constructed Material into this->materials vector
-    Model::Material* mat = {};
+
+// ---- DEBUG BLOCK: print material info ----
+    {
+        aiString matName;
+        if (AI_SUCCESS == aimat->Get(AI_MATKEY_NAME, matName)) {
+            ENGINE_INFO("Processing material: '{}'", matName.C_Str());
+        } else {
+            ENGINE_INFO("Processing unnamed material.");
+        }
+
+        // Define all texture types you want to check
+        std::vector<std::pair<aiTextureType, const char*>> texTypes = {
+            {aiTextureType_BASE_COLOR,        "BASE_COLOR"},
+            {aiTextureType_DIFFUSE,           "DIFFUSE"},
+            {aiTextureType_NORMALS,           "NORMALS"},
+            {aiTextureType_METALNESS,         "METALNESS"},
+            {aiTextureType_DIFFUSE_ROUGHNESS, "ROUGHNESS"},
+            {aiTextureType_AMBIENT_OCCLUSION, "AO"},
+            {aiTextureType_EMISSIVE,          "EMISSIVE"}
+        };
+
+        for (auto [type, name] : texTypes) {
+            unsigned int count = aimat->GetTextureCount(type);
+            if (count == 0) continue;
+
+            ENGINE_INFO("  TextureType: {} has {} piece(s) in total", name, count);
+            ENGINE_INFO("       they are:");
+            for (unsigned int i = 0; i < count; ++i) {
+                aiString texPath;
+                if (AI_SUCCESS == aimat->GetTexture(type, i, &texPath)) {
+                    ENGINE_INFO("{} NO.[{}] name: {}",name, i, texPath.C_Str());
+                }
+            }
+        }
+    }
+// ---- END DEBUG BLOCK ----
+
+
+
+    Model::Material mat = {};
 
     TextureType::BASE_COLOR;
     Texture diffuse_or_alberto;
@@ -51,6 +90,7 @@ void Model::PBRload(aiMaterial* aimat, const aiScene* scene) {
     aimat->GetTexture(aiTextureType_BASE_COLOR, 0, &texturename);
 
     ENGINE_INFO("Base color texture name: {}\n", texturename.C_Str());
+    string texturename_str = string{texturename.C_Str()};
 
     if(texturename.length == 0) {
         ENGINE_WARN("No base color texture found in material, trying diffuse...\n");
@@ -58,18 +98,26 @@ void Model::PBRload(aiMaterial* aimat, const aiScene* scene) {
         //TODO: add default texture loading here
     }//try another one
 
-    if(texturename.C_Str()[0] == '*') {
+    if(texturename_str[0] == '*') {
         ENGINE_INFO("base texture is inmem, now loaading...");
-        aiTexture* inmem = scene->mTextures[(std::stoi(std::string{texturename.C_Str()}) + 1)];
+        if(texturename_str.size() <= 1) {
+            ENGINE_ERROR("assimp inmem texture name length <= 1, something is wrong, returning in advanced");
+            return {};
+        }
+        string indexstr = texturename_str.substr(1);
+        aiTexture* inmem = scene->mTextures[(std::stoi(indexstr))];
         diffuse_or_alberto.id = TextureSdlGl{inmem}.getTextureId();
     }
 
     //TODO: finish normal, roughness, metalic, ao
 
-    mat->textures.push_back(diffuse_or_alberto);
+    mat.textures.push_back(diffuse_or_alberto);
+    return mat;
 }
 
 void Model::loadMaterials(const aiScene* scene) {
+    ENGINE_INFO("Loading {} materials\n", scene->mNumMaterials);
+    ENGINE_INFO("This model has {} textures in total\n", scene->mNumTextures);
     //resize the material vectors to size of actual materials
     this->materials.resize(scene->mNumMaterials);
 
@@ -78,9 +126,8 @@ void Model::loadMaterials(const aiScene* scene) {
         //got the ai mat, then throw it to pbrload. pbrload will construct the Material and push it to this->materials
         aiMaterial* aiMat = scene->mMaterials[i];
 
-        //!!!this will modify the material vector field of this class!!!
-        Model::PBRload(aiMat, scene);
 
+        this->materials[i] = this->PBRload(aiMat, scene);
     }
 }
 
@@ -117,14 +164,12 @@ void Model::loadModel(string path, bool flipUVy) {
         ENGINE_ERROR("Assimp unknown error: {}\n", "Unknown error");
         return;
     }
-    ENGINE_DEBUG("debug here");
 
     if(!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) 
     {
         ENGINE_ERROR("ASSIMP::{}\n", importer.GetErrorString());
         return;
     }
-    ENGINE_DEBUG("debug here");
     ENGINE_DEBUG("path debug: {}", path);
     this->directory = fs::path{path}.parent_path();
 
@@ -226,7 +271,7 @@ Model::Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
         material_index_tmp = mesh->mMaterialIndex;
     }
 
-    return Mesh{vertices, indices, material_index_tmp};
+    return Mesh{vertices, indices, material_index_tmp, this};
 }
 
 

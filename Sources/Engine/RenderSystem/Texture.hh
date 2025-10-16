@@ -9,7 +9,7 @@
 #include <Logger.hh>
 
 //decoupling possible? 
-#include <assimp/Texture.h>
+#include <assimp/texture.h>
 
 using namespace std;
 

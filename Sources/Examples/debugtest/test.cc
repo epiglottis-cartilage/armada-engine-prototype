@@ -17,12 +17,21 @@ int main(int argc, char** argv){
     Assimp::Importer importer;
 	cout << "path loc: " << p.string() << endl;
     const aiScene* scene = importer.ReadFile(p.string(), aiProcess_Triangulate);
+
+
+
+
+
     if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode){
         
         cout << "error: " << importer.GetErrorString() << endl;
         return -1;
     }
     cout << "model loaded successfully" << endl;
+
+
+
+    return 0;
 
 
 }
