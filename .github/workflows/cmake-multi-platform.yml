@@ -33,6 +33,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Fix submodule URLs to use HTTPS
+      run: |
+        git config --global url."https://github.com/".insteadOf "git@github.com:"
     - name: Init git submodules
       run: git submodule update --init --recursive
 
