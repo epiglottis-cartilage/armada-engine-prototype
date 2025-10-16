@@ -24,56 +24,51 @@ int main(int argc, char** argv){
 
     //always get dir using asset system
     fs::path modeldir = gameengine->getAssetSystem()->getModelDir();
-    fs::path modelfile = modeldir / "fense" / "fense.obj";
-//
-//    //use path if possible to accesss new features
-//    fleet::Model* woodfense = new fleet::Model{modelfile};
-//    //bind shader to model
-//    woodfense->setShader(phongShader);
-//
-//    fleet::Model* ironfense = new fleet::Model(modeldir / "fense2" / "fense.obj");
-//    ironfense->setShader(phongShader);
-//
-//    fleet::Model* terrain = new fleet::Model(modeldir / "Rock_Terrain3_SF" / "Rock_Terrain3_SF.obj");
+    fs::path apc_file = modeldir / "ba_stryker_icv.glb";
+
+    //use path if possible to accesss new features
+    fleet::Model* apc = new fleet::Model{apc_file};
+    //bind shader to model
+    apc->setShader(phongShader);
+
+//    fleet::Model* terrain = new fleet::Model(modeldir / "terrain_dristibute_gn.glb");
 //    terrain->setShader(phongShader);
 
-    fleet::Model* heli = new fleet::Model(modeldir / "mi35m" / "mi35.glb");
+    fleet::Model* cvchelmet = new fleet::Model(modeldir / "cvchelmet.glb");
+    cvchelmet->setShader(phongShader);
+
+    fleet::Model* heli = new fleet::Model(modeldir / "mi35.glb");
     heli->setShader(phongShader);
 
     
 
     //add model to stage manager to display
-//    EntityPtr woodfenseptr = std::make_shared<fleet::Entity>(woodfense);
-//    gameengine->getStateManager()->addEntity(woodfenseptr);
-//    auto model1transform = glm::translate(glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f)), glm::vec3(0.0f, 0.0f, -5.0f));
-//    woodfenseptr->setTransform(model1transform);
-//
-//    EntityPtr ironfenseptr = std::make_shared<fleet::Entity>(ironfense);
-//    gameengine->getStateManager()->addEntity(ironfenseptr);
-//    auto model2transform = glm::translate(glm::mat4(1.0f), glm::vec3(2.0f, 0.0f, -5.0f));
-//    ironfenseptr->setTransform(model2transform);
+    EntityPtr apcptr = std::make_shared<fleet::Entity>(apc);
+    gameengine->getStateManager()->addEntity(apcptr);
+    auto model1transform = glm::translate(glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f)), glm::vec3(0.0f, 0.0f, -5.0f));
+    apcptr->setTransform(model1transform);
 
 //    EntityPtr terrainptr = std::make_shared<fleet::Entity>(terrain);
 //    gameengine->getStateManager()->addEntity(terrainptr);
+//    auto model2transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -5.0f, -5.0f));
+//    terrainptr->setTransform(model2transform);
+
+    EntityPtr helmetptr = std::make_shared<fleet::Entity>(cvchelmet);
+    gameengine->getStateManager()->addEntity(helmetptr);
+    auto helmettransform = glm::scale(
+        glm::mat4(1.0f), glm::vec3(0.2f)
+    );
+    helmetptr->setTransform(helmettransform);
  
 
     EntityPtr heliptr = std::make_shared<fleet::Entity>(heli);
     gameengine->getStateManager()->addEntity(heliptr);
     auto helitransform = glm::translate(
         glm::rotate(
-            glm::rotate(
-                glm::mat4(1.0f), glm::radians(20.0f), glm::vec3(1.0f, 0.0f, 0.0f)
-            ),
-            glm::radians(45.0f), 
-            glm::vec3(0.0f, 1.0f, 0.0f)
+            glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f)
         )
         , 
-        glm::vec3(2.0f, 5.0f, -10.0f)
-    );
-    helitransform = glm::rotate(
-        glm::mat4(1.0f),
-        glm::radians(-90.0f),
-        glm::vec3(1.0f, 0.0f, 0.0f)
+        glm::vec3(2.0f, 10.0f, 10.0f)
     );
     heliptr->setTransform(helitransform);
     
