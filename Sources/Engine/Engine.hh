@@ -1,5 +1,5 @@
 #pragma once
-#define GLM_ENABLE_EXPERIMENTAL
+
 #include <Common.hh>
 #include <Config.hh>
 #include <Camera.hh>
