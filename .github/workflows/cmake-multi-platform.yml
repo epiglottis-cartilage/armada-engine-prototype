@@ -145,7 +145,7 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: |
           cd ${{ steps.strings.outputs.build-output-dir }}
-          zip -r armada-${{ matrix.os }}.zip sandbox/${{ matrix.build_type }}
+          zip -r armada-${{ matrix.os }}.zip sandbox/*
 #      run: |
 #        cd ${{ steps.strings.outputs.build-output-dir }}
 #        zip -r armada-${{ matrix.os }}.zip sandbox/${{ matrix.build_type }}
