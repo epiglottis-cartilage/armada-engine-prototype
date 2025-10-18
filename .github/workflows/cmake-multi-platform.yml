@@ -51,16 +51,19 @@ jobs:
           ${{ runner.os }}-vcpkg-
 
     - name: Setup vcpkg (Windows only)
+      if: matrix.os == 'windows-latest'
+      uses: lukka/run-vcpkg@v11
+      with:
+        vcpkgDirectory: ${{ runner.workspace }}/vcpkg_cache
+        runVcpkgInstall: false
+
+    - name: try hitting vcpkg cache (Windows only)
       if: ${{matrix.os == 'windows-latest' && steps.windows-caching.outputs.cache-hit != 'true'}}
       uses: lukka/run-vcpkg@v11
       with:
         vcpkgGitCommitId: '7d75835b57e79e8c183e022d1e7c13394c6d52c1'
         vcpkgDirectory: ${{ runner.workspace }}/vcpkg_cache
         runVcpkgInstall: true
-
-
-
-
 
     - name: Cache Linux dependencies
       id: linux-caching
