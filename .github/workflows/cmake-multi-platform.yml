@@ -51,8 +51,7 @@ jobs:
           ${{ runner.os }}-vcpkg-
 
     - name: Setup vcpkg (Windows only)
-      if: matrix.os == 'windows-latest'
-      if: ${{steps.windows-caching.outputs.cache-hit != 'true'}}
+      if: ${{matrix.os == 'windows-latest' && steps.windows-caching.outputs.cache-hit != 'true'}}
       uses: lukka/run-vcpkg@v11
       with:
         vcpkgGitCommitId: '7d75835b57e79e8c183e022d1e7c13394c6d52c1'
@@ -76,8 +75,7 @@ jobs:
           ${{ runner.os }}-apt-
 
     - name: Setup Dependencies (Linux Only)
-      if: matrix.os == 'ubuntu-latest'
-      if: ${{steps.linux-caching.outputs.cache-hit != 'true'}}
+      if: ${{matrix.os == 'ubuntu-latest' && steps.linux-caching.outputs.cache-hit != 'true'}}
       run: |
         sudo apt-get update
         sudo apt-get install -y \
