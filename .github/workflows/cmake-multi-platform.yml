@@ -56,7 +56,7 @@ jobs:
       with:
         vcpkgGitCommitId: '7d75835b57e79e8c183e022d1e7c13394c6d52c1'
         vcpkgDirectory: ${{ runner.workspace }}/vcpkg_cache
-        runVcpkgInstall: ${{steps.windows-caching.outputs.cache-hits != 'true'}}
+        runVcpkgInstall: ${{steps.windows-caching.outputs.cache-hit != 'true'}}
 
 
 
