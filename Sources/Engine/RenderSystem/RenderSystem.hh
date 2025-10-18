@@ -32,19 +32,19 @@ NAMESPACE_BEGIN
 
 #define SHADERDIR "shaders"
 
-struct RenderContext {
-    Camera* aCurrentCamera;
-    float deltatime;
-
-
-};
-
 struct RenderCommand {
     const Model* model;
     const Shader* shader;
     glm::mat4 transform;
-    
+
 };
+
+struct RenderContext {
+    Camera* aCurrentCamera;
+    float deltatime;
+    vector<RenderCommand> drawtargets;
+};
+
 
 class FLEET_API RenderSystem {
 
@@ -60,7 +60,7 @@ public:
          int line=__LINE__
     );
 
-    void updatestatmanager(StateManager* stateManager);
+//    void updatestatmanager(StateManager* stateManager);
     ShaderManager* getShaderManager() const { return shaderManager; }
 
     /*Noticed: this method will update the aCurrentCamera's viewmatrix field*/
@@ -99,7 +99,6 @@ private:
     //SDL_GLContext is already void* pointer.......although I hate such usage
     SDL_GLContext glContext;
 
-    StateManager* stateManager;
     ShaderManager* shaderManager;
 
     eastl::vector<RenderCommand> cmdQueue;

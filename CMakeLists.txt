@@ -1,9 +1,10 @@
 cmake_minimum_required(VERSION 3.15)
 project(MyOpenGLExamples)
 
-# 设定 C++ 标准
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+include(FetchContent)
 
 if(UNIX)
     set(CMAKE_C_COMPILER_LAUNCHER ccache)
@@ -22,6 +23,9 @@ function(collect_headers result_var base_dir)
     )
     set(${result_var} ${collected_headers} PARENT_SCOPE)
 endfunction()
+
+#config entt
+add_subdirectory(${CMAKE_SOURCE_DIR}/Sources/Thirdparty/entt)
 
 find_package(SDL2 CONFIG REQUIRED)
 find_package(OpenGL REQUIRED)
@@ -70,6 +74,9 @@ set(ENGINE_HEADERS_FILES
 
     ${CMAKE_SOURCE_DIR}/Sources/Engine/ECSSystem/Entity.hh
     ${CMAKE_SOURCE_DIR}/Sources/Engine/ECSSystem/StageManager.hh
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/ECSSystem/Component.h
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/ECSSystem/MeshComponent.h
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/ECSSystem/TransformComponent.h
 
 )
 
@@ -100,6 +107,9 @@ set(ENGINE_SOURCES_FILES
 
     ${CMAKE_SOURCE_DIR}/Sources/Engine/ECSSystem/Entity.cc
     ${CMAKE_SOURCE_DIR}/Sources/Engine/ECSSystem/StageManager.cc
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/ECSSystem/Component.cpp
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/ECSSystem/MeshComponent.cpp
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/ECSSystem/TransformComponent.cpp
 )
 
 set(EXAMPLES_DIR "${CMAKE_SOURCE_DIR}/Sources/Examples")
@@ -160,6 +170,7 @@ function(build_engine_stclib lib_name)
 
         # Modified stl
         EASTL
+        EnTT::EnTT
     )
 
 endfunction()

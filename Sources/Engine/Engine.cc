@@ -25,73 +25,52 @@ engine::init read config file from the working directory,
 set debug config(also output log to working directory by default) and init all sub systems*/
 void Engine::init(){
     fs::path exePath = std::filesystem::current_path() / CONFIG_FILE_NAME;
-
     ENGINE_VALIDLOCATION(exePath);
-
     this->aConfig = new Config{ exePath.string() };
-
     ENGINE_INFO("Config Loaded, now printing some fields:\n{}", aConfig->cfgassetsystem.assetpath);
-
-    aAppContext = new AppContext{};
+    aAppContext = make_unique<AppContext>();
     aAppContext->aIsInited = true;
     aAppContext->aShouldQuit = false;
-
     ENGINE_INFO("AppContext create success\n");
 
     Logger::Init(aConfig->cfgappcontext);
     aLogger = Logger::Get();
-
     ENGINE_INFO("Logger create success\n");
-
     aAssetSystem = new AssetSystem{aConfig->cfgassetsystem};
-
     ENGINE_INFO("AssetSystem create success\n");
 
     //init all systems, assign corresponding fields for later access
     aRenderSystem = new RenderSystem{aConfig->cfgrendersystem, this->aAssetSystem};
-    aRenderContext = new RenderContext{};
-
     ENGINE_INFO("RenderSystem create success\n");
-
-
-
-    aStateManager = new StateManager{};
-
     ENGINE_INFO(" StateManager create success\n");
-
-    //TODO: Add ECS and remove below line
-    aRenderSystem->updatestatmanager(aStateManager);
-
-
+    aStateManager = std::make_unique<entt::registry>();
+    aMeshSystem = std::make_unique<MeshSystem>(*this->aAppContext->aRenderContext, this->aStateManager);
+    ENGINE_INFO("ECS System mesh system created");
     aAppContext->aIsInited = true;
-
     ENGINE_INFO("Engine init success\n");
-//    delete this->aConfig;
     ENGINE_INFO("parse some config: {}", aConfig->cfgassetsystem.assetpath);
 }
-
 
 
 /*
 this method make sure that game logic is running under 60Hz*/
 void Engine::run(EngineCallbackFunction gamelogic){
-    auto engineContext = getAppContext();
+    AppContext& engineContext = getAppContext();
     ENGINE_INFO("Engine run start\n");
-    ENGINE_INFO("app context content: {} {}", engineContext->aShouldQuit, engineContext->aIsInited);
+    ENGINE_INFO("app context content: {} {}", engineContext.aShouldQuit, engineContext.aIsInited);
     ENGINE_INFO("Engine run start\n");
-    while(!engineContext->aShouldQuit){
-        //game loop
-//        ENGINE_INFO("one Engine loop start\n");
 
 
-        const float dt = 1.0f / 60.0f;
-        Uint64 previoustime = SDL_GetTicks64();
-        Uint64 accumulator = 0.0f;
+    const float dt = 1.0f / 60.0f;
+    Uint64 previoustime = SDL_GetTicks64();
+    Uint64 accumulator = 0.0f;
+    while(!engineContext.aShouldQuit){
         //update game logic, will try best to run in 60 Hz
+        this->aMeshSystem->tick();
         while(accumulator >= dt){
 
-            //update game physics, etc
-            //update game physics
+            //tick ecs
+//================================================
             //update game logic
             gamelogic(dt);
             accumulator -= dt;
@@ -101,14 +80,14 @@ void Engine::run(EngineCallbackFunction gamelogic){
 
 //        ENGINE_INFO("updating camera");
         //process Input, update camera current status, like view matrix, ...
-        if(this->aRenderContext->aCurrentCamera != nullptr){
+        auto* aRenderContext = this->aAppContext->aRenderContext.get();
+        if(aRenderContext->aCurrentCamera != nullptr){
             aRenderContext->aCurrentCamera->ProcessInputUpdateCamera(dt);
         }
         //delta time field is not used currently
-        this->aRenderContext->deltatime = dt;
+        aRenderContext->deltatime = dt;
 
 
-//        ENGINE_INFO("rendering");
         //transmit camera data, render frame, etc
         this->aRenderSystem->prerender(
             aRenderContext
@@ -132,10 +111,7 @@ void Engine::run(EngineCallbackFunction gamelogic){
 
 void Engine::shutdown(){
     delete this->aConfig;
-    delete this->aAppContext;
     delete this->aAssetSystem;
-    delete this->aStateManager;
-    delete this->aRenderContext;
     delete this->aRenderSystem;
     ENGINE_INFO("Engine shutdown success\n");
     Logger::Shutdown();

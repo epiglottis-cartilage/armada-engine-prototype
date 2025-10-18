@@ -4,3 +4,6 @@
 [submodule "Sources/Thirdparty/EAbase"]
 	path = Sources/Thirdparty/EAbase
 	url = https://github.com/electronicarts/EABase.git
+[submodule "Sources/Thirdparty/entt"]
+	path = Sources/Thirdparty/entt
+	url = https://github.com/skypjack/entt.git

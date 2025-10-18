@@ -138,9 +138,6 @@ int RenderSystem::errorposition(const char* file, int line){
     return 0;
 }
 
-void RenderSystem::updatestatmanager(StateManager* stateManager){
-    this->stateManager = stateManager;
-}
 
 //Rendering Command System
 void RenderSystem::submit(const Model* model, const Shader* shader, const glm::mat4& transform){
@@ -171,11 +168,18 @@ void RenderSystem::prerender(RenderContext* context){
 
 
     //gltransform the transform matrix
-    auto rendertargets = this->stateManager->getEntities();
-    for(const auto& rendertarget: rendertargets){
-        auto model = rendertarget.second->getModel();
-        submit(model, model->getShader(), rendertarget.second->getTransform());
+//    auto rendertargets = this->stateManager->getEntities();
+//    for(const auto& rendertarget: rendertargets){
+//        auto model = rendertarget.second->getModel();
+//        submit(model, model->getShader(), rendertarget.second->getTransform());
+//    }
+    auto& rendertargetsref = context->drawtargets;
+    for (const auto& eachcommands: rendertargetsref)
+    {
+        submit(eachcommands.model, eachcommands.shader, eachcommands.transform);
     }
+    //remember to clean the render context
+    context->drawtargets.clear();
 }
 
 void RenderSystem::renderframe(RenderContext* context){

@@ -15,11 +15,7 @@ int main(int argc, char** argv){
     gameengine->init();
 
 
-    
-
     fleet::Shader* phongShader = gameengine->getRenderSystem()->getShaderManager()->getOrCreate("Phong");
-
-    
 
 
     //always get dir using asset system
@@ -27,9 +23,9 @@ int main(int argc, char** argv){
     fs::path apc_file = modeldir / "ba_stryker_icv.glb";
 
     //use path if possible to accesss new features
-    fleet::Model* apc = new fleet::Model{apc_file};
+    fleet::Model* apcModel = new fleet::Model{apc_file};
     //bind shader to model
-    apc->setShader(phongShader);
+    apcModel->setShader(phongShader);
 
     fleet::Model* terrain = new fleet::Model(modeldir / "terraintest.glb");
     terrain->setShader(phongShader);
@@ -43,36 +39,34 @@ int main(int argc, char** argv){
     
 
     //add model to stage manager to display
-    EntityPtr apcptr = std::make_shared<fleet::Entity>(apc);
-    gameengine->getStateManager()->addEntity(apcptr);
-    auto model1transform = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    model1transform = glm::translate(model1transform, glm::vec3(5.0f));
-    apcptr->setTransform(model1transform);
-
-    EntityPtr terrainptr = std::make_shared<fleet::Entity>(terrain);
-    gameengine->getStateManager()->addEntity(terrainptr);
-    auto model2transform = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    terrainptr->setTransform(model2transform);
-
-    EntityPtr helmetptr = std::make_shared<fleet::Entity>(cvchelmet);
-    gameengine->getStateManager()->addEntity(helmetptr);
-    auto helmettransform = glm::scale(
-        glm::mat4(1.0f), glm::vec3(0.01f)
+    fleet::StateManagerPtr& gSceneManager = gameengine->getStateManager();
+    fleet::Entity apc = gSceneManager->create();
+    //add entity with location
+    gSceneManager->emplace<fleet::TransformComponent>(
+        apc,
+        glm::vec3(1.0f),
+        glm::vec3(0.0f, 0.0f, 90.0f),
+        glm::vec3(1.0f)
     );
-    helmetptr->setTransform(helmettransform);
- 
-
-    EntityPtr heliptr = std::make_shared<fleet::Entity>(heli);
-    gameengine->getStateManager()->addEntity(heliptr);
-    auto helitransform = glm::translate(
-        glm::rotate(
-            glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f)
-        )
-        , 
-        glm::vec3(2.0f, 10.0f, 10.0f)
+    //add entity with model
+    gSceneManager->emplace<fleet::MeshComponent>(
+        apc,
+        apcModel
     );
-    heliptr->setTransform(helitransform);
-    
+
+    fleet::Entity terrainEnt = gSceneManager->create();
+    gSceneManager->emplace<fleet::TransformComponent>(
+        terrainEnt,
+        glm::vec3(0.0f),
+        glm::vec3(-90.0f, 0.0f, 0.0f),
+        glm::vec3(1.0f)
+    );
+    gSceneManager->emplace<fleet::MeshComponent>(
+        terrainEnt,
+        terrain
+    );
+
+
 
     fleet::Camera* camera = gameengine->engineCreateCamera(glm::vec3(0.0f, 0.0f, 3.0f), 70.0f);
     camera->setCameraProjectionMatrix(

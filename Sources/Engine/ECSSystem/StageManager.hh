@@ -8,26 +8,41 @@
 
 //this module is coupling Model class for temperal solution
 #include <Entity.hh>
+#include <Component.h>
+#include <TransformComponent.h>
+#include <MeshComponent.h>
 
 NAMESPACE_BEGIN
+struct RenderContext;
 
+using StateManagerPtr = unique_ptr<entt::registry>;
 
-
-class StateManager{
+class TransformSystem
+{
 public:
-    StateManager();
-    ~StateManager();
-
-    void addEntity(shared_ptr<Entity> entity);
-    void removeEntity(EntityId id);
-
-    const std::unordered_map<EntityId, shared_ptr<Entity>>& getEntities() const {
-        return this->entities;
+    TransformSystem(StateManagerPtr& stateManager) :
+        enttregistry(stateManager)
+    {}
+    void tick()
+    {
+        //do sth here
     }
 
 private:
-    std::unordered_map<EntityId, shared_ptr<Entity>> entities;
+    StateManagerPtr& enttregistry;
 };
+
+class MeshSystem{
+public:
+    MeshSystem(RenderContext& rendercontext, StateManagerPtr& stateManager) :
+        enttregistry(stateManager),
+        rendercontext(rendercontext){};
+    void tick();
+private:
+    StateManagerPtr& enttregistry;
+    RenderContext& rendercontext;
+};
+
 
 
 NAMESPACE_END

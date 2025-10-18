@@ -3,7 +3,6 @@
 NAMESPACE_BEGIN
 
 
-EntityId Entity::nextId = 0;
 
 
 
