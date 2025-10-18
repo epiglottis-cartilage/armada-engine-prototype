@@ -50,7 +50,7 @@ jobs:
 #          ${{ runner.os }}-vcpkg-
 
     - name: Setup vcpkg (Windows only)
-#      if: matrix.os == 'windows-latest'
+      if: matrix.os == 'windows-latest'
       uses: lukka/run-vcpkg@v11
       with:
         vcpkgGitCommitId: '7d75835b57e79e8c183e022d1e7c13394c6d52c1'
@@ -72,33 +72,33 @@ jobs:
 #        additionalCachedPaths: ${{ runner.cache-dir }}/vcpkg/installed
 
 
-#    # Linux: 用 apt 安装依赖并缓存
-#    - name: Cache Linux dependencies
-#      if: matrix.os == 'ubuntu-latest'
-#      uses: actions/cache@v3
-#      with:
-#        path: |
-#          /var/cache/apt/archives  # apt 缓存的 deb 包路径
-#          /var/lib/apt/lists       # apt 索引缓存
-#        key: ${{ runner.os }}-apt-${{ hashFiles('.github/workflows/ci.yml') }}  # 依赖不变则缓存有效
-#        restore-keys: |
-#          ${{ runner.os }}-apt-
-#
-#    - name: Setup Dependencies (Linux Only)
-#      if: matrix.os == 'ubuntu-latest'
-#      run: |
-#        sudo apt-get update
-#        sudo apt-get install -y \
-#          ccache \
-#          libsdl2-dev \
-#          libsdl2-image-dev \
-#          libglew-dev \
-#          libglm-dev \
-#          libassimp-dev \
-#          libyaml-cpp-dev \
-#          libspdlog-dev \
-#          mesa-common-dev \
-#          libglu1-mesa-dev
+    # Linux: 用 apt 安装依赖并缓存
+    - name: Cache Linux dependencies
+      if: matrix.os == 'ubuntu-latest'
+      uses: actions/cache@v3
+      with:
+        path: |
+          /var/cache/apt/archives  # apt 缓存的 deb 包路径
+          /var/lib/apt/lists       # apt 索引缓存
+        key: ${{ runner.os }}-apt-${{ hashFiles('.github/workflows/ci.yml') }}  # 依赖不变则缓存有效
+        restore-keys: |
+          ${{ runner.os }}-apt-
+
+    - name: Setup Dependencies (Linux Only)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          ccache \
+          libsdl2-dev \
+          libsdl2-image-dev \
+          libglew-dev \
+          libglm-dev \
+          libassimp-dev \
+          libyaml-cpp-dev \
+          libspdlog-dev \
+          mesa-common-dev \
+          libglu1-mesa-dev
 
     - name: Set reusable strings
       id: strings
@@ -106,8 +106,8 @@ jobs:
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
-    - name: Configure CMake #(Windows)
-#      if: matrix.os == 'windows-latest'
+    - name: Configure CMake (Windows)
+      if: matrix.os == 'windows-latest'
       run: >
         cmake -B ${{ steps.strings.outputs.build-output-dir }}
         -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
@@ -116,14 +116,14 @@ jobs:
         -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
         -S ${{ github.workspace }}
 
-#    - name: Configure CMake (Linux)
-#      if: matrix.os == 'ubuntu-latest'
-#      run: >
-#        cmake -B ${{ steps.strings.outputs.build-output-dir }}
-#        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
-#        -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
-#        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-#        -S ${{ github.workspace }}
+    - name: Configure CMake (Linux)
+      if: matrix.os == 'ubuntu-latest'
+      run: >
+        cmake -B ${{ steps.strings.outputs.build-output-dir }}
+        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
+        -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
+        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        -S ${{ github.workspace }}
 
     - name: Build
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
@@ -138,8 +138,16 @@ jobs:
 
     - name: Package build output
       run: |
-        cd ${{ steps.strings.outputs.build-output-dir }}
-        zip -r armada-${{ matrix.os }}.zip sandbox/${{ matrix.build_type }}
+        if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+          Compress-Archive -Path "${{ steps.strings.outputs.build-output-dir }}/sandbox/${{ matrix.build_type }}/*" -DestinationPath "${{ steps.strings.outputs.build-output-dir }}/armada-${{ matrix.os }}.zip" -Force
+        else
+          cd ${{ steps.strings.outputs.build-output-dir }}
+          zip -r armada-${{ matrix.os }}.zip sandbox/${{ matrix.build_type }}
+        fi
+      shell: pwsh
+#      run: |
+#        cd ${{ steps.strings.outputs.build-output-dir }}
+#        zip -r armada-${{ matrix.os }}.zip sandbox/${{ matrix.build_type }}
 
     - name: Upload packaged artifact
       uses: actions/upload-artifact@v4
