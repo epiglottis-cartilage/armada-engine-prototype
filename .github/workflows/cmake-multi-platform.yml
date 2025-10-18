@@ -136,15 +136,16 @@ jobs:
 #          ${{ github.workspace }}/build/Sandbox/Release/*   # for Windows
 #          ${{ github.workspace }}/build/Sandbox/*           # for Linux
 
-    - name: Package build output
+    - name: Package build output (windows)
+      if: matrix.os == "windows-latest"
       run: |
-        if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
           Compress-Archive -Path "${{ steps.strings.outputs.build-output-dir }}/sandbox/${{ matrix.build_type }}/*" -DestinationPath "${{ steps.strings.outputs.build-output-dir }}/armada-${{ matrix.os }}.zip" -Force
-        else
+
+    - name: Package build output (linux)
+      if: matrix.os == "ubuntu-latest"
+      run: |
           cd ${{ steps.strings.outputs.build-output-dir }}
           zip -r armada-${{ matrix.os }}.zip sandbox/${{ matrix.build_type }}
-        fi
-      shell: pwsh
 #      run: |
 #        cd ${{ steps.strings.outputs.build-output-dir }}
 #        zip -r armada-${{ matrix.os }}.zip sandbox/${{ matrix.build_type }}
