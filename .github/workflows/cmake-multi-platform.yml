@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]  # 修正为官方 OS 名称
+        os: [ubuntu-latest, windows-latest]  
         build_type: [Release]
         c_compiler: [gcc, cl]
         include:
@@ -40,52 +40,44 @@ jobs:
       run: git submodule init ; git submodule update
 
 
-#    - name: Cache vcpkg installed packages
-#      if: matrix.os == 'windows-latest'
-#      uses: actions/cache@v3
-#      with:
-#        path: ${{ runner.workspace }}/vcpkg_cache
-#        key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
-#        restore-keys: |
-#          ${{ runner.os }}-vcpkg-
+    - name: Cache vcpkg installed packages
+      id: windows-caching
+      if: matrix.os == 'windows-latest'
+      uses: actions/cache@v3
+      with:
+        path: ${{ runner.workspace }}/vcpkg_cache
+        key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          ${{ runner.os }}-vcpkg-
 
     - name: Setup vcpkg (Windows only)
       if: matrix.os == 'windows-latest'
+      if: ${{steps.windows-caching.outputs.cache-hit != 'true'}}
       uses: lukka/run-vcpkg@v11
       with:
         vcpkgGitCommitId: '7d75835b57e79e8c183e022d1e7c13394c6d52c1'
         vcpkgDirectory: ${{ runner.workspace }}/vcpkg_cache
         runVcpkgInstall: true
-        additionalCachedPaths: ${{ github.workspace }}/vcpkg/installed
 
 
 
-#    # Windows: 用 vcpkg 安装依赖并缓存
-#    - name: Setup vcpkg (Windows only)
-#      if: matrix.os == 'windows-latest'
-#      uses: lukka/run-vcpkg@v11
-#      with:
-#        vcpkgGitCommitId: '7d75835b57e79e8c183e022d1e7c13394c6d52c1'
-#        runVcpkgInstall: true
-#        vcpkgDirectory: ${{ runner.cache-dir }}/vcpkg  # 缓存到 runner 缓存目录
-#        # 启用 vcpkg 缓存（lukka/run-vcpkg 自带缓存逻辑）
-#        additionalCachedPaths: ${{ runner.cache-dir }}/vcpkg/installed
 
 
-    # Linux: 用 apt 安装依赖并缓存
     - name: Cache Linux dependencies
+      id: linux-caching
       if: matrix.os == 'ubuntu-latest'
       uses: actions/cache@v3
       with:
         path: |
-          /var/cache/apt/archives  # apt 缓存的 deb 包路径
-          /var/lib/apt/lists       # apt 索引缓存
-        key: ${{ runner.os }}-apt-${{ hashFiles('.github/workflows/cmake-multi-platform.yml') }}  # 依赖不变则缓存有效
+          /var/cache/apt/archives  
+          /var/lib/apt/lists       
+        key: ${{ runner.os }}-apt-${{ hashFiles('.github/workflows/cmake-multi-platform.yml') }}  
         restore-keys: |
           ${{ runner.os }}-apt-
 
     - name: Setup Dependencies (Linux Only)
       if: matrix.os == 'ubuntu-latest'
+      if: ${{steps.linux-caching.outputs.cache-hit != 'true'}}
       run: |
         sudo apt-get update
         sudo apt-get install -y \
