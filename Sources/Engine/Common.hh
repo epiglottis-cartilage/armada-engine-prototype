@@ -1,5 +1,6 @@
 #pragma once
 
+#define GLM_ENABLE_EXPERIMENTAL
 //cpp20 includes
 #include <string>
 #include <filesystem>
