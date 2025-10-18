@@ -80,7 +80,7 @@ jobs:
         path: |
           /var/cache/apt/archives  # apt 缓存的 deb 包路径
           /var/lib/apt/lists       # apt 索引缓存
-        key: ${{ runner.os }}-apt-${{ hashFiles('.github/workflows/ci.yml') }}  # 依赖不变则缓存有效
+        key: ${{ runner.os }}-apt-${{ hashFiles('.github/workflows/cmake-multi-platform.yml') }}  # 依赖不变则缓存有效
         restore-keys: |
           ${{ runner.os }}-apt-
 
@@ -139,13 +139,13 @@ jobs:
     - name: Package build output (windows)
       if: matrix.os == 'windows-latest'
       run: |
-          Compress-Archive -Path "${{ steps.strings.outputs.build-output-dir }}/sandbox/${{ matrix.build_type }}/*" -DestinationPath "${{ steps.strings.outputs.build-output-dir }}/armada-${{ matrix.os }}.zip" -Force
+          Compress-Archive -Path "${{ steps.strings.outputs.build-output-dir }}/Sandbox/${{ matrix.build_type }}/*" -DestinationPath "${{ steps.strings.outputs.build-output-dir }}/armada-${{ matrix.os }}.zip" -Force
 
     - name: Package build output (linux)
       if: matrix.os == 'ubuntu-latest'
       run: |
           cd ${{ steps.strings.outputs.build-output-dir }}
-          zip -r armada-${{ matrix.os }}.zip sandbox/*
+          zip -r armada-${{ matrix.os }}.zip Sandbox/*
 #      run: |
 #        cd ${{ steps.strings.outputs.build-output-dir }}
 #        zip -r armada-${{ matrix.os }}.zip sandbox/${{ matrix.build_type }}
