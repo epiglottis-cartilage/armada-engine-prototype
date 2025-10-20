@@ -3,8 +3,11 @@
 
 NAMESPACE_BEGIN
 
+unique_ptr<AppContext> uptrAppContext = make_unique<AppContext>();
+AppContext* objptrAppContext = uptrAppContext.get();
+
 //global null ptr to engine instance itself
-Engine* gameEngine;
+Engine* objptrGameEngine;
 
 Engine::Engine(string gamename, string gameversion):
     aGamename(gamename),
@@ -24,11 +27,13 @@ Camera* Engine::engineCreateCamera(glm::vec3 position, float angle){
 engine::init read config file from the working directory, 
 set debug config(also output log to working directory by default) and init all sub systems*/
 void Engine::init(){
+    objptrGameEngine = this;
+
     fs::path exePath = std::filesystem::current_path() / CONFIG_FILE_NAME;
     ENGINE_VALIDLOCATION(exePath);
     this->aConfig = new Config{ exePath.string() };
     ENGINE_INFO("Config Loaded, now printing some fields:\n{}", aConfig->cfgassetsystem.assetpath);
-    aAppContext = make_unique<AppContext>();
+    aAppContext = objptrAppContext;
     aAppContext->aIsInited = true;
     aAppContext->aShouldQuit = false;
     ENGINE_INFO("AppContext create success\n");
@@ -41,6 +46,7 @@ void Engine::init(){
 
     //init all systems, assign corresponding fields for later access
     aRenderSystem = new RenderSystem{aConfig->cfgrendersystem, this->aAssetSystem};
+    aUIDrawSystem = make_unique<UIDrawSystem>();
     ENGINE_INFO("RenderSystem create success\n");
     ENGINE_INFO(" StateManager create success\n");
     aStateManager = std::make_unique<entt::registry>();
@@ -49,6 +55,7 @@ void Engine::init(){
     aAppContext->aIsInited = true;
     ENGINE_INFO("Engine init success\n");
     ENGINE_INFO("parse some config: {}", aConfig->cfgassetsystem.assetpath);
+
 }
 
 
@@ -63,10 +70,10 @@ void Engine::run(EngineCallbackFunction gamelogic){
 
     const float dt = 1.0f / 60.0f;
     Uint64 previoustime = SDL_GetTicks64();
-    Uint64 accumulator = 0.0f;
+    Uint64 accumulator = 0;
     while(!engineContext.aShouldQuit){
         //update game logic, will try best to run in 60 Hz
-        this->aMeshSystem->tick();
+        this->aMeshSystem->tick(dt);
         while(accumulator >= dt){
 
             //tick ecs
@@ -92,13 +99,17 @@ void Engine::run(EngineCallbackFunction gamelogic){
         this->aRenderSystem->prerender(
             aRenderContext
         );
+        this->aUIDrawSystem->prerender();
         this->aRenderSystem->renderframe(
             aRenderContext
         );
+        if (objptrAppContext->aShowEditor)
+            this->aUIDrawSystem->drawframe();
+        this->aUIDrawSystem->postrender();
         this->aRenderSystem->postrender(
             aRenderContext
         );
-        
+
 
         //delta accmulate
         Uint64 currenttime = SDL_GetTicks64();

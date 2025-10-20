@@ -16,18 +16,25 @@ class TransformComponent :
 public Component
 {
 public:
-  TransformComponent() = default;
-  TransformComponent(glm::vec3 pos, glm::vec3 rot, glm::vec3 scale) : position(pos), rotation(rot), scale(scale) {}
+    TransformComponent() = default;
+    TransformComponent(glm::vec3 pos, glm::vec3 rot, glm::vec3 scale);
 
-  glm::vec3 position = glm::vec3{1.0f};
-  glm::vec3 rotation = glm::vec3{0.0f};
-  glm::vec3 scale = glm::vec3{1.0f};
 
-  void tick(float deltatime) override;
+    void tick(float deltatime) override;
+    void setPosition(glm::vec3 position){this->position[buffer] = position;};
+    void setRotation(glm::vec3 rotation){this->rotation[buffer] = rotation;};
+    void setScale(glm::vec3 scale){this->scale[buffer] = scale;};
+    glm::vec3 getPosition() {return position[current];};
+    glm::vec3 getRotation() {return rotation[current];};
+    glm::vec3 getScale() {return scale[current];};
 
-  glm::mat4 getTransformMat() ;
+    glm::mat4 getTransformMat() ;
 private:
-
+    glm::vec3 position[2] = {};
+    glm::vec3 rotation[2] = {};
+    glm::vec3 scale[2] = {};
+    int current = 0;//always read the 0, 1 always be buffer
+    int buffer = current + 1;
 };
 NAMESPACE_END
 

@@ -1,9 +1,14 @@
 #include "Camera.hh"
 
+#include <imgui_impl_sdl2.h>
+#include <GlobalContext.hh>
+
+
 NAMESPACE_BEGIN
 
+extern AppContext* objptrAppContext;
 
-Camera::Camera(glm::vec3 position) :
+    Camera::Camera(glm::vec3 position) :
     position(position), 
     cameraDirection(glm::vec3(0.0f, 0.0f, -1.0f)),
     cameraUp(glm::vec3(0.0f, 1.0f, 0.0f)),
@@ -58,10 +63,23 @@ void Camera::ProcessInputUpdateCamera(float dt){
 
     // Process SDL events for camera speed and mouse movement
     while(SDL_PollEvent(&e)){
-//        ENGINE_INFO("Processing SDL event for camera\n");
-        switch (e.type) {
-
-            //in sdl, x is from left to right, y is from top to bottom
+        ImGui_ImplSDL2_ProcessEvent(&e);
+        if (e.type == SDL_QUIT)
+        {
+            this->onExitCalled();
+            break;
+        }
+        if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_F10) {
+            objptrAppContext->aEditorMode = !objptrAppContext->aEditorMode;
+            objptrAppContext->switchEditorMode();
+        }
+        if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_F9) {
+            objptrAppContext->aShowEditor = !objptrAppContext->aShowEditor;
+        }
+        if (!objptrAppContext->aEditorMode)
+        {
+            switch (e.type) {
+                //in sdl, x is from left to right, y is from top to bottom
             case SDL_MOUSEMOTION:
                 hoffset = e.motion.xrel;
                 voffset = -e.motion.yrel;
@@ -69,23 +87,21 @@ void Camera::ProcessInputUpdateCamera(float dt){
 
             case SDL_KEYDOWN:
                 switch (e.key.keysym.sym) {
-                    case SDLK_UP:
-                        cameraSpeed += 0.1f;
-                        break;
-                    case SDLK_DOWN:
-                        cameraSpeed -= 0.1f;
-                        break;
-                    default:
-                        break;
+            case SDLK_UP:
+                cameraSpeed += 0.1f;
+                    break;
+            case SDLK_DOWN:
+                cameraSpeed -= 0.1f;
+                    break;
+
+            default:
+                break;
                 }
                 break;
 
-            case SDL_QUIT:
-//                this->engineAppContext->aShouldQuit = true;
-                this->onExitCalled();
-                break;
             default:
                 break;
+            }
         }
     }
 

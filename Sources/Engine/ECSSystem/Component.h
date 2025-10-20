@@ -10,7 +10,8 @@
 NAMESPACE_BEGIN
 class Component {
     public:
-      virtual void tick(float deltatime) = 0;
+        virtual void tick(float deltatime) = 0;
+
 
 };
 NAMESPACE_END

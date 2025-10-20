@@ -3,11 +3,12 @@
 
 NAMESPACE_BEGIN
 
-void MeshSystem::tick()
+void MeshSystem::tick(float deltatime)
 {
     auto view = enttregistry->view<MeshComponent, TransformComponent>();
     for (auto [entity, mesh, transform]: view.each())
     {
+        transform.tick(deltatime);
         if (mesh.visible)
         {
             this->rendercontext.drawtargets.push_back(

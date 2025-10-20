@@ -1,9 +1,11 @@
 #pragma once
 
+#include <GlobalContext.hh>
 #include <Common.hh>
 #include <Config.hh>
 #include <Camera.hh>
 #include <RenderSystem.hh>
+#include <UIDrawSystem.hh>
 #include <StageManager.hh>
 #include <AssetSystem.hh>
 #include <Logger.hh>
@@ -21,24 +23,6 @@ using namespace std;
 using EngineCallbackFunction = std::function <void(float)>;
 using ecsMeshSystem = unique_ptr<MeshSystem>&;
 
-class AppContext {
-public:
-    AppContext() :
-        aIsRunning(false),
-        aIsInited(false),
-        aShouldQuit(false)
-    {
-        aRenderContext = make_unique<RenderContext>();
-    }
-
-    unique_ptr<RenderContext> aRenderContext;
-    bool aIsRunning ;
-    bool aIsInited ;
-    bool aShouldQuit;
-private:
-
-
-};
 
 class FLEET_API Engine {
 
@@ -64,6 +48,7 @@ public:
 
     AppContext& getAppContext() { return *aAppContext; }
     RenderSystem* getRenderSystem() { return aRenderSystem; }
+    UIDrawSystem* getUIDrawSystem() { return aUIDrawSystem.get(); }
     AssetSystem* getAssetSystem() { return aAssetSystem; }
     LoggerPtr getLogger() { return aLogger; }
     StateManagerPtr& getStateManager() { return aStateManager; }
@@ -72,8 +57,9 @@ private:
     //TODO: make them all become unique ptr
     string aGamename;
     string aGameversion;
-    unique_ptr<AppContext> aAppContext;
+    AppContext* aAppContext;
     RenderSystem* aRenderSystem;
+    unique_ptr<UIDrawSystem> aUIDrawSystem;
     AssetSystem* aAssetSystem;
     StateManagerPtr aStateManager;
     unique_ptr<MeshSystem> aMeshSystem;

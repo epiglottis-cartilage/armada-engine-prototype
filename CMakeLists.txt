@@ -36,11 +36,48 @@ find_package(assimp CONFIG REQUIRED)
 find_package(yaml-cpp CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 
+FetchContent_Declare(
+    imgui
+    GIT_REPOSITORY https://github.com/ocornut/imgui.git
+    GIT_TAG v1.92.4
+)
+FetchContent_MakeAvailable(imgui)
+add_library(imgui STATIC
+    ${imgui_SOURCE_DIR}/imgui.cpp
+    ${imgui_SOURCE_DIR}/imgui_draw.cpp
+    ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+    ${imgui_SOURCE_DIR}/imgui_tables.cpp
+    ${imgui_SOURCE_DIR}/imgui_demo.cpp
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl2.cpp
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
+)
+target_include_directories(
+    imgui PUBLIC
+    ${imgui_SOURCE_DIR}
+    ${imgui_SOURCE_DIR}/backends
+)
+target_link_libraries(imgui PRIVATE SDL2::SDL2 OpenGL::GL)
+
+FetchContent_Declare(
+    rttr
+    GIT_REPOSITORY https://github.com/rttrorg/rttr.git
+    GIT_TAG v0.9.6
+)
+FetchContent_MakeAvailable(rttr)
+if (TARGET rttr_core AND NOT TARGET rttr::rttr_core)
+    add_library(rttr::rttr_core ALIAS rttr_core)
+endif()
+
+if (TARGET rttr_lib AND NOT TARGET rttr::rttr_lib)
+    add_library(rttr::rttr_lib ALIAS rttr_lib)
+endif()
+
 set(ENGINE_HEADERS_DIRS
 
     ${CMAKE_SOURCE_DIR}/Sources/Engine
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Shaders
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Editorimgui
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Camera
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Utils
     ${CMAKE_SOURCE_DIR}/Sources/Engine/InputSystem
@@ -54,6 +91,7 @@ set(ENGINE_HEADERS_DIRS
 set(ENGINE_HEADERS_FILES
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Common.hh
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Engine.hh
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/GlobalContext.hh
 
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Model.hh
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/RenderSystem.hh
@@ -64,6 +102,7 @@ set(ENGINE_HEADERS_FILES
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Shaders/Shader.hh
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Shaders/PhongShader.hh
 
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Editorimgui/UIDrawSystem.hh
 
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Camera/Camera.hh
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Utils/Config.hh
@@ -76,6 +115,7 @@ set(ENGINE_HEADERS_FILES
     ${CMAKE_SOURCE_DIR}/Sources/Engine/ECSSystem/StageManager.hh
     ${CMAKE_SOURCE_DIR}/Sources/Engine/ECSSystem/Component.h
     ${CMAKE_SOURCE_DIR}/Sources/Engine/ECSSystem/MeshComponent.h
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/ECSSystem/NameComponent.hh
     ${CMAKE_SOURCE_DIR}/Sources/Engine/ECSSystem/TransformComponent.h
 
 )
@@ -84,7 +124,8 @@ set(ENGINE_HEADERS_FILES
 set(ENGINE_SOURCES_FILES 
     #engine main
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Engine.cc
-                       
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/GlobalContext.cc
+
     #rendersystem,core, essentiaE
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Model.cc
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/RenderSystem.cc
@@ -95,6 +136,7 @@ set(ENGINE_SOURCES_FILES
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Shaders/Shader.cc
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Shaders/PhongShader.cc
 
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Editorimgui/UIDrawSystem.cc
 
     ${CMAKE_SOURCE_DIR}/Sources/Engine/AssetSystem/AssetSystem.cc
                        
@@ -110,6 +152,7 @@ set(ENGINE_SOURCES_FILES
     ${CMAKE_SOURCE_DIR}/Sources/Engine/ECSSystem/Component.cpp
     ${CMAKE_SOURCE_DIR}/Sources/Engine/ECSSystem/MeshComponent.cpp
     ${CMAKE_SOURCE_DIR}/Sources/Engine/ECSSystem/TransformComponent.cpp
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/ECSSystem/NameComponent.cc
 )
 
 set(EXAMPLES_DIR "${CMAKE_SOURCE_DIR}/Sources/Examples")
@@ -167,10 +210,12 @@ function(build_engine_stclib lib_name)
         assimp::assimp
         yaml-cpp::yaml-cpp
         spdlog::spdlog
+        EnTT::EnTT
+        rttr::rttr_core
+        imgui
 
         # Modified stl
         EASTL
-        EnTT::EnTT
     )
 
 endfunction()

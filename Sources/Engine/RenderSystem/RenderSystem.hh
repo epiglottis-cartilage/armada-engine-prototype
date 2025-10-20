@@ -5,6 +5,7 @@
 
 
 #include <Common.hh>
+#include <GlobalContext.hh>
 #include <ConfigTypes.hh>
 #include <Shader.hh>
 #include <Texture.hh>
@@ -30,6 +31,8 @@
 
 NAMESPACE_BEGIN
 
+extern AppContext* objptrAppContext;
+
 #define SHADERDIR "shaders"
 
 struct RenderCommand {
@@ -40,6 +43,8 @@ struct RenderCommand {
 };
 
 struct RenderContext {
+    SDL_Window* mainwindow;
+    SDL_GLContext glcontext;
     Camera* aCurrentCamera;
     float deltatime;
     vector<RenderCommand> drawtargets;

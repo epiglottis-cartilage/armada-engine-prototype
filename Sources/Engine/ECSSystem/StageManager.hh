@@ -11,6 +11,7 @@
 #include <Component.h>
 #include <TransformComponent.h>
 #include <MeshComponent.h>
+#include <NameComponent.hh>
 
 NAMESPACE_BEGIN
 struct RenderContext;
@@ -23,7 +24,7 @@ public:
     TransformSystem(StateManagerPtr& stateManager) :
         enttregistry(stateManager)
     {}
-    void tick()
+    void tick(float deltatime)
     {
         //do sth here
     }
@@ -37,7 +38,7 @@ public:
     MeshSystem(RenderContext& rendercontext, StateManagerPtr& stateManager) :
         enttregistry(stateManager),
         rendercontext(rendercontext){};
-    void tick();
+    void tick(float deltatime);
 private:
     StateManagerPtr& enttregistry;
     RenderContext& rendercontext;

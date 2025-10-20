@@ -42,10 +42,6 @@ void RenderSystem::parseconfig(cfgRenderSystem config){
 
 /*On run, a RenderSystem will implicitly create a ShaderManager on init()*/
 void RenderSystem::init(){
-
-
-
-//    this->glContext = new SDL_GLContext ;
     GLuint errorcode;
     GLenum errorClass;
     SDL_Init(SDL_INIT_EVERYTHING);
@@ -71,9 +67,11 @@ void RenderSystem::init(){
         this->windowFlags 
     );
     error = {SDL_GetError()};
+    objptrAppContext->aRenderContext->mainwindow = this->window;
     if(window == NULL){
         ENGINE_ERROR("SDL_CreateWindow Error: \n", error);
     }
+    
     if(error != ""){
         ENGINE_ERROR("SDL set GL attribute Error: \n", error);
     }
@@ -88,6 +86,7 @@ void RenderSystem::init(){
     }
 
     this->glContext = SDL_GL_CreateContext(window);
+    objptrAppContext->aRenderContext->glcontext = this->glContext;
     glewExperimental = GL_TRUE;
 
     glewInit();

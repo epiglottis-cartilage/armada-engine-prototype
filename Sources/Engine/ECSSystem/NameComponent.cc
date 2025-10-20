@@ -3,3 +3,12 @@
 //
 
 #include "NameComponent.hh"
+
+NAMESPACE_BEGIN
+
+void NameComponent::tick(float deltatime)
+{
+
+}
+
+NAMESPACE_END

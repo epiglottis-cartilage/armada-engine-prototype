@@ -22,6 +22,7 @@ typedef std::string string;
 
 using std::vector;
 using std::shared_ptr;
+using std::unique_ptr;
 
 namespace fs = std::filesystem;
 ////globaly replace new with EASTL version

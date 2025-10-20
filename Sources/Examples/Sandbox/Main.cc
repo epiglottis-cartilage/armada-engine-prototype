@@ -42,6 +42,7 @@ int main(int argc, char** argv){
     fleet::StateManagerPtr& gSceneManager = gameengine->getStateManager();
     fleet::Entity apc = gSceneManager->create();
     //add entity with location
+    gSceneManager->emplace<fleet::NameComponent>(apc, "Armored APC");
     gSceneManager->emplace<fleet::TransformComponent>(
         apc,
         glm::vec3(1.0f),
@@ -55,6 +56,7 @@ int main(int argc, char** argv){
     );
 
     fleet::Entity terrainEnt = gSceneManager->create();
+    gSceneManager->emplace<fleet::NameComponent>(terrainEnt, "Testing Ground");
     gSceneManager->emplace<fleet::TransformComponent>(
         terrainEnt,
         glm::vec3(0.0f),
