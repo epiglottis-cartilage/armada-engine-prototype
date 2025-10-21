@@ -6,18 +6,17 @@ A Easy-to-use OOP rendering framework. Currently converting its architecture to 
 Armada Engine (fleet engine) is my personal project aimed at building a high-performance game engine tailored for first-person and third-person shooter titles. 
 
 ### Implemented Features
-- **Cross-Platform Support**: Compiles and runs on Linux and Windows. (Mac OS X support WIP)
-- **Enhance CI**: cloud autonomous CI flow 
+- **Simple Rendering Layer**: Currently using OpenGL 460 (Will be convert to RHI ASAP)(Vulkan/D3D11 WIP)
 - **ECS system**: component based GameObject and data driven programming
+- **reflection system && simple editor**: reflect components fields for editing, with `imgui` as a simple editor
 - **glb/gltf model loading**: load customized models
 
 ### Current Planning 
-- **reflection system && simple editor**: use `rttr` to reflect components fields for editing
 - **cluster forward lighting**: transmit lighting based on screen location
-- **Advanced Anti-Aliasing**: MSAA, FXAA. TXAA support WIP. DLAA & SSAA will add in future.
+- **Advanced Anti-Aliasing**: MSAA, FXAA. TXAA support WIP. 
 - **PBR Material System**: Physically based rendering WIP
 - **Flexible Rendering Pipelines**: Choose between deferred, forward, and traditional rendering.
-- **Ambient Occlusion Techniques**: SSAO, HBAO+, RTAO, GTAO, and others (WIP)
+- **Ambient Occlusion Techniques**: SSAO, HBAO+ and others (WIP)
 - **Multi-Rendering Backends**: Currently supports OpenGL. DirectX11/12, and Vulkan WIP.
 
 ### Future Roadmap
@@ -33,7 +32,7 @@ Armada Engine (fleet engine) is my personal project aimed at building a high-per
 - `resources` : contains all assets, such as models, textures, audio, animations, CGs, etc.
 Noticed that this directory is not sync up. You are encouraged to use your own assets.
 
-- `Sources` : contains all actual code. `engine` is the armada engine itself, `examples` are some demo & tests to show how to use the engine.
+- `Sources` : contains all actual code. `Engine` is the armada engine itself, `Examples` are some demo & tests to show how to use the engine. `Thirdparty` contains some of the external library.
 
 ## Cross-platform Build
 This engine is both compiled and run cross-platform. It relys on `cmake` to find dependencies and build for each platform.
