@@ -11,6 +11,7 @@ Armada Engine (fleet engine) is my personal project aimed at building a high-per
 - **Simple Rendering Layer**: Currently using OpenGL 460 (Will be convert to RHI ASAP)(Vulkan/D3D11 WIP)
 - **ECS system**: component based GameObject and data driven programming
 - **reflection system && simple editor**: reflect components fields for editing, with `imgui` as a simple editor
+- **Subscription based Event System & Input Manager**: Subscriber/Observer based Event System, and Query/Queue process Input System
 - **glb/gltf model loading**: load customized models
 
 ### Current Planning 
@@ -23,10 +24,10 @@ Armada Engine (fleet engine) is my personal project aimed at building a high-per
 
 ### Future Roadmap
 - Add rendering abstraction Layer
+- Bullet physics engine integration
 - Use Fast-Delegation to lower callback function costs
 - Add Irrklang as audio engine
 - Add Lua scripting binding 
-- Bullet physics engine integration
 - ParticleFX particle system
 - Animation engine integration
 
