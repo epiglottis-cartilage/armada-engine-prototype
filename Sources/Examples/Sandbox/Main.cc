@@ -34,8 +34,8 @@ int main(int argc, char** argv){
     fleet::Model* cvchelmet = new fleet::Model(modeldir / "cvchelmet.glb");
     cvchelmet->setShader(phongShader);
 
-    fleet::Model* heli = new fleet::Model(modeldir / "mi35.glb");
-    heli->setShader(phongShader);
+    fleet::Model* helimodel = new fleet::Model(modeldir / "mi35.glb");
+    helimodel->setShader(phongShader);
 
     
 
@@ -55,6 +55,23 @@ int main(int argc, char** argv){
         apc,
         apcModel
     );
+
+    //add a heli model
+    fleet::Entity heli = gSceneManager->create();
+    gSceneManager->emplace<fleet::NameComponent>(heli, "Mi-35");
+    gSceneManager->emplace<fleet::TransformComponent>(
+        heli,
+        glm::vec3(5.0f, 10.0f, -10.0f),
+        glm::vec3(0.0f, 0.0f, 90.0f),
+        glm::vec3(1.0f)
+    );
+    //add entity with model
+    gSceneManager->emplace<fleet::MeshComponent>(
+        heli,
+        helimodel
+    );
+
+    
 
     //Example of using subscriber based input manager
     auto* geventmanager = gameengine->getEventManager();

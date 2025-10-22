@@ -2,6 +2,8 @@
 
 A Easy-to-use OOP rendering framework. Currently converting its architecture to fits a game engine.
 
+![preview photo of armada engine](./.github/photos/enginepreview.png "preview")
+
 ## Overview & Introductions
 Armada Engine (fleet engine) is my personal project aimed at building a high-performance game engine tailored for first-person and third-person shooter titles. 
 
