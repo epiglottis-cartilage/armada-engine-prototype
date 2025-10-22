@@ -1,7 +1,7 @@
 #include <RenderSystem.hh>
 
-
 NAMESPACE_BEGIN
+
 
 RenderSystem::RenderSystem(cfgRenderSystem config, AssetSystem* assetManager)
 {
@@ -59,8 +59,8 @@ void RenderSystem::init(){
         ENGINE_ERROR("SDL set GL attribute Error: %s\n", error);
     }
 
-
-    this->window = SDL_CreateWindow("get gl info", SDL_WINDOWPOS_CENTERED,
+    string windowtitle = objptrAppContext->aGamename + " " + objptrAppContext->aGameVersion;
+    this->window = SDL_CreateWindow(windowtitle.c_str(), SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED, 
         this->windowWidth, 
         this->windowHeight,  

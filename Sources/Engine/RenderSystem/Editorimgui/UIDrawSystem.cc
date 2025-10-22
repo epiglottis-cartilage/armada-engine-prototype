@@ -1,6 +1,7 @@
 #include <UIDrawSystem.hh>
 #include <GlobalContext.hh>
 #include <Engine.hh>
+#include <SDL2/SDL.h>
 
 NAMESPACE_BEGIN
 extern AppContext* objptrAppContext;
@@ -13,7 +14,7 @@ void UIDrawSystem::drawframe()
     ImGui::Text("Press F19 to hide editor");
     ImGui::Separator();
 
-    StateManagerPtr& stateManager = objptrGameEngine->getStateManager();
+    StateManager* stateManager = objptrGameEngine->getStateManager();
 
     auto view = stateManager->view<TransformComponent, MeshComponent>();
     rttr::type transform_type = rttr::type::get<TransformComponent>();
@@ -107,6 +108,19 @@ void UIDrawSystem::init(SDL_Window* window, SDL_GLContext glcontext)
 
     ImGui_ImplSDL2_InitForOpenGL(window, glcontext);
     ImGui_ImplOpenGL3_Init("#version 330");
+
+    //register editor hide/switch_to subscriber
+    auto* eventmanager = objptrGameEngine->getEventManager();
+    eventmanager->subscribe(EventType::KeyPressed, [](const Event& e)
+    {
+        auto& ev = static_cast<const KeyPressedEvent&>(e);
+        if (ev.key == SDLK_F10)
+            objptrAppContext->aEditorMode = !objptrAppContext->aEditorMode;
+            objptrAppContext->switchEditorMode();
+        if (ev.key == SDLK_F9)
+            objptrAppContext->aShowEditor = !objptrAppContext->aShowEditor;
+    });
+
 }
 
 void UIDrawSystem::quit()

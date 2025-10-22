@@ -15,13 +15,6 @@ Engine::Engine(string gamename, string gameversion):
 {
 }
 
-Camera* Engine::engineCreateCamera(glm::vec3 position, float angle){
-    Camera* newCamera = new Camera{position, angle};
-    newCamera->onExitCalled = [this]() {
-        this->aAppContext->aShouldQuit = true;
-    };
-    return newCamera;
-}
 
 /*
 engine::init read config file from the working directory, 
@@ -36,6 +29,9 @@ void Engine::init(){
     aAppContext = objptrAppContext;
     aAppContext->aIsInited = true;
     aAppContext->aShouldQuit = false;
+    aAppContext->aIsInited = true;
+    aAppContext->aGamename = this->aGamename;
+    aAppContext->aGameVersion = this->aGameversion;
     ENGINE_INFO("AppContext create success\n");
 
     Logger::Init(aConfig->cfgappcontext);
@@ -43,19 +39,25 @@ void Engine::init(){
     ENGINE_INFO("Logger create success\n");
     aAssetSystem = new AssetSystem{aConfig->cfgassetsystem};
     ENGINE_INFO("AssetSystem create success\n");
+    aEventManager = std::make_unique<EventManager>();
+    aInputManager = std::make_unique<InputManager>(*getEventManager());
+    ENGINE_INFO("EventManager & InputManager create success\n");
 
     //init all systems, assign corresponding fields for later access
-    aRenderSystem = new RenderSystem{aConfig->cfgrendersystem, this->aAssetSystem};
+    aRenderSystem =  make_unique<RenderSystem>(aConfig->cfgrendersystem, this->aAssetSystem);
     aUIDrawSystem = make_unique<UIDrawSystem>();
     ENGINE_INFO("RenderSystem create success\n");
     ENGINE_INFO(" StateManager create success\n");
     aStateManager = std::make_unique<entt::registry>();
-    aMeshSystem = std::make_unique<MeshSystem>(*this->aAppContext->aRenderContext, this->aStateManager);
+    aMeshSystem = std::make_unique<MeshSystem>(*this->aAppContext->aRenderContext, *this->aStateManager);
     ENGINE_INFO("ECS System mesh system created");
-    aAppContext->aIsInited = true;
+
     ENGINE_INFO("Engine init success\n");
     ENGINE_INFO("parse some config: {}", aConfig->cfgassetsystem.assetpath);
 
+    getEventManager()->subscribe(EventType::Quit, [this](const Event& e){
+        this->aAppContext->aShouldQuit = true;
+    });
 }
 
 
@@ -82,14 +84,12 @@ void Engine::run(EngineCallbackFunction gamelogic){
             gamelogic(dt);
             accumulator -= dt;
         }
-
-
-
+        this->aInputManager->pollEvents();
 //        ENGINE_INFO("updating camera");
         //process Input, update camera current status, like view matrix, ...
         auto* aRenderContext = this->aAppContext->aRenderContext.get();
         if(aRenderContext->aCurrentCamera != nullptr){
-            aRenderContext->aCurrentCamera->ProcessInputUpdateCamera(dt);
+            aRenderContext->aCurrentCamera->UpdateCamera(dt);
         }
         //delta time field is not used currently
         aRenderContext->deltatime = dt;
@@ -123,7 +123,6 @@ void Engine::run(EngineCallbackFunction gamelogic){
 void Engine::shutdown(){
     delete this->aConfig;
     delete this->aAssetSystem;
-    delete this->aRenderSystem;
     ENGINE_INFO("Engine shutdown success\n");
     Logger::Shutdown();
 }

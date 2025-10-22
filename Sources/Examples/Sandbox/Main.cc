@@ -1,4 +1,5 @@
 #include <Engine.hh>
+#include <FpsCamera.hh>
 #include <ShaderManager.hh>
 #include <glm/glm.hpp>
 #include <Main.hh>
@@ -39,7 +40,7 @@ int main(int argc, char** argv){
     
 
     //add model to stage manager to display
-    fleet::StateManagerPtr& gSceneManager = gameengine->getStateManager();
+    fleet::StateManager* gSceneManager = gameengine->getStateManager();
     fleet::Entity apc = gSceneManager->create();
     //add entity with location
     gSceneManager->emplace<fleet::NameComponent>(apc, "Armored APC");
@@ -54,6 +55,16 @@ int main(int argc, char** argv){
         apc,
         apcModel
     );
+
+    //Example of using subscriber based input manager
+    auto* geventmanager = gameengine->getEventManager();
+    geventmanager->subscribe(fleet::EventType::KeyPressed, [gSceneManager, apc](const fleet::Event& e){
+        auto& keyevent = static_cast<const fleet::KeyPressedEvent&>(e);
+        if (keyevent.key == SDLK_r) {
+            auto& tmp = gSceneManager->get<fleet::TransformComponent>(apc);
+            tmp.setPosition(tmp.getPosition() + glm::vec3{0.0f, 0.0f, 0.5f});
+        }
+    });
 
     fleet::Entity terrainEnt = gSceneManager->create();
     gSceneManager->emplace<fleet::NameComponent>(terrainEnt, "Testing Ground");
@@ -70,7 +81,7 @@ int main(int argc, char** argv){
 
 
 
-    fleet::Camera* camera = gameengine->engineCreateCamera(glm::vec3(0.0f, 0.0f, 3.0f), 70.0f);
+    fleet::FPSCamera* camera = new fleet::FPSCamera{glm::vec3{0.0f, 1.0f, 1.0f}, 70.0f};
     camera->setCameraProjectionMatrix(
         glm::perspective(glm::radians(70.0f), 16.0f/9.0f, 0.1f, 1000.0f)
     );

@@ -11,9 +11,10 @@
 #include <Logger.hh>
 #include <functional>
 #include <glm/glm.hpp>
+#include <EventManager.hh>
+#include <InputManager.hh>
 
 //namespace: fleet::xxx
-
 
 
 NAMESPACE_BEGIN
@@ -31,42 +32,38 @@ public:
     if not explicit giving config path, 
     then executable will look at its working directory for configs file*/
     Engine(string gamename, string gameversion);
-
     ~Engine() = default;
 
-
     void init();
-
-    Camera* engineCreateCamera(glm::vec3 position, float angle);
+    void run(EngineCallbackFunction gamelogic);
+    void shutdown();
 
     void setCurrentCamera(Camera* camera) { aAppContext->aRenderContext->aCurrentCamera = camera; }
     
 
-    void run(EngineCallbackFunction gamelogic);
-    void shutdown();
-
-
     AppContext& getAppContext() { return *aAppContext; }
-    RenderSystem* getRenderSystem() { return aRenderSystem; }
+    RenderSystem* getRenderSystem() { return aRenderSystem.get(); }
     UIDrawSystem* getUIDrawSystem() { return aUIDrawSystem.get(); }
     AssetSystem* getAssetSystem() { return aAssetSystem; }
     LoggerPtr getLogger() { return aLogger; }
-    StateManagerPtr& getStateManager() { return aStateManager; }
+    StateManager* getStateManager() { return aStateManager.get(); }
     ecsMeshSystem getMeshSystem() { return aMeshSystem; }
+    EventManager* getEventManager() { return aEventManager.get(); }
+    InputManager* getInputManager() { return aInputManager.get(); }
 private:
     //TODO: make them all become unique ptr
     string aGamename;
     string aGameversion;
     AppContext* aAppContext;
-    RenderSystem* aRenderSystem;
+    unique_ptr<RenderSystem> aRenderSystem;
     unique_ptr<UIDrawSystem> aUIDrawSystem;
     AssetSystem* aAssetSystem;
-    StateManagerPtr aStateManager;
+    unique_ptr<StateManager> aStateManager;
     unique_ptr<MeshSystem> aMeshSystem;
     LoggerPtr aLogger;
-    
+    unique_ptr<EventManager>  aEventManager;
+    unique_ptr<InputManager> aInputManager;
 
-    Camera* aCurrentCamera;
 
 
     Config* aConfig;

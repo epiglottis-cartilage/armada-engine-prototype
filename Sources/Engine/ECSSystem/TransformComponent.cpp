@@ -18,9 +18,16 @@ TransformComponent::TransformComponent(glm::vec3 pos, glm::vec3 rot, glm::vec3 s
 }
 
 void TransformComponent::tick(float deltatime) {
-    std::swap(position[current], position[buffer]);
-    std::swap(rotation[current], rotation[buffer]);
-    std::swap(   scale[current],    scale[buffer]);
+    if (isdirty)
+    {
+        isdirty = !isdirty;
+        current = buffer;
+        buffer = 1 - current;
+        position[buffer] = position[current];
+        rotation[buffer] = rotation[current];
+        scale[buffer] = scale[current];
+
+    }
 }
 
 glm::mat4 TransformComponent::getTransformMat() {

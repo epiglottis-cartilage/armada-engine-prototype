@@ -15,6 +15,8 @@ public:
     AppContext();
 
     unique_ptr<RenderContext> aRenderContext;
+    string aGamename;
+    string aGameVersion;
     bool aIsRunning ;
     bool aIsInited ;
     bool aShouldQuit;

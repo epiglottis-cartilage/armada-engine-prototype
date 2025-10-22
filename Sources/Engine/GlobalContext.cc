@@ -9,7 +9,7 @@
 NAMESPACE_BEGIN
 
 AppContext::AppContext() :
-    aIsRunning(false),
+    aIsRunning(false), //use this if possible......
     aIsInited(false),
     aShouldQuit(false),
     aEditorMode(false),

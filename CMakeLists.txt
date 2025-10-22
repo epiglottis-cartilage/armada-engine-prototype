@@ -85,6 +85,7 @@ set(ENGINE_HEADERS_DIRS
     ${CMAKE_SOURCE_DIR}/Sources/Engine/PhysicSystem
     ${CMAKE_SOURCE_DIR}/Sources/Engine/AssetSystem
     ${CMAKE_SOURCE_DIR}/Sources/Engine/ECSSystem
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/Core
 
 )
 
@@ -92,6 +93,10 @@ set(ENGINE_HEADERS_FILES
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Common.hh
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Engine.hh
     ${CMAKE_SOURCE_DIR}/Sources/Engine/GlobalContext.hh
+
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/Core/Event.hh
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/Core/EventManager.hh
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/Core/InputManager.hh
 
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Model.hh
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/RenderSystem.hh
@@ -105,6 +110,7 @@ set(ENGINE_HEADERS_FILES
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Editorimgui/UIDrawSystem.hh
 
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Camera/Camera.hh
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/Camera/FpsCamera.hh
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Utils/Config.hh
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Utils/ConfigTypes.hh
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Utils/Logger.hh
@@ -126,6 +132,9 @@ set(ENGINE_SOURCES_FILES
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Engine.cc
     ${CMAKE_SOURCE_DIR}/Sources/Engine/GlobalContext.cc
 
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/Core/EventManager.cc
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/Core/InputManager.cc
+
     #rendersystem,core, essentiaE
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Model.cc
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/RenderSystem.cc
@@ -142,7 +151,8 @@ set(ENGINE_SOURCES_FILES
                        
     #camera class
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Camera/Camera.cc
-                       
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/Camera/FpsCamera.cc
+
     #utilities, like cosole output, config loader, etc
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Utils/Config.cc
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Utils/Logger.cc

@@ -11,11 +11,18 @@ void MeshSystem::tick(float deltatime)
         transform.tick(deltatime);
         if (mesh.visible)
         {
-            this->rendercontext.drawtargets.push_back(
+            this->rendercontext->drawtargets.push_back(
                 RenderCommand{mesh.modelptr, mesh.modelptr->getShader(), transform.getTransformMat()}
                 );
         }
     }
 }
+
+MeshSystem::MeshSystem(RenderContext& rendercontext, StateManager& stateManager):
+    enttregistry(&stateManager),
+    rendercontext(&rendercontext)
+{
+}
+
 
 NAMESPACE_END

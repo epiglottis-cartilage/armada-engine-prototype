@@ -39,17 +39,15 @@ public:
 //    void syncCameraAngleData(
 //        float pitchoffset, float yawoffset, float rolloffset
 //    );
+    virtual void UpdateCamera(float dt);
 
 
     void setCameraPosition(glm::vec3 newPosition){
         this->position = newPosition;
     }
-
     void setCameraLookat(glm::vec3 target){
         cameraDirection = glm::normalize(target - position);
-
     }
-
     void setCameraUp(glm::vec3 newUp){
         cameraUp = newUp;
     }
@@ -61,10 +59,6 @@ public:
         this->sensitivity = newSensitivity;
     }
 
-    /*this is a temperal solution, because Listener based Event system Unfinished leads to Input manager un-implement, 
-    I don't have better choice*/
-    //TODO: refactor this function after Input Manager is done
-    void ProcessInputUpdateCamera(float dt);
 
     glm::vec3 getCameraPosition(){return position;}
     glm::vec3 getCameraLookat(){return cameraDirection;}
@@ -76,7 +70,7 @@ public:
     //delete this once event listener is done
     std::function<void ()> onExitCalled;
 
-private:
+protected:
     glm::vec3 position;
     glm::vec3 cameraDirection;
     glm::vec3 cameraUp;

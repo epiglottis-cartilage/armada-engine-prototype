@@ -16,32 +16,31 @@
 NAMESPACE_BEGIN
 struct RenderContext;
 
-using StateManagerPtr = unique_ptr<entt::registry>;
+using StateManager = entt::registry;
 
 class TransformSystem
 {
 public:
-    TransformSystem(StateManagerPtr& stateManager) :
-        enttregistry(stateManager)
-    {}
+    TransformSystem(StateManager& stateManager)
+    {this->enttregistry = &stateManager;}
     void tick(float deltatime)
     {
         //do sth here
     }
 
 private:
-    StateManagerPtr& enttregistry;
+    StateManager* enttregistry;
 };
 
 class MeshSystem{
 public:
-    MeshSystem(RenderContext& rendercontext, StateManagerPtr& stateManager) :
-        enttregistry(stateManager),
-        rendercontext(rendercontext){};
+    MeshSystem(RenderContext& rendercontext, StateManager& stateManager);
+
+
     void tick(float deltatime);
 private:
-    StateManagerPtr& enttregistry;
-    RenderContext& rendercontext;
+    StateManager* enttregistry;
+    RenderContext* rendercontext;
 };
 
 
