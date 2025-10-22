@@ -58,6 +58,8 @@ target_include_directories(
 )
 target_link_libraries(imgui PRIVATE SDL2::SDL2 OpenGL::GL)
 
+set(BUILD_TESTS OFF CACHE BOOL "Disable RTTR unit tests" FORCE)
+set(BUILD_DOCUMENTATION OFF CACHE BOOL "Disable RTTR documentation generation" FORCE)
 FetchContent_Declare(
     rttr
     GIT_REPOSITORY https://github.com/rttrorg/rttr.git

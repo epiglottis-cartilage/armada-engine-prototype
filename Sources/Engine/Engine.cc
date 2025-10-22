@@ -3,11 +3,10 @@
 
 NAMESPACE_BEGIN
 
-unique_ptr<AppContext> uptrAppContext = make_unique<AppContext>();
-AppContext* objptrAppContext = uptrAppContext.get();
 
 //global null ptr to engine instance itself
 Engine* objptrGameEngine;
+AppContext* objptrAppContext;
 
 Engine::Engine(string gamename, string gameversion):
     aGamename(gamename),
@@ -26,7 +25,8 @@ void Engine::init(){
     ENGINE_VALIDLOCATION(exePath);
     this->aConfig = new Config{ exePath.string() };
     ENGINE_INFO("Config Loaded, now printing some fields:\n{}", aConfig->cfgassetsystem.assetpath);
-    aAppContext = objptrAppContext;
+    aAppContext = make_unique<AppContext>();
+    objptrAppContext = getAppContext();
     aAppContext->aIsInited = true;
     aAppContext->aShouldQuit = false;
     aAppContext->aIsInited = true;
@@ -37,14 +37,14 @@ void Engine::init(){
     Logger::Init(aConfig->cfgappcontext);
     aLogger = Logger::Get();
     ENGINE_INFO("Logger create success\n");
-    aAssetSystem = new AssetSystem{aConfig->cfgassetsystem};
+    aAssetSystem = make_unique<AssetSystem>(aConfig->cfgassetsystem);
     ENGINE_INFO("AssetSystem create success\n");
     aEventManager = std::make_unique<EventManager>();
     aInputManager = std::make_unique<InputManager>(*getEventManager());
     ENGINE_INFO("EventManager & InputManager create success\n");
 
     //init all systems, assign corresponding fields for later access
-    aRenderSystem =  make_unique<RenderSystem>(aConfig->cfgrendersystem, this->aAssetSystem);
+    aRenderSystem =  make_unique<RenderSystem>(aConfig->cfgrendersystem, getAssetSystem());
     aUIDrawSystem = make_unique<UIDrawSystem>();
     ENGINE_INFO("RenderSystem create success\n");
     ENGINE_INFO(" StateManager create success\n");
@@ -64,16 +64,16 @@ void Engine::init(){
 /*
 this method make sure that game logic is running under 60Hz*/
 void Engine::run(EngineCallbackFunction gamelogic){
-    AppContext& engineContext = getAppContext();
+    AppContext* engineContext = getAppContext();
     ENGINE_INFO("Engine run start\n");
-    ENGINE_INFO("app context content: {} {}", engineContext.aShouldQuit, engineContext.aIsInited);
+    ENGINE_INFO("app context content: {} {}", engineContext->aShouldQuit, engineContext->aIsInited);
     ENGINE_INFO("Engine run start\n");
 
 
     const float dt = 1.0f / 60.0f;
     Uint64 previoustime = SDL_GetTicks64();
     Uint64 accumulator = 0;
-    while(!engineContext.aShouldQuit){
+    while(!engineContext->aShouldQuit){
         //update game logic, will try best to run in 60 Hz
         this->aMeshSystem->tick(dt);
         while(accumulator >= dt){
@@ -122,7 +122,6 @@ void Engine::run(EngineCallbackFunction gamelogic){
 
 void Engine::shutdown(){
     delete this->aConfig;
-    delete this->aAssetSystem;
     ENGINE_INFO("Engine shutdown success\n");
     Logger::Shutdown();
 }

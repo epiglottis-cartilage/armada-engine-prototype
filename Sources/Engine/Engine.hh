@@ -41,10 +41,10 @@ public:
     void setCurrentCamera(Camera* camera) { aAppContext->aRenderContext->aCurrentCamera = camera; }
     
 
-    AppContext& getAppContext() { return *aAppContext; }
+    AppContext* getAppContext() { return aAppContext.get(); }
     RenderSystem* getRenderSystem() { return aRenderSystem.get(); }
     UIDrawSystem* getUIDrawSystem() { return aUIDrawSystem.get(); }
-    AssetSystem* getAssetSystem() { return aAssetSystem; }
+    AssetSystem* getAssetSystem() { return aAssetSystem.get(); }
     LoggerPtr getLogger() { return aLogger; }
     StateManager* getStateManager() { return aStateManager.get(); }
     ecsMeshSystem getMeshSystem() { return aMeshSystem; }
@@ -54,10 +54,10 @@ private:
     //TODO: make them all become unique ptr
     string aGamename;
     string aGameversion;
-    AppContext* aAppContext;
+    unique_ptr<AppContext> aAppContext;
     unique_ptr<RenderSystem> aRenderSystem;
     unique_ptr<UIDrawSystem> aUIDrawSystem;
-    AssetSystem* aAssetSystem;
+    unique_ptr<AssetSystem> aAssetSystem;
     unique_ptr<StateManager> aStateManager;
     unique_ptr<MeshSystem> aMeshSystem;
     LoggerPtr aLogger;

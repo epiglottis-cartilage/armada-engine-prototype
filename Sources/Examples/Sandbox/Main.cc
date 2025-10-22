@@ -81,7 +81,7 @@ int main(int argc, char** argv){
 
 
 
-    fleet::FPSCamera* camera = new fleet::FPSCamera{glm::vec3{0.0f, 1.0f, 1.0f}, 70.0f};
+    fleet::FPSCamera* camera = new fleet::FPSCamera{glm::vec3{0.0f, 5.0f, 5.0f}, 70.0f};
     camera->setCameraProjectionMatrix(
         glm::perspective(glm::radians(70.0f), 16.0f/9.0f, 0.1f, 1000.0f)
     );
