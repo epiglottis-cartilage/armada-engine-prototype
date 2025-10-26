@@ -9,8 +9,11 @@
 
 NAMESPACE_BEGIN
 class Component {
-    public:
-        virtual void tick(float deltatime) = 0;
+public:
+    Component() = default;
+    virtual ~Component() = default;
+
+    virtual void tick(float deltatime) = 0;
 
 
 };

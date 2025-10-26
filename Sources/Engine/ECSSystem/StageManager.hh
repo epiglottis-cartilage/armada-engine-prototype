@@ -12,6 +12,7 @@
 #include <TransformComponent.h>
 #include <MeshComponent.h>
 #include <NameComponent.hh>
+#include <LightComponent.hh>
 
 NAMESPACE_BEGIN
 struct RenderContext;
@@ -21,12 +22,8 @@ using StateManager = entt::registry;
 class TransformSystem
 {
 public:
-    TransformSystem(StateManager& stateManager)
-    {this->enttregistry = &stateManager;}
-    void tick(float deltatime)
-    {
-        //do sth here
-    }
+    TransformSystem(StateManager& stateManager) : enttregistry(&stateManager) {};
+    void tick(float deltatime);
 
 private:
     StateManager* enttregistry;
@@ -43,6 +40,17 @@ private:
     RenderContext* rendercontext;
 };
 
+class LightSystem {
+    friend LightComponent;
+public:
+    LightSystem(StateManager& stateManager): enttregistry(&stateManager) {};
+    void tick(float deltatime);
+private:
+    int lightnums = 0;
+    bool numsdirty = false;
+    void init();
+    StateManager* enttregistry;
+};
 
 
 NAMESPACE_END

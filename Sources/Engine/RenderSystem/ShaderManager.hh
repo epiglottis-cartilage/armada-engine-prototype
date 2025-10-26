@@ -7,16 +7,23 @@
 #include <glm/glm.hpp>
 #include <unordered_map>
 #include <ConfigTypes.hh>
+#include <GlobalContext.hh>
 
 #include <Shader.hh>
 #include <PhongShader.hh>
 
 NAMESPACE_BEGIN
 
+struct CameraMatrices {
+    glm::mat4 matrixView;
+    glm::mat4 matrixProjection;
+    glm::vec3 positionCamera;
+    float _padding;
+};
 
 class ShaderManager{
 public:
-    ShaderManager(); ;
+    ShaderManager();
     ~ShaderManager();
 
     Shader* getOrCreate(const std::string& type) {
@@ -36,11 +43,9 @@ public:
     }
     void clear() { shaders.clear(); }
 
-    vector<GLuint> getUBOBinding() const { return uboBindings; }
     ShaderFactory& getShaderFactory() { return ShaderFactory::instance(); }
 
 private:
-    vector<GLuint> uboBindings;
 
     std::unordered_map<std::string, std::unique_ptr<Shader>> shaders;
 };

@@ -22,7 +22,6 @@ NAMESPACE_BEGIN
 using namespace std;
 
 using EngineCallbackFunction = std::function <void(float)>;
-using ecsMeshSystem = unique_ptr<MeshSystem>&;
 
 
 class FLEET_API Engine {
@@ -47,20 +46,24 @@ public:
     AssetSystem* getAssetSystem() { return aAssetSystem.get(); }
     LoggerPtr getLogger() { return aLogger; }
     StateManager* getStateManager() { return aStateManager.get(); }
-    ecsMeshSystem getMeshSystem() { return aMeshSystem; }
+    MeshSystem* getMeshSystem() { return aMeshSystem.get(); }
+    TransformSystem* getTransformSystem() { return aTransformSystem.get(); }
+    LightSystem* getLightSystem() { return aLightSystem.get(); }
     EventManager* getEventManager() { return aEventManager.get(); }
     InputManager* getInputManager() { return aInputManager.get(); }
 private:
-    //TODO: make them all become unique ptr
     string aGamename;
     string aGameversion;
+    LoggerPtr aLogger;
+
     unique_ptr<AppContext> aAppContext;
     unique_ptr<RenderSystem> aRenderSystem;
     unique_ptr<UIDrawSystem> aUIDrawSystem;
     unique_ptr<AssetSystem> aAssetSystem;
     unique_ptr<StateManager> aStateManager;
+    unique_ptr<TransformSystem> aTransformSystem;
+    unique_ptr<LightSystem> aLightSystem;
     unique_ptr<MeshSystem> aMeshSystem;
-    LoggerPtr aLogger;
     unique_ptr<EventManager>  aEventManager;
     unique_ptr<InputManager> aInputManager;
 

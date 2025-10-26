@@ -47,6 +47,7 @@ struct RenderContext {
     SDL_GLContext glcontext;
     Camera* aCurrentCamera;
     float deltatime;
+    vector<GLuint> uboBindings;
     vector<RenderCommand> drawtargets;
 };
 

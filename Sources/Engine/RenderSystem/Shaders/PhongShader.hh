@@ -13,7 +13,6 @@ NAMESPACE_BEGIN
 
 class PhongShader : public Shader {
 public:
-    unsigned int program = 0;
 
     explicit PhongShader(const fs::path& shaderdir) ;
     ~PhongShader();
@@ -22,15 +21,6 @@ public:
     void setUniform(const std::string& name, float value) const override ;
 
     std::string typeName() const override { return "Phong"; }
-    GLuint getProgram() const { return program; }
-private:
-    class GLShader {
-
-    public: 
-        /* construct a opengl shader from the location `shaderfilepath`*/
-        GLShader(GLenum shadertype, fs::path shaderfilepath);
-        GLuint shaderID;
-    };
 };
 
 NAMESPACE_END

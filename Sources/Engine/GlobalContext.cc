@@ -8,6 +8,11 @@
 
 NAMESPACE_BEGIN
 
+class Engine;
+
+Engine* objptrGameEngine;
+AppContext* objptrAppContext;
+
 AppContext::AppContext() :
     aIsRunning(false), //use this if possible......
     aIsInited(false),

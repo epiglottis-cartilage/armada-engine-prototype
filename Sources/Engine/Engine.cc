@@ -5,8 +5,8 @@ NAMESPACE_BEGIN
 
 
 //global null ptr to engine instance itself
-Engine* objptrGameEngine;
-AppContext* objptrAppContext;
+extern Engine* objptrGameEngine;
+extern AppContext* objptrAppContext;
 
 Engine::Engine(string gamename, string gameversion):
     aGamename(gamename),
@@ -48,8 +48,12 @@ void Engine::init(){
     aUIDrawSystem = make_unique<UIDrawSystem>();
     ENGINE_INFO("RenderSystem create success\n");
     ENGINE_INFO(" StateManager create success\n");
+
+    ENGINE_INFO("Starting creating ECS system cluster.....");
     aStateManager = std::make_unique<entt::registry>();
+    aTransformSystem = std::make_unique<TransformSystem>(*this->aStateManager);
     aMeshSystem = std::make_unique<MeshSystem>(*this->aAppContext->aRenderContext, *this->aStateManager);
+    aLightSystem = std::make_unique<LightSystem>(*this->aStateManager);
     ENGINE_INFO("ECS System mesh system created");
 
     ENGINE_INFO("Engine init success\n");
@@ -75,7 +79,9 @@ void Engine::run(EngineCallbackFunction gamelogic){
     Uint64 accumulator = 0;
     while(!engineContext->aShouldQuit){
         //update game logic, will try best to run in 60 Hz
+        this->aTransformSystem->tick(dt);
         this->aMeshSystem->tick(dt);
+        this->aLightSystem->tick(dt);
         while(accumulator >= dt){
 
             //tick ecs

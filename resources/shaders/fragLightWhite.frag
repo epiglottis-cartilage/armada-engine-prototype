@@ -1,9 +1,23 @@
 # version 330
+layout (location = 0) in vec3 position;
+layout (location = 1) in vec3 normal;
+layout (location = 2) in vec2 texCoords;
 
-//uniform vec3 lightColor;
+out vec2 TexCoord;
 
-out vec4 color;
+uniform mat4 matrixModel;
 
-void main(){
-    color = vec4(1.0f);
+layout (std140) uniform CameraMatrices
+{
+    mat4 matrixView;
+    mat4 matrixProjection;
+};
+
+void main()
+{
+
+    gl_Position = matrixProjection * matrixView * matrixModel  * vec4(position, 1.0f);
+    TexCoord = texCoords;
+
+
 }

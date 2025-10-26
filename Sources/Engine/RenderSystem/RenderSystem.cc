@@ -158,11 +158,10 @@ void RenderSystem::prerender(RenderContext* context){
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     Camera* camera = context->aCurrentCamera;
-
+    CameraMatrices matCameraData = {camera->getViewMatrix(), camera->getProjectionMatrix(), camera->getCameraPosition()};
     //gltransform the camera matrix
-    glBindBuffer(GL_UNIFORM_BUFFER, this->shaderManager->getUBOBinding()[0]);
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(camera->getViewMatrix()));
-    glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(camera->getProjectionMatrix()));
+    glBindBuffer(GL_UNIFORM_BUFFER, objptrAppContext->aRenderContext->uboBindings[0]);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(matCameraData), &matCameraData);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 

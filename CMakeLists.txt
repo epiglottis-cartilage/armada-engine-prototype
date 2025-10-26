@@ -101,6 +101,7 @@ set(ENGINE_HEADERS_FILES
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Core/InputManager.hh
 
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Model.hh
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Light.hh
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/RenderSystem.hh
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Texture.hh
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/ShaderManager.hh
@@ -108,6 +109,7 @@ set(ENGINE_HEADERS_FILES
 
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Shaders/Shader.hh
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Shaders/PhongShader.hh
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Shaders/PointLightShader.hh
 
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Editorimgui/UIDrawSystem.hh
 
@@ -125,6 +127,7 @@ set(ENGINE_HEADERS_FILES
     ${CMAKE_SOURCE_DIR}/Sources/Engine/ECSSystem/MeshComponent.h
     ${CMAKE_SOURCE_DIR}/Sources/Engine/ECSSystem/NameComponent.hh
     ${CMAKE_SOURCE_DIR}/Sources/Engine/ECSSystem/TransformComponent.h
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/ECSSystem/LightComponent.hh
 
 )
 
@@ -139,6 +142,7 @@ set(ENGINE_SOURCES_FILES
 
     #rendersystem,core, essentiaE
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Model.cc
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Light.cc
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/RenderSystem.cc
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Texture.cc
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/ShaderManager.cc
@@ -146,6 +150,7 @@ set(ENGINE_SOURCES_FILES
 
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Shaders/Shader.cc
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Shaders/PhongShader.cc
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Shaders/PointLightShader.cc
 
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Editorimgui/UIDrawSystem.cc
 
@@ -163,6 +168,7 @@ set(ENGINE_SOURCES_FILES
     ${CMAKE_SOURCE_DIR}/Sources/Engine/ECSSystem/StageManager.cc
     ${CMAKE_SOURCE_DIR}/Sources/Engine/ECSSystem/Component.cpp
     ${CMAKE_SOURCE_DIR}/Sources/Engine/ECSSystem/MeshComponent.cpp
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/ECSSystem/LightComponent.cc
     ${CMAKE_SOURCE_DIR}/Sources/Engine/ECSSystem/TransformComponent.cpp
     ${CMAKE_SOURCE_DIR}/Sources/Engine/ECSSystem/NameComponent.cc
 )

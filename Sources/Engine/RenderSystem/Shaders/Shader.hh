@@ -9,12 +9,14 @@
 NAMESPACE_BEGIN
 
 #define UBOCAMERA "CameraMatrices"
+#define UBOLIGHTBUFFER "LightBuffer"
 #define MATPROJ "matrixProjection"
 #define MATVIEW "matrixView"
 
 
 enum class UBOType{
     Camera = 0,
+    LightBuffer,
 };
 
 /*
@@ -39,6 +41,13 @@ public:
 protected:
     GLuint shaderID;
 
+    class GLShader {
+
+    public:
+        /* construct a opengl shader from the location `shaderfilepath`*/
+        GLShader(GLenum shadertype, fs::path shaderfilepath);
+        GLuint shaderID;
+    };
 
     //TODO: design a better architecture for shader UBO binding!!! 
     virtual void bindUBO(UBOType type);

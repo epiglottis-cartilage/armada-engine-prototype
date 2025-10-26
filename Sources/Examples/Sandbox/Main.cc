@@ -11,33 +11,17 @@ using EntityPtr = std::shared_ptr<fleet::Entity>;
 int main(int argc, char** argv){
 
 
-    //debug build 0x000000xxxxxx000000a3
-    fleet::Engine* gameengine = new fleet::Engine{"sandboxtest", "0.0.1"};
+    fleet::Engine* gameengine = new fleet::Engine{"Sandbox", "0.0.5"};
     gameengine->init();
 
 
     fleet::Shader* phongShader = gameengine->getRenderSystem()->getShaderManager()->getOrCreate("Phong");
+    fleet::Shader* lightShader = gameengine->getRenderSystem()->getShaderManager()->getOrCreate("Light");
 
 
     //always get dir using asset system
     fs::path modeldir = gameengine->getAssetSystem()->getModelDir();
     fs::path apc_file = modeldir / "ba_stryker_icv.glb";
-
-    //use path if possible to accesss new features
-    fleet::Model* apcModel = new fleet::Model{apc_file};
-    //bind shader to model
-    apcModel->setShader(phongShader);
-
-    fleet::Model* terrain = new fleet::Model(modeldir / "terraintest.glb");
-    terrain->setShader(phongShader);
-
-    fleet::Model* cvchelmet = new fleet::Model(modeldir / "cvchelmet.glb");
-    cvchelmet->setShader(phongShader);
-
-    fleet::Model* helimodel = new fleet::Model(modeldir / "mi35.glb");
-    helimodel->setShader(phongShader);
-
-    
 
     //add model to stage manager to display
     fleet::StateManager* gSceneManager = gameengine->getStateManager();
@@ -53,8 +37,44 @@ int main(int argc, char** argv){
     //add entity with model
     gSceneManager->emplace<fleet::MeshComponent>(
         apc,
-        apcModel
+        apc_file,
+        phongShader
     );
+
+    fleet::Entity smallPointLightEnt = gSceneManager->create();
+    gSceneManager->emplace<fleet::NameComponent>(smallPointLightEnt, "Small Point Light");
+    gSceneManager->emplace<fleet::TransformComponent>(
+        smallPointLightEnt,
+        glm::vec3(3.0f),
+        glm::vec3(0.0f),
+        glm::vec3(1.0f)
+    );
+    gSceneManager->emplace<fleet::LightComponent>(
+        smallPointLightEnt,
+        lightShader,
+        fleet::typeLight::Point,
+        glm::vec4{1.0f, 0.0f, 0.0f, 1.0f},
+        0.8f,
+        30.0f
+    );
+    //Warning, this interface will be changed without backward support in next release
+
+
+    //create a terrain
+    fleet::Entity terrainEnt = gSceneManager->create();
+    gSceneManager->emplace<fleet::NameComponent>(terrainEnt, "Testing Ground");
+    gSceneManager->emplace<fleet::TransformComponent>(
+        terrainEnt,
+        glm::vec3(0.0f),
+        glm::vec3(-90.0f, 0.0f, 0.0f),
+        glm::vec3(1.0f)
+    );
+    gSceneManager->emplace<fleet::MeshComponent>(
+        terrainEnt,
+        modeldir / "terraintest.glb",
+        phongShader
+    );
+
 
     //add a heli model
     fleet::Entity heli = gSceneManager->create();
@@ -68,10 +88,14 @@ int main(int argc, char** argv){
     //add entity with model
     gSceneManager->emplace<fleet::MeshComponent>(
         heli,
-        helimodel
+        modeldir / "mi35.glb",
+        phongShader
     );
+    fleet::Model* cvchelmet = new fleet::Model(modeldir / "cvchelmet.glb");
+    cvchelmet->setShader(lightShader);
 
-    
+
+
 
     //Example of using subscriber based input manager
     auto* geventmanager = gameengine->getEventManager();
@@ -83,18 +107,6 @@ int main(int argc, char** argv){
         }
     });
 
-    fleet::Entity terrainEnt = gSceneManager->create();
-    gSceneManager->emplace<fleet::NameComponent>(terrainEnt, "Testing Ground");
-    gSceneManager->emplace<fleet::TransformComponent>(
-        terrainEnt,
-        glm::vec3(0.0f),
-        glm::vec3(-90.0f, 0.0f, 0.0f),
-        glm::vec3(1.0f)
-    );
-    gSceneManager->emplace<fleet::MeshComponent>(
-        terrainEnt,
-        terrain
-    );
 
 
 

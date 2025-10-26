@@ -92,7 +92,7 @@ public:
         this->loadModel(path, flipuv);
     }
 
-    Model(fs::path path, bool flipuv=true)
+    Model(const fs::path path, bool flipuv=true)
     {
 
         ENGINE_VALIDLOCATION(path);
@@ -116,7 +116,7 @@ public:
     void setShader(Shader* shader) { this->shader = shader; }
     vector<Material> getMaterials() const { return materials; }
     
-private:
+protected:
     glm::mat4 transform = glm::mat4(1.0f);
     vector<Mesh> meshes;
     vector<Material> materials;

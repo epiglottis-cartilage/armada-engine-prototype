@@ -11,15 +11,22 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/euler_angles.hpp>
 
+
 NAMESPACE_BEGIN
+class TransformSystem;
+
 class TransformComponent :
 public Component
 {
+    friend TransformSystem;
 public:
     TransformComponent() = default;
     TransformComponent(glm::vec3 pos, glm::vec3 rot, glm::vec3 scale);
 
 
+    /*
+     * this method will swap the buffer, update position. It won't check dirty or not!!!
+     */
     void tick(float deltatime) override;
     void setPosition(glm::vec3 position){this->position[buffer] = position;isdirty = true;};
     void setRotation(glm::vec3 rotation){this->rotation[buffer] = rotation;isdirty = true;};

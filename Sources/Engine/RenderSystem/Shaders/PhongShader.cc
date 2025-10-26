@@ -2,44 +2,6 @@
 
 NAMESPACE_BEGIN
 
-using namespace std;
-
-//TODO: move this inner class to base class `shader`
-PhongShader::GLShader::GLShader(GLenum shadertype, fs::path shaderfilepath) {
-    
-    GLchar shaderInfoLog[512];
-    GLint success;
-    
-
-    string sourceGeneralVertexPath = shaderfilepath.string();
-    ifstream file(sourceGeneralVertexPath);
-
-    ENGINE_VALIDLOCATION(shaderfilepath);
-
-    if (!file.is_open()) {
-        ENGINE_WARN("Error: failed to open shader file {}\n", sourceGeneralVertexPath);
-        //throw std::runtime_error("Shader file cannot be opened");
-    }
-
-
-    string content((istreambuf_iterator<char>(file)), 
-        istreambuf_iterator<char>()
-    );    
-
-    GLuint vertexShader = glCreateShader(shadertype);
-    this->shaderID = vertexShader;
-
-    const char* sourcesShader = content.c_str();
-    glShaderSource(vertexShader, 1, &sourcesShader, NULL);
-    glCompileShader(vertexShader);
-
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if (!success) {
-        glGetShaderInfoLog(vertexShader, 512, NULL, shaderInfoLog);
-        ENGINE_ERROR("Phong Shader compilation failed:\n{}\n", shaderInfoLog);
-    }
-}
-
 PhongShader::PhongShader(const fs::path& shaderdir) :
 Shader(shaderdir)
 {
@@ -66,7 +28,8 @@ Shader(shaderdir)
         ENGINE_INFO("Phong Shader program linked successfully");
     }
 
-    bindUBO(UBOType::Camera);
+//    bindUBO(UBOType::Camera);
+//    bindUBO(UBOType::LightBuffer);
 }
 
 PhongShader::~PhongShader() {
