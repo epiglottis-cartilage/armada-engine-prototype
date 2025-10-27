@@ -11,7 +11,7 @@ using EntityPtr = std::shared_ptr<fleet::Entity>;
 int main(int argc, char** argv){
 
 
-    fleet::Engine* gameengine = new fleet::Engine{"Sandbox", "0.0.5"};
+    auto* gameengine = new fleet::Engine{"Sandbox", "0.0.5"};
     gameengine->init();
 
 
@@ -59,6 +59,23 @@ int main(int argc, char** argv){
     );
     //Warning, this interface will be changed without backward support in next release
 
+    fleet::Entity sunDirectionLight = gSceneManager->create();
+    gSceneManager->emplace<fleet::NameComponent>(sunDirectionLight, "Sun Directional Light");
+    gSceneManager->emplace<fleet::TransformComponent>(
+        sunDirectionLight,
+        glm::vec3(0.0f, 10.0f, 0.0f),
+        glm::vec3(0.0f),
+        glm::vec3(1.0f)
+    );
+    gSceneManager->emplace<fleet::LightComponent>(
+        sunDirectionLight,
+        lightShader,
+        fleet::typeLight::Directional,
+        glm::vec4{0.0f, 0.5f, 0.5f, 1.0f},
+        1.0f,
+        100.0f
+    );
+
 
     //create a terrain
     fleet::Entity terrainEnt = gSceneManager->create();
@@ -91,7 +108,7 @@ int main(int argc, char** argv){
         modeldir / "mi35.glb",
         phongShader
     );
-    fleet::Model* cvchelmet = new fleet::Model(modeldir / "cvchelmet.glb");
+    auto* cvchelmet = new fleet::Model(modeldir / "cvchelmet.glb");
     cvchelmet->setShader(lightShader);
 
 
@@ -110,7 +127,7 @@ int main(int argc, char** argv){
 
 
 
-    fleet::FPSCamera* camera = new fleet::FPSCamera{glm::vec3{0.0f, 5.0f, 5.0f}, 70.0f};
+    auto* camera = new fleet::FPSCamera{glm::vec3{0.0f, 5.0f, 5.0f}, 70.0f};
     camera->setCameraProjectionMatrix(
         glm::perspective(glm::radians(70.0f), 16.0f/9.0f, 0.1f, 1000.0f)
     );

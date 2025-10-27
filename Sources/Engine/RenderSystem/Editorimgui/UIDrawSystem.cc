@@ -16,7 +16,7 @@ void UIDrawSystem::drawframe()
 
     StateManager* stateManager = objptrGameEngine->getStateManager();
 
-    auto view = stateManager->view<TransformComponent, MeshComponent>();
+    auto view = stateManager->view<TransformComponent>();
     rttr::type transform_type = rttr::type::get<TransformComponent>();
     // 提前获取字段的反射信息（避免循环中重复查找）
     rttr::property pos_prop = transform_type.get_property("position");

@@ -23,6 +23,7 @@ ShaderManager::ShaderManager(){
     glBindBufferBase(GL_UNIFORM_BUFFER, static_cast<GLuint>(UBOType::Camera), uboBindings[0]);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
+    uboBindings.push_back(1);
     glGenBuffers(1, &uboBindings[1]);
     glBindBuffer(GL_UNIFORM_BUFFER, uboBindings[1]);
     glBufferData(GL_UNIFORM_BUFFER, sizeof(LightBuffer), nullptr, GL_DYNAMIC_DRAW);

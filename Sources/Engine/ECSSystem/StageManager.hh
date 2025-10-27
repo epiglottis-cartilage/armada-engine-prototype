@@ -47,7 +47,7 @@ public:
     void tick(float deltatime);
 private:
     int lightnums = 0;
-    bool numsdirty = false;
+    bool numsdirty = true;
     void init();
     StateManager* enttregistry;
 };

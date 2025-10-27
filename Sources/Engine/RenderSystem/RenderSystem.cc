@@ -51,8 +51,8 @@ void RenderSystem::init(){
     }
 
 
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 5);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     error = {SDL_GetError()};
     if(error != ""){
@@ -110,6 +110,10 @@ void RenderSystem::init(){
     if(error != ""){
         ENGINE_ERROR("SDL set GL attribute Error: {}", error);
     }
+
+    ENGINE_INFO("RENDER SYSTEM INIT COMPLETE");
+    ENGINE_INFO("GL VERSION: {}", string{reinterpret_cast<const char*>(glGetString(GL_VERSION))});
+    ENGINE_INFO("GLSL VERSION: {}", string{reinterpret_cast<const char*>(glGetString(GL_SHADING_LANGUAGE_VERSION))});
 
     ENGINE_INFO("Register Phong Shader to ShaderFactory");
     ShaderFactory::init(this->assetManagerPtr->getShaderDir() );

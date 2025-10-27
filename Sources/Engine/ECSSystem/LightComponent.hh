@@ -10,15 +10,17 @@
 #include <Shader.hh>
 #include <Model.hh>
 #include <Light.hh>
+#include <entt/entt.hpp>
 
 NAMESPACE_BEGIN
 
 
 class LightComponent : public Component {
 public:
+    using allocator_type = void;
     LightComponent() = delete;
     //this constructor is for directional light
-    LightComponent(Shader* shader, const typeLight type, const glm::vec4 color = glm::vec4{1.0f, 1.0f, 1.0f, 1.0f}, const float intensity = 1.0f);
+//    LightComponent(Shader* shader, const typeLight type, const glm::vec4 color = glm::vec4{1.0f, 1.0f, 1.0f, 1.0f}, const float intensity = 1.0f);
     //this constructor is for point light
     LightComponent(Shader* shader, const typeLight type, const glm::vec4 color = glm::vec4{1.0f, 1.0f, 1.0f, 1.0f}, const float intensity = 1.0f, const float range = 10.0f);
     ~LightComponent();

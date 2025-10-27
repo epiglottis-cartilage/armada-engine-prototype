@@ -26,17 +26,24 @@ Shader::GLShader::GLShader(GLenum shadertype, fs::path shaderfilepath) {
         istreambuf_iterator<char>()
     );
 
-    GLuint vertexShader = glCreateShader(shadertype);
-    this->shaderID = vertexShader;
+    GLuint inmemoryShader = glCreateShader(shadertype);
+    this->shaderID = inmemoryShader;
 
     const char* sourcesShader = content.c_str();
-    glShaderSource(vertexShader, 1, &sourcesShader, NULL);
-    glCompileShader(vertexShader);
+    glShaderSource(inmemoryShader, 1, &sourcesShader, NULL);
+    glCompileShader(inmemoryShader);
 
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+    glGetShaderiv(inmemoryShader, GL_COMPILE_STATUS, &success);
+    string out;
+    if (shadertype == GL_VERTEX_SHADER)
+        out = "GL vertex shader";
+    if (shadertype == GL_FRAGMENT_SHADER)
+        out = "GL fragment shader";
     if (!success) {
-        glGetShaderInfoLog(vertexShader, 512, NULL, shaderInfoLog);
-        ENGINE_ERROR("Phong Shader compilation failed:\n{}\n", shaderInfoLog);
+        glGetShaderInfoLog(inmemoryShader, 512, NULL, shaderInfoLog);
+        ENGINE_ERROR("{} Shader compilation failed:\n{}\n",out, shaderInfoLog);
+    }else {
+        ENGINE_INFO("{} Shader compilation success", out);
     }
 }
 

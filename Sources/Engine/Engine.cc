@@ -11,8 +11,7 @@ extern AppContext* objptrAppContext;
 Engine::Engine(string gamename, string gameversion):
     aGamename(gamename),
     aGameversion(gameversion)
-{
-}
+{}
 
 
 /*
@@ -101,20 +100,28 @@ void Engine::run(EngineCallbackFunction gamelogic){
         aRenderContext->deltatime = dt;
 
 
+//        ENGINE_DEBUG("render debug point 1: before prerend");
+//        this->aRenderSystem->errorposition(__FILE__, __LINE__);
         //transmit camera data, render frame, etc
         this->aRenderSystem->prerender(
             aRenderContext
         );
         this->aUIDrawSystem->prerender();
+//        ENGINE_DEBUG("render debug point 2: before render");
+//        this->aRenderSystem->errorposition(__FILE__, __LINE__);
         this->aRenderSystem->renderframe(
             aRenderContext
         );
         if (objptrAppContext->aShowEditor)
             this->aUIDrawSystem->drawframe();
+//        ENGINE_DEBUG("render debug point 3: after render");
+//        this->aRenderSystem->errorposition(__FILE__, __LINE__);
         this->aUIDrawSystem->postrender();
         this->aRenderSystem->postrender(
             aRenderContext
         );
+//        ENGINE_DEBUG("render debug point 4: after postrend");
+//        this->aRenderSystem->errorposition(__FILE__, __LINE__);
 
 
         //delta accmulate
