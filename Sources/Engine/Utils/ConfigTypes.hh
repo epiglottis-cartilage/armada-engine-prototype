@@ -27,7 +27,8 @@ struct cfgAppContext {
     bool consoleoutput = false;
     bool fileoutput = false;
     //below options false is truncate, true is append
-    bool fileoutputappend = false;
+    //above is inverse!!! true is truncate, false is append!!!!
+    bool fileoutputappend = true;
 };
 
 struct cfgAudioSystem {

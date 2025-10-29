@@ -107,7 +107,7 @@ int main(int argc, char** argv){
     );
     gSceneManager->emplace<fleet::MeshComponent>(
         terrainEnt,
-        modeldir / "terraintest.glb",
+        modeldir / "terraintest3.glb",
         phongShader
     );
 

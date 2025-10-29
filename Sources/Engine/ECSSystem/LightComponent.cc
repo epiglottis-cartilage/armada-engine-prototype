@@ -5,6 +5,7 @@
 #include "LightComponent.hh"
 #include <GlobalContext.hh>
 #include <Engine.hh>
+#include <rttr/registration>
 
 NAMESPACE_BEGIN
 
@@ -46,6 +47,9 @@ void LightComponent::setIntensity(float intensity) {
     ENGINE_INFO("light intensity set");
     glUseProgram(0);
 }
+float LightComponent::getIntensity() {
+    return this->properties.intensity;
+}
 
 void LightComponent::tick(float dt) {
     //update the instance's data to the ubo shared memory
@@ -69,16 +73,39 @@ void LightComponent::setColor(const glm::vec4 rgbaColor) {
     ENGINE_INFO("light color set");
     glUseProgram(0);
 }
+glm::vec4 LightComponent::getColor() {
+    return this->properties.color;
+}
+
 
 void LightComponent::setRange(float range) {
     this->isdirty = true;
     this->properties.range = range;
 }
+float LightComponent::getRange() {
+    return this->properties.range;
+}
+
 void LightComponent::setShader(Shader* newshader) {
     this->isdirty = true;
     this->ptrShader = newshader;
 }
+Shader* LightComponent::getShader() {
+    return this->ptrShader;
+}
 
+RTTR_REGISTRATION
+{
+    using namespace rttr;
 
+    registration::class_<LightComponent>("LightComponent")
+        // 注册构造函数
+        .constructor<Shader*, typeLight, glm::vec4, float, float>()
 
+        // 注册字段
+        .property("color", &LightComponent::getColor, &LightComponent::setColor)
+        .property("intensity",  &LightComponent::getIntensity, &LightComponent::setIntensity)
+        .property("range",      &LightComponent::getRange,    &LightComponent::setRange)
+        ;
+}
 NAMESPACE_END

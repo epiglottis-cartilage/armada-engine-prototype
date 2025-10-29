@@ -11,81 +11,91 @@ void UIDrawSystem::drawframe()
 {
     ImGui::Begin("ECS Editor");
     ImGui::Text("Press F10 to switch to editor");
-    ImGui::Text("Press F19 to hide editor");
+    ImGui::Text("Press F9 to hide editor");
     ImGui::Separator();
 
     StateManager* stateManager = objptrGameEngine->getStateManager();
-
     auto view = stateManager->view<TransformComponent>();
-    rttr::type transform_type = rttr::type::get<TransformComponent>();
-    // 提前获取字段的反射信息（避免循环中重复查找）
-    rttr::property pos_prop = transform_type.get_property("position");
-    rttr::property rot_prop = transform_type.get_property("rotation");
-    rttr::property scale_prop = transform_type.get_property("scale");
 
-    for(auto entity : view)
+    for (auto entity : view)
     {
-        string label;
-        if (stateManager->all_of<NameComponent>(entity)){
-            auto& nameComp = stateManager->get<NameComponent>(entity);
-            label = nameComp.name;
-        }else{
-            label = "Entity " + std::to_string(static_cast<uint32_t>(entt::to_integral(entity)));
-        }
-
+        std::string label;
+        if (stateManager->all_of<NameComponent>(entity))
+            label = stateManager->get<NameComponent>(entity).name;
+        else
+            label = "Entity " + std::to_string((uint32_t)entt::to_integral(entity));
 
         if (ImGui::TreeNode(label.c_str()))
         {
-            ImGui::Text("Transform");
-            ImGui::PushID(static_cast<int>(entt::to_integral(entity)));
+            if (ImGui::TreeNode("Transform")) {
+                auto& transform = stateManager->get<TransformComponent>(entity);
+                rttr::instance transform_instance(transform);
+                rttr::type transform_type = rttr::type::get(transform);
 
-            // 获取组件实例
-            auto& transform = stateManager->get<TransformComponent>(entity);
-            // 将实例包装为RTTR可操作的对象
-            rttr::instance transform_instance(transform);
-
-            // 1. 处理Position（通过getter/setter）
-            if (pos_prop.is_valid())
-            {
-                // 调用getter获取当前值
-                glm::vec3 pos = pos_prop.get_value(transform_instance).get_value<glm::vec3>();
-                glm::vec3 new_pos = pos;
-
-                // 显示ImGui控件并修改new_pos
-                if (ImGui::DragFloat3("Position", &new_pos.x, 0.1f))
+                for (auto& prop : transform_type.get_properties())
                 {
-                    // 调用setter设置新值
-                    pos_prop.set_value(transform_instance, new_pos);
+                    rttr::variant value = prop.get_value(transform_instance);
+
+                    if (value.is_type<glm::vec3>())
+                    {
+                        glm::vec3 vec = value.get_value<glm::vec3>();
+                        glm::vec3 new_vec = vec;
+
+                        float speed = 0.1f;
+                        if (prop.get_metadata("ui_speed").is_valid())
+                            speed = prop.get_metadata("ui_speed").get_value<float>();
+
+                        if (ImGui::DragFloat3(prop.get_name().to_string().c_str(), &new_vec.x, speed))
+                            prop.set_value(transform_instance, new_vec);
+                    }
+                }
+                ImGui::TreePop();
+            }
+            if (stateManager->all_of<LightComponent>(entity))  // 检查实体是否有 LightComponent
+            {
+                if (ImGui::TreeNode("Light"))  // Light 节点
+                {
+                    auto& light = stateManager->get<LightComponent>(entity);
+                    rttr::instance light_instance(light);
+                    rttr::type light_type = rttr::type::get(light);
+
+                    // 遍历 LightComponent 的反射属性并绘制
+                    for (auto& prop : light_type.get_properties())
+                    {
+                        rttr::variant value = prop.get_value(light_instance);
+
+                        // 处理颜色（glm::vec4）
+                        if (value.is_type<glm::vec4>())
+                        {
+                            glm::vec4 color = value.get_value<glm::vec4>();
+                            glm::vec4 new_color = color;
+
+                            // 使用颜色编辑控件（支持 RGBA）
+                            if (ImGui::ColorEdit4(prop.get_name().to_string().c_str(), &new_color.x))
+                                prop.set_value(light_instance, new_color);
+                        }
+                        // 处理强度（float）
+                        else if (value.is_type<float>())
+                        {
+                            float val = value.get_value<float>();
+                            float new_val = val;
+
+                            // 根据属性名区分强度和范围，设置不同的拖动速度
+                            float speed = (prop.get_name() == "intensity") ? 0.01f : 0.1f;
+                            if (ImGui::DragFloat(prop.get_name().to_string().c_str(), &new_val, speed))
+                                prop.set_value(light_instance, new_val);
+                        }
+                    }
+                    ImGui::TreePop();  // 关闭 Light 节点
                 }
             }
 
-            // 2. 处理Rotation（同上）
-            if (rot_prop.is_valid())
-            {
-                glm::vec3 rot = rot_prop.get_value(transform_instance).get_value<glm::vec3>();
-                glm::vec3 new_rot = rot;
-                if (ImGui::DragFloat3("Rotation", &new_rot.x, 0.1f))
-                {
-                    rot_prop.set_value(transform_instance, new_rot);
-                }
-            }
+            ImGui::TreePop();  // 关闭实体总节点
 
-            // 3. 处理Scale（同上）
-            if (scale_prop.is_valid())
-            {
-                glm::vec3 scale = scale_prop.get_value(transform_instance).get_value<glm::vec3>();
-                glm::vec3 new_scale = scale;
-                if (ImGui::DragFloat3("Scale", &new_scale.x, 0.1f))
-                {
-                    scale_prop.set_value(transform_instance, new_scale);
-                }
-            }
-
-            ImGui::PopID();
-            ImGui::TreePop();
         }
     }
     ImGui::End();
+
 }
 
 UIDrawSystem::UIDrawSystem()

@@ -28,15 +28,19 @@ public:
     bool visible = true;
     //this flag is for updating the ubo shared memory, not for the transform!
     bool isdirty = true;
-    gpuLightStruct properties;
+    gpuLightStruct properties = {};
     Shader* ptrShader;
     int lightindex = 0;
 
     void tick(float dt);
     void setColor(const glm::vec4 rgbaColor);
+    glm::vec4 getColor();
     void setIntensity(float intensity);
+    float getIntensity();
     void setRange(float range);
+    float getRange();
     void setShader(Shader* newshader);
+    Shader* getShader();
 private:
     const typeLight lighttype;
 };

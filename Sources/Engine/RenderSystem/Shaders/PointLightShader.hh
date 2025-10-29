@@ -14,7 +14,7 @@ NAMESPACE_BEGIN
 #define POINTLIGHTFRAGMENTSHADER "lightFragmentShader.frag"
 
 #define POINTLIGHT "Pointlight"
-#define LIGHTINDEX "indexLight"
+#define LIGHTINDEX "lightindex"
 
 class PointLightShader : public Shader {
 public:

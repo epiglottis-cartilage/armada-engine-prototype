@@ -87,6 +87,83 @@ public:
     }
 
 private:
+
+void static GLAPIENTRY
+OpenGLDebugMessageCallback(GLenum source,
+                           GLenum type,
+                           GLuint id,
+                           GLenum severity,
+                           GLsizei length,
+                           const GLchar* message,
+                           const void* userParam)
+{
+    // 过滤掉通知类消息
+    if (severity == GL_DEBUG_SEVERITY_NOTIFICATION)
+        return;
+
+    const char* srcStr;
+    switch (source) {
+        case GL_DEBUG_SOURCE_API:             srcStr = "API"; break;
+        case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   srcStr = "Window System"; break;
+        case GL_DEBUG_SOURCE_SHADER_COMPILER: srcStr = "Shader Compiler"; break;
+        case GL_DEBUG_SOURCE_THIRD_PARTY:     srcStr = "Third Party"; break;
+        case GL_DEBUG_SOURCE_APPLICATION:     srcStr = "Application"; break;
+        default:                              srcStr = "Other"; break;
+    }
+
+    const char* typeStr;
+    switch (type) {
+        case GL_DEBUG_TYPE_ERROR:               typeStr = "Error"; break;
+        case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: typeStr = "Deprecated"; break;
+        case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  typeStr = "Undefined"; break;
+        case GL_DEBUG_TYPE_PORTABILITY:         typeStr = "Portability"; break;
+        case GL_DEBUG_TYPE_PERFORMANCE:         typeStr = "Performance"; break;
+        case GL_DEBUG_TYPE_MARKER:              typeStr = "Marker"; break;
+        case GL_DEBUG_TYPE_PUSH_GROUP:          typeStr = "Push Group"; break;
+        case GL_DEBUG_TYPE_POP_GROUP:           typeStr = "Pop Group"; break;
+        default:                                typeStr = "Other"; break;
+    }
+
+    const char* sevStr;
+    switch (severity) {
+        case GL_DEBUG_SEVERITY_HIGH:         sevStr = "HIGH"; break;
+        case GL_DEBUG_SEVERITY_MEDIUM:       sevStr = "MEDIUM"; break;
+        case GL_DEBUG_SEVERITY_LOW:          sevStr = "LOW"; break;
+        case GL_DEBUG_SEVERITY_NOTIFICATION: sevStr = "NOTIFICATION"; break;
+        default:                             sevStr = "UNKNOWN"; break;
+    }
+
+    // 使用你的日志系统输出
+    if (severity == GL_DEBUG_SEVERITY_HIGH || type == GL_DEBUG_TYPE_ERROR)
+        ENGINE_ERROR("[GL DEBUG] Source={}, Type={}, Severity={}, Message={}",
+                     srcStr, typeStr, sevStr, message);
+    else if (severity == GL_DEBUG_SEVERITY_MEDIUM)
+        ENGINE_INFO("[GL DEBUG] Source={}, Type={}, Severity={}, Message={}",
+                    srcStr, typeStr, sevStr, message);
+    else
+        ENGINE_DEBUG("[GL DEBUG] Source={}, Type={}, Severity={}, Message={}",
+                     srcStr, typeStr, sevStr, message);
+}
+
+void static initGLDebug()
+{
+    // 检查是否支持 KHR_debug
+    GLint flags;
+    glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
+    if (flags & GL_CONTEXT_FLAG_DEBUG_BIT)
+    {
+        glEnable(GL_DEBUG_OUTPUT);
+        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS); // 同步输出方便调试
+        glDebugMessageCallback(OpenGLDebugMessageCallback, nullptr);
+        glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE,
+                              0, nullptr, GL_TRUE);
+        ENGINE_ERROR("[GL DEBUG] Debug output enabled.\n") ;
+    }
+    else {
+        ENGINE_ERROR("[GL DEBUG] Context does not support debug output.\n") ;
+    }
+}
+
     void init();
     void parseconfig(cfgRenderSystem config);
 
@@ -122,6 +199,7 @@ private:
     glm::mat4 view;
     glm::mat4 modelMatrix;
 };
+
 
 
 

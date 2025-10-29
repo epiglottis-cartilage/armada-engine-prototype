@@ -22,6 +22,7 @@ public:
     bool aShouldQuit;
     bool aEditorMode ;
     bool aShowEditor ;
+    bool renderloopdebug;
 
     void switchEditorMode();
 

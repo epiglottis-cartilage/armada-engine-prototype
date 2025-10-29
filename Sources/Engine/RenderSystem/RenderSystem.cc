@@ -54,6 +54,7 @@ void RenderSystem::init(){
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 5);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
     error = {SDL_GetError()};
     if(error != ""){
         ENGINE_ERROR("SDL set GL attribute Error: %s\n", error);
@@ -90,6 +91,7 @@ void RenderSystem::init(){
     glewExperimental = GL_TRUE;
 
     glewInit();
+    initGLDebug();
     glGetError();
 
     int windowwidth, windowheight;

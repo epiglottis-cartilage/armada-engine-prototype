@@ -39,7 +39,7 @@ void MeshSystem::tick(float deltatime){
                     GLuint location = glGetUniformLocation(lightcomp.ptrShader->getID(), LIGHTINDEX);
                     if (location == -1)
                         ENGINE_ERROR("light index location is -1!");
-                    glUniform1f(location, lightcomp.lightindex);
+                    glUniform1i(location, lightcomp.lightindex);
                     glUseProgram(0);
                 }
             }
@@ -70,9 +70,10 @@ void LightSystem::tick(float deltatime) {
     }
     auto view = enttregistry->view<LightComponent>();
     for (auto [entity, light]: view.each()) {
-        if (light.isdirty)
+        if (light.isdirty) {
             light.isdirty = !light.isdirty;
             light.tick(deltatime);
+        }
     }
 }
 
