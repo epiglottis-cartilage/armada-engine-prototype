@@ -15,7 +15,8 @@
     "glew",
     "assimp",
     "yaml-cpp",
-    "spdlog"
+    "spdlog",
+    "rttr"
 
   ]
 }
