@@ -60,18 +60,23 @@ target_link_libraries(imgui PRIVATE SDL2::SDL2 OpenGL::GL)
 
 set(BUILD_UNIT_TESTS OFF CACHE BOOL "Disable RTTR unit tests" FORCE)
 set(BUILD_DOCUMENTATION OFF CACHE BOOL "Disable RTTR documentation generation" FORCE)
-FetchContent_Declare(
-    rttr
-    GIT_REPOSITORY https://github.com/rttrorg/rttr.git
-    GIT_TAG v0.9.6
-)
-FetchContent_MakeAvailable(rttr)
-if (TARGET rttr_core AND NOT TARGET rttr::rttr_core)
-    add_library(rttr::rttr_core ALIAS rttr_core)
-endif()
+if(UNIX)
+	FetchContent_Declare(
+		rttr
+		GIT_REPOSITORY https://github.com/rttrorg/rttr.git
+		GIT_TAG v0.9.6
+	)
+	FetchContent_MakeAvailable(rttr)
+	if (TARGET rttr_core AND NOT TARGET rttr::rttr_core)
+		add_library(rttr::rttr_core ALIAS rttr_core)
+	endif()
 
-if (TARGET rttr_lib AND NOT TARGET rttr::rttr_lib)
-    add_library(rttr::rttr_lib ALIAS rttr_lib)
+	if (TARGET rttr_lib AND NOT TARGET rttr::rttr_lib)
+		add_library(rttr::rttr_lib ALIAS rttr_lib)
+	endif()
+endif()
+if(WIN32)
+    find_package(RTTR CONFIG REQUIRED Core)
 endif()
 
 set(ENGINE_HEADERS_DIRS
@@ -212,6 +217,12 @@ endfunction()
 #collect_headers(EASTL_HEADERS ${EASTL_ROOT_DIR}/include/)
 
 #compile engine as a static lib, althought I have no idea if this helps something....
+if(WIN32)
+	set(rttr_rttr RTTR::Core)
+endif()
+if(UNIX)
+    set(rttr_rttr rttr::rttr_core)
+endif()
 function(build_engine_stclib lib_name)
 
     add_library(${lib_name} STATIC ${ENGINE_SOURCES_FILES} ${ENGINE_HEADERS_FILES}
@@ -229,7 +240,7 @@ function(build_engine_stclib lib_name)
         yaml-cpp::yaml-cpp
         spdlog::spdlog
         EnTT::EnTT
-        rttr::rttr_core
+        ${rttr_rttr}
         imgui
 
         # Modified stl
