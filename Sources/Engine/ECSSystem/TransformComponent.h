@@ -37,7 +37,7 @@ public:
 
     glm::mat4 getTransformMat() ;
 private:
-    bool isdirty = false;
+    bool isdirty = true;
     glm::vec3 position[2] = {};
     glm::vec3 rotation[2] = {};
     glm::vec3 scale[2] = {};

@@ -79,8 +79,8 @@ void Engine::run(EngineCallbackFunction gamelogic){
     while(!engineContext->aShouldQuit){
         //update game logic, will try best to run in 60 Hz
         this->aTransformSystem->tick(dt);
-        this->aMeshSystem->tick(dt);
         this->aLightSystem->tick(dt);
+        this->aMeshSystem->tick(dt);
         while(accumulator >= dt){
 
             //tick ecs
@@ -100,28 +100,28 @@ void Engine::run(EngineCallbackFunction gamelogic){
         aRenderContext->deltatime = dt;
 
 
-//        ENGINE_DEBUG("render debug point 1: before prerend");
-//        this->aRenderSystem->errorposition(__FILE__, __LINE__);
-        //transmit camera data, render frame, etc
-        this->aRenderSystem->prerender(
-            aRenderContext
-        );
-        this->aUIDrawSystem->prerender();
-//        ENGINE_DEBUG("render debug point 2: before render");
-//        this->aRenderSystem->errorposition(__FILE__, __LINE__);
-        this->aRenderSystem->renderframe(
-            aRenderContext
-        );
-        if (objptrAppContext->aShowEditor)
-            this->aUIDrawSystem->drawframe();
-//        ENGINE_DEBUG("render debug point 3: after render");
-//        this->aRenderSystem->errorposition(__FILE__, __LINE__);
-        this->aUIDrawSystem->postrender();
-        this->aRenderSystem->postrender(
-            aRenderContext
-        );
-//        ENGINE_DEBUG("render debug point 4: after postrend");
-//        this->aRenderSystem->errorposition(__FILE__, __LINE__);
+        ENGINE_DEBUG("render debug point 1: before prerend");
+        RenderSystem::errorposition(__FILE__, __LINE__);
+      //transmit camera data, render frame, etc
+      this->aRenderSystem->prerender(
+          aRenderContext
+      );
+      this->aUIDrawSystem->prerender();
+        ENGINE_DEBUG("render debug point 2: before render");
+        RenderSystem::errorposition(__FILE__, __LINE__);
+      this->aRenderSystem->renderframe(
+          aRenderContext
+      );
+      if (objptrAppContext->aShowEditor)
+          this->aUIDrawSystem->drawframe();
+        ENGINE_DEBUG("render debug point 3: after render");
+        RenderSystem::errorposition(__FILE__, __LINE__);
+      this->aUIDrawSystem->postrender();
+      this->aRenderSystem->postrender(
+          aRenderContext
+      );
+        ENGINE_DEBUG("render debug point 4: after postrend");
+        RenderSystem::errorposition(__FILE__, __LINE__);
 
 
         //delta accmulate

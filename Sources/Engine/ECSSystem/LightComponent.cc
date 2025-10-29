@@ -21,22 +21,6 @@ LightComponent::~LightComponent() {
 
 }
 
-//LightComponent::LightComponent(Shader* shader, const typeLight type, const glm::vec4 color, const float intensity ):
-//    Component(), //base
-//    properties({ type, glm::vec3{0.0f}, color, intensity
-//        }),
-//    ptrShader(shader),
-//    lighttype(type) {
-//    auto* lightsystem = objptrGameEngine->getLightSystem();
-//    auto& lightnumber = lightsystem->lightnums;
-//    this->lightindex = lightnumber;
-//    lightnumber++;
-//    lightsystem->numsdirty = true;
-//
-//    ENGINE_INFO("Creating a new light (index {}), current light number: {}(include this one)",this->lightindex, lightnumber);
-//
-//}
-
 LightComponent::LightComponent(Shader* shader, const typeLight type, const glm::vec4 color , const float intensity, const float range ):
     Component(), //base
     properties({ type, glm::vec3{0.0f}, color, intensity, range
@@ -48,7 +32,7 @@ LightComponent::LightComponent(Shader* shader, const typeLight type, const glm::
     this->lightindex = lightnumber;
     lightnumber++;
     lightsystem->numsdirty = true;
-    ENGINE_INFO("Creating a new light, current light number: {}(include this one)", this->lightindex, lightnumber);
+    ENGINE_INFO("Creating a new light, current light number: {}(include this one)", lightnumber);
 }
 
 
@@ -69,6 +53,8 @@ void LightComponent::tick(float dt) {
     glBindBuffer(GL_UNIFORM_BUFFER, objptrAppContext->aRenderContext->uboBindings[uboindex]);
     glBufferSubData(GL_UNIFORM_BUFFER, 16+this->lightindex * sizeof(gpuLightStruct), sizeof(gpuLightStruct), &this->properties);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    ENGINE_DEBUG("Light Component Ticks, ubo shared buffer touched");
+    RenderSystem::errorposition(__FILE__, __LINE__);
 }
 
 

@@ -127,19 +127,6 @@ RenderSystem::~RenderSystem(){
     SDL_Quit();
 }
 
-int RenderSystem::errorposition(const char* file, int line){
-
-    GLuint errorcode = glGetError();
-    if(errorcode == GL_NO_ERROR){
-        ENGINE_INFO("No GL error occur");
-        return 0;
-    }
-    while(errorcode != GL_NO_ERROR){
-        ENGINE_ERROR("GL error occur! Error code: {} at {}:{}", errorcode, file, line);
-        errorcode = glGetError();
-    }
-    return 0;
-}
 
 
 //Rendering Command System

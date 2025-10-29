@@ -57,6 +57,11 @@ int main(int argc, char** argv){
         0.8f,
         30.0f
     );
+    gSceneManager->emplace<fleet::MeshComponent>(
+        smallPointLightEnt,
+        modeldir / "orangelight.glb",
+        lightShader
+    );
     //Warning, this interface will be changed without backward support in next release
 
     fleet::Entity sunDirectionLight = gSceneManager->create();
@@ -76,6 +81,20 @@ int main(int argc, char** argv){
         100.0f
     );
 
+    //create a house
+    fleet::Entity house = gSceneManager->create();
+    gSceneManager->emplace<fleet::NameComponent>(house, "House");
+    gSceneManager->emplace<fleet::TransformComponent>(
+        house,
+        glm::vec3{0.0f},
+        glm::vec3(0.0f),
+        glm::vec3{1.0f}
+    );
+    gSceneManager->emplace<fleet::MeshComponent>(
+        house,
+        modeldir / "testinghouse.glb",
+        phongShader
+    );
 
     //create a terrain
     fleet::Entity terrainEnt = gSceneManager->create();
@@ -108,8 +127,6 @@ int main(int argc, char** argv){
         modeldir / "mi35.glb",
         phongShader
     );
-    auto* cvchelmet = new fleet::Model(modeldir / "cvchelmet.glb");
-    cvchelmet->setShader(lightShader);
 
 
 

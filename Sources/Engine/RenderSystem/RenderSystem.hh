@@ -61,10 +61,18 @@ public:
 
     /*if logger is on, this method report all OpenGL error to logger untill no error. 
     Noticed that currently this method always return 0*/
-    int errorposition(
-        const char* file=__FILE__,
-         int line=__LINE__
-    );
+    int static errorposition(const char* file, int line){
+        GLuint errorcode = glGetError();
+        if(errorcode == GL_NO_ERROR){
+            ENGINE_INFO("No GL error occur");
+            return 0;
+        }
+        while(errorcode != GL_NO_ERROR){
+            ENGINE_ERROR("GL error occur! Error code: {} at {}:{}", errorcode, file, line);
+            errorcode = glGetError();
+        }
+        return 0;
+    }
 
 //    void updatestatmanager(StateManager* stateManager);
     ShaderManager* getShaderManager() const { return shaderManager; }

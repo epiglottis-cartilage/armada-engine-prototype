@@ -30,6 +30,7 @@ public:
     bool isdirty = true;
     gpuLightStruct properties;
     Shader* ptrShader;
+    int lightindex = 0;
 
     void tick(float dt);
     void setColor(const glm::vec4 rgbaColor);
@@ -38,7 +39,6 @@ public:
     void setShader(Shader* newshader);
 private:
     const typeLight lighttype;
-    int lightindex = 0;
 };
 
 NAMESPACE_END

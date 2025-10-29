@@ -1,6 +1,7 @@
 #include <StageManager.hh>
 #include <RenderSystem.hh>
 #include <glm/glm.hpp>
+#include <PointLightShader.hh>
 
 NAMESPACE_BEGIN
 
@@ -24,13 +25,24 @@ void TransformSystem::tick(float deltatime) {
 }
 
 
-void MeshSystem::tick(float deltatime)
-{
+void MeshSystem::tick(float deltatime){
     auto view = enttregistry->view<MeshComponent, TransformComponent>();
     for (auto [entity, mesh, transform]: view.each())
     {
         if (mesh.visible)
         {
+            if (enttregistry->any_of<LightComponent>(entity)) {
+                auto& lightcomp = enttregistry->get<LightComponent>(entity);
+                //check if currently entity is a light source with model!
+                if (lightcomp.ptrShader->typeName() == POINTLIGHT) {
+                    glUseProgram(lightcomp.ptrShader->getID());
+                    GLuint location = glGetUniformLocation(lightcomp.ptrShader->getID(), LIGHTINDEX);
+                    if (location == -1)
+                        ENGINE_ERROR("light index location is -1!");
+                    glUniform1f(location, lightcomp.lightindex);
+                    glUseProgram(0);
+                }
+            }
             this->rendercontext->drawtargets.push_back(
                 RenderCommand{mesh.modelptr, mesh.modelptr->getShader(), transform.getTransformMat()}
                     );
@@ -42,9 +54,7 @@ MeshSystem::MeshSystem(RenderContext& rendercontext, StateManager& stateManager)
     enttregistry(&stateManager),
     rendercontext(&rendercontext)
 {}
-
 void LightSystem::init() {
-
 }
 
 
@@ -55,6 +65,8 @@ void LightSystem::tick(float deltatime) {
         //buffer current light num
         glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(int), &lightnums);
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
+        ENGINE_DEBUG("light num dirty, light system ticks!");
+        RenderSystem::errorposition(__FILE__, __LINE__);
     }
     auto view = enttregistry->view<LightComponent>();
     for (auto [entity, light]: view.each()) {
