@@ -20,7 +20,7 @@ extern AppContext* objptrAppContext;
     yawNum(0.0f), 
     rollNum(0.0f), 
     sensitivity(glm::vec3(0.1f, 0.1f, 0.1f)), 
-    cameraSpeed(5.0f), 
+    cameraSpeed(15.0f), 
     enableDeadZone(true), 
     deadZoneX(2.0f), 
     deadZoneY(2.0f)
@@ -45,7 +45,7 @@ Camera::Camera(glm::vec3 position, float angle) :
     yawNum(0.0f), 
     rollNum(0.0f), 
     sensitivity(glm::vec3(0.1f, 0.1f, 0.1f)), 
-    cameraSpeed(5.0f), 
+    cameraSpeed(15.0f), 
     enableDeadZone(true), 
     deadZoneX(2.0f), 
     deadZoneY(2.0f)

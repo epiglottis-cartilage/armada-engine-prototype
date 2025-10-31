@@ -58,7 +58,7 @@ int main(int argc, char** argv){
         smallPointLightEnt,
         lightShader,
         fleet::typeLight::Point,
-        glm::vec4{1.0f, 0.0f, 0.0f, 1.0f},
+        glm::vec4{1.0f, 0.435f, 0.0f, 1.0f},
         0.8f,
         30.0f
     );
@@ -73,15 +73,20 @@ int main(int argc, char** argv){
     gSceneManager->emplace<fleet::NameComponent>(sunDirectionLight, "Sun Directional Light");
     gSceneManager->emplace<fleet::TransformComponent>(
         sunDirectionLight,
-        glm::vec3(0.0f, 10.0f, 0.0f),
+        glm::vec3(0.0f, 300.0f, 0.0f),
         glm::vec3(0.0f),
         glm::vec3(1.0f)
     );
+    gSceneManager->emplace<fleet::MeshComponent>(
+        sunDirectionLight,
+        modeldir / "deathstar.glb",
+		lightShader
+	);
     gSceneManager->emplace<fleet::LightComponent>(
         sunDirectionLight,
         lightShader,
         fleet::typeLight::Directional,
-        glm::vec4{1.0f, 0.0f, 0.0f, 1.0f},
+        glm::vec4{0.0f, 0.414f, 1.0f, 1.0f},
         1.0f,
         100.0f
     );
@@ -156,6 +161,22 @@ int main(int argc, char** argv){
     //bind active camera to viewport
     gameengine->setCurrentCamera(camera);
     camera->setCameraSensitivity(glm::vec3(1.0f));
+    geventmanager->subscribe(
+        fleet::EventType::KeyPressed,
+        [camera](const fleet::Event& e) {
+        auto& keyevent = static_cast<const fleet::KeyPressedEvent&>(e);
+        if (keyevent.key == SDLK_UP) {
+            camera->setCameraSpeed(camera->getCameraSpeed() + 1.0f);
+        }
+    });
+    geventmanager->subscribe(
+        fleet::EventType::KeyPressed,
+        [camera](const fleet::Event& e) {
+        auto& keyevent = static_cast<const fleet::KeyPressedEvent&>(e);
+        if (keyevent.key == SDLK_DOWN) {
+            camera->setCameraSpeed(camera->getCameraSpeed() - 1.0f);
+        }
+    });
 
     
 

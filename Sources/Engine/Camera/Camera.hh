@@ -58,6 +58,9 @@ public:
     void setCameraSensitivity(glm::vec3 newSensitivity){
         this->sensitivity = newSensitivity;
     }
+    void setCameraSpeed(float newSpeed){
+        this->cameraSpeed = newSpeed;
+	}
 
 
     glm::vec3 getCameraPosition(){return position;}
@@ -65,6 +68,7 @@ public:
     glm::vec3 getCameraUp(){return cameraUp;}
     glm::mat4 getViewMatrix(){return viewMatrix;}
     glm::mat4 getProjectionMatrix(){return projectionMatrix;}
+	float getCameraSpeed() { return cameraSpeed; }
 
 
     //delete this once event listener is done
