@@ -174,7 +174,7 @@ void RenderSystem::prerender(RenderContext* context){
 }
 
 void RenderSystem::renderframe(RenderContext* context){
-    for(RenderCommand cmd: this->cmdQueue){
+    for(RenderCommand& cmd: this->cmdQueue){
         //executing Render Command
         this->executecommand(cmd);
     }

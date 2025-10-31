@@ -39,6 +39,7 @@ struct RenderCommand {
     const Model* model;
     const Shader* shader;
     glm::mat4 transform;
+    int lightindex;
 
 };
 

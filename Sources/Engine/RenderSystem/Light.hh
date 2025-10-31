@@ -23,26 +23,23 @@ enum class typeLight {
 
 struct alignas(16) gpuLightStruct {
     int type = 0;
-    float _pad0[3];
-
+    float intensity = 0.7;
+    float range = 7;
+    float _pad0 = 7;
     glm::vec4 position = {0,0,0,0};
     glm::vec4 direction = {0,0,0,0};
     glm::vec4 color = {0,0,0,0};
 
-    float intensity = 1;
-    float range = 5;
-    float _pad1[2];
 
     gpuLightStruct() = default;
-    //this method is for direction light only
-    gpuLightStruct(typeLight type, glm::vec3 direction, glm::vec4 color, float intensity);
-    //this method is for point light only
     gpuLightStruct(typeLight type, glm::vec3 position, glm::vec4 color, float intensity, float range);
 };
 
 struct alignas(16) LightBuffer {
-    int32_t numLights = 0;
-    float _pad0[3];
+    int numLights = 0;
+    float _pad0;
+    float _pad1;
+    float _pad2;
     gpuLightStruct lightInstance[MAX_LIGHTS];
 };
 

@@ -14,7 +14,5 @@ layout (std140, binding = 0) uniform CameraMatrices
 
 void main()
 {
-
     gl_Position = matrixProjection * matrixView * matrixModel  * vec4(position, 1.0f);
-
 }

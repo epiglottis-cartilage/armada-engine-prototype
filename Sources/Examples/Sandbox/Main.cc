@@ -14,6 +14,11 @@ int main(int argc, char** argv){
     auto* gameengine = new fleet::Engine{"Sandbox", "0.0.5"};
     gameengine->init();
 
+    ENGINE_DEBUG("size debug: lightstruct: {} lightbuffer: {}, sizeof int: {}", 
+        sizeof(fleet::gpuLightStruct), 
+        sizeof(fleet::LightBuffer),
+        sizeof(int)
+    );
 
     fleet::Shader* phongShader = gameengine->getRenderSystem()->getShaderManager()->getOrCreate("Phong");
     fleet::Shader* lightShader = gameengine->getRenderSystem()->getShaderManager()->getOrCreate("Light");
@@ -47,7 +52,7 @@ int main(int argc, char** argv){
         smallPointLightEnt,
         glm::vec3(3.0f),
         glm::vec3(0.0f),
-        glm::vec3(1.0f)
+        glm::vec3(0.1f)
     );
     gSceneManager->emplace<fleet::LightComponent>(
         smallPointLightEnt,
@@ -59,7 +64,7 @@ int main(int argc, char** argv){
     );
     gSceneManager->emplace<fleet::MeshComponent>(
         smallPointLightEnt,
-        modeldir / "orangelight.glb",
+        modeldir / "cvchelmet.glb",
         lightShader
     );
     //Warning, this interface will be changed without backward support in next release
@@ -76,7 +81,7 @@ int main(int argc, char** argv){
         sunDirectionLight,
         lightShader,
         fleet::typeLight::Directional,
-        glm::vec4{0.0f, 0.5f, 0.5f, 1.0f},
+        glm::vec4{1.0f, 0.0f, 0.0f, 1.0f},
         1.0f,
         100.0f
     );
@@ -107,7 +112,7 @@ int main(int argc, char** argv){
     );
     gSceneManager->emplace<fleet::MeshComponent>(
         terrainEnt,
-        modeldir / "terraintest3.glb",
+        modeldir / "terraintest.glb",
         phongShader
     );
 

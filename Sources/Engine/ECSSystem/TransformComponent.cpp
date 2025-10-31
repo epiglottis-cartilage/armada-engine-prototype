@@ -28,9 +28,23 @@ void TransformComponent::tick(float deltatime) {
 glm::mat4 TransformComponent::getTransformMat() {
     glm::mat4 result = glm::mat4(1.0f);
     glm::mat4 translate = glm::translate(result, position[current]);
-    glm::mat4 rotate = glm::yawPitchRoll(glm::radians(rotation[current].y), glm::radians(rotation[current].x), glm::radians(rotation[current].z));
+    glm::mat4 rotate = glm::yawPitchRoll(
+        glm::radians(rotation[current].y), 
+        glm::radians(rotation[current].x), 
+        glm::radians(rotation[current].z)
+    );
     glm::mat4 scalemat = glm::scale(result, this->scale[current]);
     return (translate * rotate * scalemat);
+}
+
+glm::vec3 TransformComponent::getDirection() {
+    glm::mat4 rotate = glm::yawPitchRoll(
+        glm::radians(rotation[current].y), 
+        glm::radians(rotation[current].x), 
+        glm::radians(rotation[current].z)
+    );
+    glm::vec4 front = rotate * glm::vec4{0.0f, 0.0f, -1.0f, 0.0f};
+    return glm::normalize(glm::vec3{front});
 }
 
 //rttr registry

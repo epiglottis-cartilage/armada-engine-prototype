@@ -34,11 +34,13 @@ public:
     glm::vec3 getPosition() {return position[current];};
     glm::vec3 getRotation() {return rotation[current];};
     glm::vec3 getScale() {return scale[current];};
+    glm::vec3 getDirection();
 
     glm::mat4 getTransformMat() ;
 private:
     bool isdirty = true;
     glm::vec3 position[2] = {};
+    //bro, remember this is euler angle--that's the angle between front vector and xyz
     glm::vec3 rotation[2] = {};
     glm::vec3 scale[2] = {};
     int current = 0;//always read the 0, 1 always be buffer

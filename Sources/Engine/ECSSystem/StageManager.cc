@@ -17,7 +17,7 @@ void TransformSystem::tick(float deltatime) {
                 auto& light = enttregistry->get<LightComponent>(entity);
 
                 light.properties.position = glm::vec4{transform.getPosition(), 1.0f};
-                light.properties.direction = glm::vec4{transform.getRotation(), 0.0f};
+                light.properties.direction = glm::vec4{transform.getDirection(), 0.0f};
                 light.isdirty = true;
             }
         }
@@ -61,6 +61,7 @@ void LightSystem::init() {
 void LightSystem::tick(float deltatime) {
     //update light nums count on ubo
     if (numsdirty) {
+        this->numsdirty = !this->numsdirty;
         glBindBuffer(GL_UNIFORM_BUFFER, objptrAppContext->aRenderContext->uboBindings[static_cast<int>(UBOType::LightBuffer)]);
         //buffer current light num
         glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(int), &lightnums);
