@@ -121,6 +121,9 @@ void RenderSystem::init(){
     ShaderFactory::init(this->assetManagerPtr->getShaderDir() );
     ENGINE_INFO("Creating ShaderManager...");
     this->shaderManager = new ShaderManager{};
+
+    //experiment zone:
+    glEnable(GL_CULL_FACE);
 }
 
 RenderSystem::~RenderSystem(){
@@ -199,7 +202,7 @@ void RenderSystem::drawmesh(const Model::Mesh& mesh, const Shader& shader, const
         "textureBaseColor",
         "textureRoughness",
         "textureMetalic",
-        "textureNormal",
+        "textureNormalMap",
         "textureAmbientOcclusion",
     };
 
@@ -216,7 +219,6 @@ void RenderSystem::drawmesh(const Model::Mesh& mesh, const Shader& shader, const
     glActiveTexture(GL_TEXTURE0);
 
     //apply transform
-//    glUniformMatrix4fv(glGetUniformLocation(shader.getID(), "matrixModel"), 1, GL_FALSE, glm::value_ptr(transform));
     shader.setUniform("matrixModel", transform);
 
     glBindVertexArray(mesh.getVAO());

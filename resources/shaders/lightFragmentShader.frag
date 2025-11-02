@@ -24,7 +24,7 @@ layout(std140, binding = 1) uniform LightBuffer {
 };
 
 void main() {
-    struct Light currentlight = lights[lightindex];
+    Light currentlight = lights[lightindex];
     fragcolor = vec4(currentlight.color.xyz * currentlight.intensity, currentlight.color.w);
 }
 

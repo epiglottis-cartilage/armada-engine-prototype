@@ -30,17 +30,20 @@ using namespace std;
 NAMESPACE_BEGIN
 
 enum class TextureType{
-    BASE_COLOR,
+    BASE_COLOR=0,
     ROUGHNESS,
     METALIC,
     NORMAL,
     AMBIENT_OCCLUSION,
+    COUNT
 };
 struct Vertex
 {
     glm::vec3 Position;
     glm::vec3 Normal;
     glm::vec2 TexCoords;
+    glm::vec3 tangent;
+    glm::vec3 bitangent;
 };
 
 struct Texture

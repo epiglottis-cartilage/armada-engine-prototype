@@ -73,13 +73,13 @@ int main(int argc, char** argv){
     gSceneManager->emplace<fleet::NameComponent>(sunDirectionLight, "Sun Directional Light");
     gSceneManager->emplace<fleet::TransformComponent>(
         sunDirectionLight,
-        glm::vec3(0.0f, 300.0f, 0.0f),
+        glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(0.0f),
         glm::vec3(1.0f)
     );
     gSceneManager->emplace<fleet::MeshComponent>(
         sunDirectionLight,
-        modeldir / "deathstar.glb",
+        modeldir / "minuszarrow.glb",
 		lightShader
 	);
     gSceneManager->emplace<fleet::LightComponent>(
@@ -92,17 +92,17 @@ int main(int argc, char** argv){
     );
 
     //create a house
-    fleet::Entity house = gSceneManager->create();
-    gSceneManager->emplace<fleet::NameComponent>(house, "House");
+    fleet::Entity pbrhelmet = gSceneManager->create();
+    gSceneManager->emplace<fleet::NameComponent>(pbrhelmet, "pbr helmet");
     gSceneManager->emplace<fleet::TransformComponent>(
-        house,
+        pbrhelmet,
         glm::vec3{0.0f},
         glm::vec3(0.0f),
         glm::vec3{1.0f}
     );
     gSceneManager->emplace<fleet::MeshComponent>(
-        house,
-        modeldir / "testinghouse.glb",
+        pbrhelmet,
+        modeldir / "damagedhelmet.glb",
         phongShader
     );
 

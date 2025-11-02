@@ -24,12 +24,17 @@ layout(std140, binding = 1) uniform LightBuffer {
 
 in VS_OUT {
     vec3 fragPos;
-    vec3 normal;
     vec2 TexCoord;
+    mat3 TBN;
 } fs_in;
 
 out vec4 colorFrag;
+
 uniform sampler2D textureBaseColor;
+uniform sampler2D textureRoughness;
+uniform sampler2D textureMetalic;
+uniform sampler2D textureNormalMap;
+uniform sampler2D textureAmbientOcclusion;
 uniform mat4 matrixModel;
 
 //transform to camera , to screen
@@ -81,7 +86,9 @@ vec3 CalcPointLight(Light light, vec3 normal, vec3 fragPos, vec3 viewDir, vec3 a
 void main()
 {
     vec3 albedo = texture(textureBaseColor, fs_in.TexCoord).rgb;
-    vec3 norm = normalize(fs_in.normal);
+    vec3 norm = texture(textureNormalMap, fs_in.TexCoord).rgb;
+    norm = norm * 2.0 - 1.0;
+    norm = normalize(fs_in.TBN * norm);
     vec3 viewDir = normalize(positionCamera - fs_in.fragPos);
 
     vec3 result = vec3(0.0);

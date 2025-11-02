@@ -3,13 +3,11 @@
 
 #include <Texture.hh>
 #include <cstddef>
+#include <imgui.h>
 
 
 NAMESPACE_BEGIN
-
-
-
-void Model::Mesh::setupMesh() {
+    void Model::Mesh::setupMesh() {
 	glGenVertexArrays(1, &this->VAO);
     glGenBuffers(1, &this->VBO);
     glGenBuffers(1, &this->EBO);
@@ -36,6 +34,14 @@ void Model::Mesh::setupMesh() {
     glEnableVertexAttribArray(2); 
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), 
                          (GLvoid*)offsetof(Vertex, TexCoords));
+    //set tangents;
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+                         (GLvoid*)offsetof(Vertex, tangent));
+    //set bitangents;
+    glEnableVertexAttribArray(4);
+    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+                         (GLvoid*)offsetof(Vertex, bitangent));
 
     glBindVertexArray(0);
 
@@ -45,47 +51,48 @@ Model::Material Model::PBRload(aiMaterial* aimat, const aiScene* scene) {
     //push constructed Material into this->materials vector
 
 // ---- DEBUG BLOCK: print material info ----
-    {
-        aiString matName;
-        if (AI_SUCCESS == aimat->Get(AI_MATKEY_NAME, matName)) {
-            ENGINE_INFO("Processing material: '{}'", matName.C_Str());
-        } else {
-            ENGINE_INFO("Processing unnamed material.");
-        }
-
-        // Define all texture types you want to check
-        std::vector<std::pair<aiTextureType, const char*>> texTypes = {
-            {aiTextureType_BASE_COLOR,        "BASE_COLOR"},
-            {aiTextureType_DIFFUSE,           "DIFFUSE"},
-            {aiTextureType_NORMALS,           "NORMALS"},
-            {aiTextureType_METALNESS,         "METALNESS"},
-            {aiTextureType_DIFFUSE_ROUGHNESS, "ROUGHNESS"},
-            {aiTextureType_AMBIENT_OCCLUSION, "AO"},
-            {aiTextureType_EMISSIVE,          "EMISSIVE"}
-        };
-
-        for (auto [type, name] : texTypes) {
-            unsigned int count = aimat->GetTextureCount(type);
-            if (count == 0) continue;
-
-            ENGINE_INFO("  TextureType: {} has {} piece(s) in total", name, count);
-            ENGINE_INFO("       they are:");
-            for (unsigned int i = 0; i < count; ++i) {
-                aiString texPath;
-                if (AI_SUCCESS == aimat->GetTexture(type, i, &texPath)) {
-                    ENGINE_INFO("{} NO.[{}] name: {}",name, i, texPath.C_Str());
-                }
-            }
-        }
-    }
+//    {
+//        aiString matName;
+//        if (AI_SUCCESS == aimat->Get(AI_MATKEY_NAME, matName)) {
+//            ENGINE_INFO("Processing material: '{}'", matName.C_Str());
+//        } else {
+//            ENGINE_INFO("Processing unnamed material.");
+//        }
+//
+//        // Define all texture types you want to check
+//        std::vector<std::pair<aiTextureType, const char*>> texTypes = {
+//            {aiTextureType_BASE_COLOR,        "BASE_COLOR"},
+//            {aiTextureType_DIFFUSE,           "DIFFUSE"},
+//            {aiTextureType_NORMALS,           "NORMALS"},
+//            {aiTextureType_METALNESS,         "METALNESS"},
+//            {aiTextureType_DIFFUSE_ROUGHNESS, "ROUGHNESS"},
+//            {aiTextureType_AMBIENT_OCCLUSION, "AO"},
+//            {aiTextureType_EMISSIVE,          "EMISSIVE"}
+//        };
+//
+//        for (auto [type, name] : texTypes) {
+//            unsigned int count = aimat->GetTextureCount(type);
+//            if (count == 0) continue;
+//
+//            ENGINE_INFO("  TextureType: {} has {} piece(s) in total", name, count);
+//            ENGINE_INFO("       they are:");
+//            for (unsigned int i = 0; i < count; ++i) {
+//                aiString texPath;
+//                if (AI_SUCCESS == aimat->GetTexture(type, i, &texPath)) {
+//                    ENGINE_INFO("{} NO.[{}] name: {}",name, i, texPath.C_Str());
+//                }
+//            }
+//        }
+//    }
 // ---- END DEBUG BLOCK ----
 
 
 
     Model::Material mat = {};
+    mat.textures.resize(static_cast<int>(TextureType::COUNT));
 
     TextureType::BASE_COLOR;
-    Texture diffuse_or_alberto;
+    Texture diffuse_or_alberto = {};
     aiString texturename;
     aimat->GetTexture(aiTextureType_BASE_COLOR, 0, &texturename);
 
@@ -95,23 +102,80 @@ Model::Material Model::PBRload(aiMaterial* aimat, const aiScene* scene) {
     if(texturename.length == 0) {
         ENGINE_WARN("No base color texture found in material, trying diffuse...\n");
         aimat->GetTexture(aiTextureType_DIFFUSE, 0, &texturename);
-        //TODO: add default texture loading here
-    }//try another one
+    }
+    if (texturename.length == 0) {
+        ENGINE_WARN("No diffuse texture found in material, using default...\n");
+        diffuse_or_alberto = loadDefaultTexture();
+    }
 
     if(texturename_str[0] == '*') {
         ENGINE_INFO("base texture is inmem, now loaading...");
         if(texturename_str.size() <= 1) {
-            ENGINE_ERROR("assimp inmem texture name length <= 1, something is wrong, returning in advanced");
-            return {};
+            ENGINE_ERROR("assimp inmem texture name length <= 1, something is wrong");
+            diffuse_or_alberto = loadDefaultTexture();
         }
         string indexstr = texturename_str.substr(1);
         aiTexture* inmem = scene->mTextures[(std::stoi(indexstr))];
         diffuse_or_alberto.id = TextureSdlGl{inmem}.getTextureId();
     }
+    mat.textures[static_cast<int>(TextureType::BASE_COLOR)] = diffuse_or_alberto;
 
-    //TODO: finish normal, roughness, metalic, ao
+//    TextureType::ROUGHNESS;
+//    diffuse_or_alberto = {};
+//    aimat->GetTexture(aiTextureType_DIFFUSE_ROUGHNESS, 0, &texturename);
+//    if (texturename.length == 0) {
+//        ENGINE_WARN("this model have no rough texture, using default...");
+//    }
+//    if(texturename_str[0] == '*') {
+//        ENGINE_INFO("texture is inmem, now loaading...");
+//        if(texturename_str.size() <= 1) {
+//            ENGINE_ERROR("assimp inmem texture name length <= 1, something is wrong");
+//            diffuse_or_alberto = loadDefaultTexture();
+//        }
+//        string indexstr = texturename_str.substr(1);
+//        aiTexture* inmem = scene->mTextures[(std::stoi(indexstr))];
+//        diffuse_or_alberto.id = TextureSdlGl{inmem}.getTextureId();
+//    }
+    mat.textures[static_cast<int>(TextureType::ROUGHNESS)] = diffuse_or_alberto;
+//
+//    TextureType::METALIC;
+//    diffuse_or_alberto = {};
+//    aimat->GetTexture(aiTextureType_METALNESS, 0, &texturename);
+//    if (texturename.length == 0) {
+//        ENGINE_WARN("this model have no rough texture, using default...");
+//    }
+//    if(texturename_str[0] == '*') {
+//        ENGINE_INFO("texture is inmem, now loaading...");
+//        if(texturename_str.size() <= 1) {
+//            ENGINE_ERROR("assimp inmem texture name length <= 1, something is wrong");
+//            diffuse_or_alberto = loadDefaultTexture();
+//        }
+//        string indexstr = texturename_str.substr(1);
+//        aiTexture* inmem = scene->mTextures[(std::stoi(indexstr))];
+//        diffuse_or_alberto.id = TextureSdlGl{inmem}.getTextureId();
+//    }
+    mat.textures[static_cast<int>(TextureType::METALIC)] = diffuse_or_alberto;
 
-    mat.textures.push_back(diffuse_or_alberto);
+    TextureType::NORMAL;
+    diffuse_or_alberto = {};
+    aimat->GetTexture(aiTextureType_NORMAL_CAMERA, 0, &texturename);
+    if (texturename.length == 0) {
+        ENGINE_WARN("this model have no rough texture, using default...");
+    }
+    if(texturename_str[0] == '*') {
+        ENGINE_INFO("texture is inmem, now loaading...");
+        if(texturename_str.size() <= 1) {
+            ENGINE_ERROR("assimp inmem texture name length <= 1, something is wrong");
+            diffuse_or_alberto = loadDefaultTexture();
+        }
+        string indexstr = texturename_str.substr(1);
+        aiTexture* inmem = scene->mTextures[(std::stoi(indexstr))];
+        diffuse_or_alberto.id = TextureSdlGl{inmem}.getTextureId();
+    }
+    mat.textures[static_cast<int>(TextureType::NORMAL)] = diffuse_or_alberto;
+
+    TextureType::AMBIENT_OCCLUSION;
+    mat.textures[static_cast<int>(TextureType::AMBIENT_OCCLUSION)] = diffuse_or_alberto;
     return mat;
 }
 
@@ -137,14 +201,8 @@ void Model::loadMaterials(const aiScene* scene) {
 flipUVy is False by default, which means no flip happens.
 */
 void Model::loadModel(string path, bool flipUVy) {
-    //path is the model file location
-    int load_params;
-    if (flipUVy) {
-        load_params = aiProcess_Triangulate | aiProcess_FlipUVs;
-    }
-    else {
-        load_params = aiProcess_Triangulate ;
-    }
+    auto load_params = aiProcess_Triangulate | aiProcess_CalcTangentSpace;
+    load_params = load_params | (flipUVy ? aiProcess_FlipUVs : 0);
 
     //assimp load the model into memory
     Assimp::Importer importer;
@@ -252,6 +310,19 @@ Model::Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
         else
             vertex.TexCoords = glm::vec2(0.0f, 0.0f);
         //#######????#########
+        //copy tangents and bitangents
+        if (mesh->HasTangentsAndBitangents()) {
+            vertex.tangent = glm::vec3{
+                mesh->mTangents[i].x,
+                mesh->mTangents[i].y,
+                mesh->mTangents[i].z
+            };
+            vertex.bitangent = glm::vec3{
+                mesh->mBitangents[i].x,
+                mesh->mBitangents[i].y,
+                mesh->mBitangents[i].z
+            };
+        }
 
         vertices.push_back(vertex);
     }
