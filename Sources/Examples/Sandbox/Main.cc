@@ -22,6 +22,7 @@ int main(int argc, char** argv){
 
     fleet::Shader* phongShader = gameengine->getRenderSystem()->getShaderManager()->getOrCreate("Phong");
     fleet::Shader* lightShader = gameengine->getRenderSystem()->getShaderManager()->getOrCreate("Light");
+    fleet::Shader* debugphongShader = gameengine->getRenderSystem()->getShaderManager()->getOrCreate("DebugPhong");
 
 
     //always get dir using asset system
@@ -107,8 +108,21 @@ int main(int argc, char** argv){
     );
 
     //create a terrain
+    fleet::Entity terrainEntOg = gSceneManager->create();
+    gSceneManager->emplace<fleet::NameComponent>(terrainEntOg, "Testing Ground");
+    gSceneManager->emplace<fleet::TransformComponent>(
+        terrainEntOg,
+        glm::vec3(0.0f),
+        glm::vec3(-90.0f, 0.0f, 0.0f),
+        glm::vec3(1.0f)
+    );
+    gSceneManager->emplace<fleet::MeshComponent>(
+        terrainEntOg,
+        modeldir / "terraintest.glb",
+        phongShader
+    );
     fleet::Entity terrainEnt = gSceneManager->create();
-    gSceneManager->emplace<fleet::NameComponent>(terrainEnt, "Testing Ground");
+    gSceneManager->emplace<fleet::NameComponent>(terrainEnt, "Ground Normal");
     gSceneManager->emplace<fleet::TransformComponent>(
         terrainEnt,
         glm::vec3(0.0f),
@@ -118,7 +132,7 @@ int main(int argc, char** argv){
     gSceneManager->emplace<fleet::MeshComponent>(
         terrainEnt,
         modeldir / "terraintest.glb",
-        phongShader
+        debugphongShader
     );
 
 

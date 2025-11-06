@@ -61,6 +61,7 @@ vec3 CalcDirectionalLight(Light light, vec3 normal, vec3 viewDir, vec3 albedo) {
     return (ambient + diffuse + specular);
 }
 
+//this is blinn-phong, since we  are using halfway vector of view and light to dot multiply with normal
 vec3 CalcPointLight(Light light, vec3 normal, vec3 fragPos, vec3 viewDir, vec3 albedo) {
 //transform light position to world
     vec3 positionLightWorld = vec3(light.position * matrixModel);

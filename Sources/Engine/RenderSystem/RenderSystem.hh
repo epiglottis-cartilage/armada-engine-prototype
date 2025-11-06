@@ -1,9 +1,5 @@
 #pragma once
 
-#define DEFAULT_TEXTURE_NAME "defaulttexture.png"
-
-
-
 #include <Common.hh>
 #include <GlobalContext.hh>
 #include <ConfigTypes.hh>
@@ -31,6 +27,8 @@
 
 NAMESPACE_BEGIN
 
+#define DEFAULT_TEXTURE_NAME "defaulttexture.png"
+
 extern AppContext* objptrAppContext;
 
 #define SHADERDIR "shaders"
@@ -43,6 +41,7 @@ struct RenderCommand {
 
 };
 
+
 struct RenderContext {
     SDL_Window* mainwindow;
     SDL_GLContext glcontext;
@@ -50,6 +49,7 @@ struct RenderContext {
     float deltatime;
     vector<GLuint> uboBindings;
     vector<RenderCommand> drawtargets;
+    cfgRenderSystem configRender = {};
 };
 
 

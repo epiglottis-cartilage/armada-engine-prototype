@@ -25,6 +25,9 @@ void Engine::init(){
     this->aConfig = new Config{ exePath.string() };
     ENGINE_INFO("Config Loaded, now printing some fields:\n{}", aConfig->cfgassetsystem.assetpath);
     aAppContext = make_unique<AppContext>();
+    auto* appContext = this->getAppContext();
+    appContext->aRenderContext->configRender = this->aConfig->cfgrendersystem;
+
     objptrAppContext = getAppContext();
     aAppContext->aIsInited = true;
     aAppContext->aShouldQuit = false;

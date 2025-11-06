@@ -1,6 +1,7 @@
 #include <ShaderManager.hh>
 #include <Camera.hh>
 
+#include "DebugNormalShader.hh"
 #include "Light.hh"
 #include "PointLightShader.hh"
 #include "RenderSystem.hh"
@@ -44,6 +45,8 @@ ShaderManager::ShaderManager(){
     //should I use such init????????
     ShaderFactory::instance().registerType("Phong", [](const fs::path& shaderdir) { return std::make_unique<PhongShader>(shaderdir); });
     ShaderFactory::instance().registerType("Light", [](const fs::path& shaderdir) { return std::make_unique<PointLightShader>(shaderdir); });
+    ShaderFactory::instance().registerType("DebugPhong", [](const fs::path& shaderdir) { return std::make_unique<DebugNormalShader>(shaderdir); });
+
     //examples::
 //    ShaderFactory::instance().registerType("PBR", [] { return std::make_unique<PBRShader>(); });
 //    ShaderFactory::instance().registerType("Skybox", [] { return std::make_unique<SkyboxShader>(); });

@@ -1,17 +1,23 @@
-#include <PhongShader.hh>
+//
+// Created by phage on 11/3/25.
+//
+
+#include "DebugNormalShader.hh"
+#include "PhongShader.hh"
 
 NAMESPACE_BEGIN
-
-PhongShader::PhongShader(const fs::path& shaderdir) :
-Shader(shaderdir){
-    GLuint vertexShader = GLShader(GL_VERTEX_SHADER, shaderdir / PHONGVERTEXSHADER).shaderID;
-    GLuint fragmentShader = GLShader(GL_FRAGMENT_SHADER, shaderdir / PHONGFRAGMENTSHADER).shaderID;
+DebugNormalShader::DebugNormalShader(const fs::path& shaderdir) :
+Shader(shaderdir) {
+    GLuint vertexShader = GLShader(GL_VERTEX_SHADER, shaderdir / PHONGVERTEXSHADER ).shaderID;
+    GLuint geometricShader = GLShader(GL_GEOMETRY_SHADER, shaderdir / Debug_Shader_Name ).shaderID;
+    GLuint fragmentShader = GLShader(GL_FRAGMENT_SHADER, shaderdir / Shining_Color_Fragshader_Name).shaderID;
     //============================================================
     // Link shaders
 
     GLuint shaderProgram = glCreateProgram();
     this->shaderID = shaderProgram;
     glAttachShader(shaderProgram, vertexShader);
+    glAttachShader(shaderProgram, geometricShader);
     glAttachShader(shaderProgram, fragmentShader);
     glLinkProgram(shaderProgram);
 
@@ -27,10 +33,11 @@ Shader(shaderdir){
         ENGINE_INFO("Phong Shader program linked successfully");
     }
 
-//    bindUBO(UBOType::Camera);
-//    bindUBO(UBOType::LightBuffer);
 }
 
+string DebugNormalShader::typeName() const {
+    return DEBUGNORMALSHADERTYPE;
+}
 
 
 NAMESPACE_END

@@ -14,6 +14,7 @@ class AppContext {
 public:
     AppContext();
 
+
     unique_ptr<RenderContext> aRenderContext;
     string aGamename;
     string aGameVersion;

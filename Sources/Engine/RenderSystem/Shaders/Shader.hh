@@ -29,7 +29,7 @@ enum class ShaderType{
 class Shader {
 public:
     explicit Shader(const fs::path& shaderdir);
-    virtual ~Shader() = default;
+    virtual ~Shader() ;
 
     virtual void setUniform(const std::string& name, const glm::mat4& value) const;
     virtual void setUniform(const std::string& name, const glm::vec3& value) const;

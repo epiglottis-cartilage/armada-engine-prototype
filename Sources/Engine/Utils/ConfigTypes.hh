@@ -13,6 +13,7 @@ struct cfgRenderSystem {
     bool vsync = false;
     int antialiasing = 0;
     int shadowquality = 0;
+    bool glEnableFaceCulling = false;
 
     std::string sdlimg_format = "png";
 };

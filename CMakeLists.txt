@@ -79,6 +79,10 @@ if(WIN32)
     find_package(RTTR CONFIG REQUIRED Core)
 endif()
 
+#now comes some package which have neither cmake nor vcpkg support
+#ImReflect
+include_directories(${INCLUDE_DIRECTORIES} "${CMAKE_SOURCE_DIR}/Sources/HardDependencies/ImReflect/")
+
 set(ENGINE_HEADERS_DIRS
 
     ${CMAKE_SOURCE_DIR}/Sources/Engine
@@ -97,6 +101,10 @@ set(ENGINE_HEADERS_DIRS
 )
 
 set(ENGINE_HEADERS_FILES
+    #Dependencies
+    ${CMAKE_SOURCE_DIR}/Sources/HardDependencies/ImReflect/ImReflect.hpp
+
+
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Common.hh
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Engine.hh
     ${CMAKE_SOURCE_DIR}/Sources/Engine/GlobalContext.hh
@@ -114,6 +122,7 @@ set(ENGINE_HEADERS_FILES
 
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Shaders/Shader.hh
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Shaders/PhongShader.hh
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Shaders/DebugNormalShader.hh
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Shaders/PointLightShader.hh
 
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Editorimgui/UIDrawSystem.hh
@@ -155,6 +164,7 @@ set(ENGINE_SOURCES_FILES
 
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Shaders/Shader.cc
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Shaders/PhongShader.cc
+    ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Shaders/DebugNormalShader.cc
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Shaders/PointLightShader.cc
 
     ${CMAKE_SOURCE_DIR}/Sources/Engine/RenderSystem/Editorimgui/UIDrawSystem.cc

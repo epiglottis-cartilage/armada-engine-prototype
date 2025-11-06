@@ -14,6 +14,9 @@ void UIDrawSystem::drawframe()
     ImGui::Text("Press F9 to hide editor");
     ImGui::Separator();
 
+//    ImGui::TreeNode("RenderConfig");
+//    ImGui::TreePop();
+
     StateManager* stateManager = objptrGameEngine->getStateManager();
     auto view = stateManager->view<TransformComponent>();
 

@@ -47,6 +47,10 @@ Shader::GLShader::GLShader(GLenum shadertype, fs::path shaderfilepath) {
     }
 }
 
+Shader::~Shader() {
+    glDeleteProgram(this->shaderID);
+}
+
 Shader::Shader(const fs::path& shaderdir) {
     this->shaderID = 0;
 }
@@ -115,5 +119,7 @@ void Shader::bindUBO(UBOType type){
         //up to now shader block is bind to binding point,
         //but binding point still not connect to ubo in-mem block yet!
 }
+
+
 
 NAMESPACE_END

@@ -46,6 +46,8 @@ private:
     int current = 0;//always read the 0, 1 always be buffer
     int buffer =  1;
 };
+//Imreflect registry
+
 NAMESPACE_END
 
 #endif //TRANSFORMCOMPONENT_H
