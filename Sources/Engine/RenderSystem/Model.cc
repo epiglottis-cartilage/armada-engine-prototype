@@ -59,7 +59,7 @@ void Primitive::drawPrimitive(const Shader& shader, const glm::mat4 transform, c
         "textureAmbientOcclusion",
     };
 
-    for (GLuint i = 0; i < parentmodel->getMaterials()[indexMaterial].textures.size(); i++) {
+    for (GLuint i = 0; i < static_cast<int>(TextureType::COUNT); i++) {
         glActiveTexture(GL_TEXTURE0 + i);
         glUniform1i(
             glGetUniformLocation(shader.getID(), pbrnames[static_cast<int>(i)].c_str()),
@@ -198,8 +198,17 @@ Model::Material Model::PBRload(tinygltf::Material& gltfmat, tinygltf::Model& glt
 
 void Model::loadMaterials(tinygltf::Model& model) {
     auto material_size = model.materials.size();
-    ENGINE_INFO("Loading {} materials\n", material_size);
-    ENGINE_INFO("This model has {} textures in total\n", model.textures.size());
+    if (material_size == 0) {
+        ENGINE_INFO("this model have no materials, constructing default textures.....");
+        this->materials.resize(1);
+        vector<Texture> defaultmat; defaultmat.resize(int(TextureType::COUNT));
+        for (int i = 0; i < int(TextureType::COUNT); i++)
+            defaultmat[i] = loadDefaultTexture();
+        this->materials[0] = {move(defaultmat)};;
+        return;
+    }
+    ENGINE_INFO("Loading {} materials", material_size);
+    ENGINE_INFO("This model has {} textures in total", model.textures.size());
     //resize the material vectors to size of actual materials
     this->materials.resize(material_size);
 
@@ -397,7 +406,8 @@ optional<Model::Mesh> Model::processMesh(const tinygltf::Node* node, const tinyg
             }
         }
         // ----------- 构建 mesh -----------
-        Primitive prim = {std::move(vertices), std::move(indices), drawMode, prims.material};
+        auto primes_meterial_index = (prims.material >= 0) ? prims.material : 0;
+        Primitive prim = {std::move(vertices), std::move(indices), drawMode, primes_meterial_index};
         primsarray.push_back(std::move(prim));
     }
 

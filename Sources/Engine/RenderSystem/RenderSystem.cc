@@ -124,6 +124,11 @@ void RenderSystem::init(){
 
     //experiment zone:
     glEnable(GL_CULL_FACE);
+
+    auto vender = reinterpret_cast<const char*>(glGetString(GL_VENDOR));
+    auto renderer = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
+    auto version = reinterpret_cast<const char*>(glGetString(GL_VERSION));
+    ENGINE_DEBUG("GL_VENDOR-GL_RENDERER-GL_VERSION: {} {} {}", vender, renderer, version);
 }
 
 RenderSystem::~RenderSystem(){

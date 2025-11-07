@@ -91,18 +91,10 @@ public:
         void setupMesh();
     };
 
-
-    Model(string path, bool flipuv=true){
-        ENGINE_INFO("DEPRECATE METHOD: Model(string path)");
-        fs::path p = fs::path{path};
-        ENGINE_INFO("loading model: {}\nValid: {}", p.string(), fs::exists(p));
-        this->loadModel(path, flipuv);
-    }
-
     Model(const fs::path path, bool flipuv=true){
 
         ENGINE_VALIDLOCATION(path);
-
+        this->modelnameandpath = path;
 
         if(path.extension() != fs::path{".glb"} && path.extension() != fs::path{".gltf"}){
             ENGINE_ERROR("you are loading a model file with non glb/gltf extension, make sure assimp support it\n");
@@ -127,6 +119,7 @@ protected:
     vector<Mesh> meshes;
     vector<Material> materials;
     fs::path directory;
+    fs::path modelnameandpath;
     
     Shader* shader;
 

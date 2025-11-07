@@ -108,7 +108,6 @@ set(ENGINE_HEADERS_DIRS
 
 set(ENGINE_HEADERS_FILES
     #Dependencies
-    ${CMAKE_SOURCE_DIR}/Sources/HardDependencies/ImReflect/ImReflect.hpp
 
 
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Common.hh
@@ -314,6 +313,9 @@ add_custom_target(copy_resources ALL
         "${OUTPUT_DIR}"
         COMMAND ${CMAKE_COMMAND} -E copy
         "${CMAKE_SOURCE_DIR}/resources/defaulttexture.png"
+        "${OUTPUT_DIR}"
+        COMMAND ${CMAKE_COMMAND} -E copy
+        "${CMAKE_SOURCE_DIR}/runwithdgpu.sh"
         "${OUTPUT_DIR}"
 )
 

@@ -104,6 +104,7 @@ void Engine::run(EngineCallbackFunction gamelogic){
 
 
       //transmit camera data, render frame, etc
+
       this->aRenderSystem->prerender(
           aRenderContext
       );
