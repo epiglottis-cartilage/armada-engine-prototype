@@ -88,20 +88,21 @@ void main()
 {
     vec3 albedo = texture(textureBaseColor, fs_in.TexCoord).rgb;
     vec3 norm = texture(textureNormalMap, fs_in.TexCoord).rgb;
-    norm = norm * 2.0 - 1.0;
-    norm = normalize(fs_in.TBN * norm);
-    vec3 viewDir = normalize(positionCamera - fs_in.fragPos);
-
-    vec3 result = vec3(0.0);
-
-    for (int i = 0; i < numLights; ++i) {
-        if (lights[i].type == 0)
-            result += CalcDirectionalLight(lights[i], norm, viewDir, albedo);
-        else if (lights[i].type == 1)
-            result += CalcPointLight(lights[i], norm, fs_in.fragPos, viewDir, albedo);
-    }
-
-    colorFrag = vec4(result, 1.0);
+    colorFrag = vec4(norm, 1.0);
+//    norm = norm * 2.0 - 1.0;
+//    norm = -normalize(fs_in.TBN * norm);
+//    vec3 viewDir = normalize(positionCamera - fs_in.fragPos);
+//
+//    vec3 result = vec3(0.0);
+//
+//    for (int i = 0; i < numLights; ++i) {
+//        if (lights[i].type == 0)
+//            result += CalcDirectionalLight(lights[i], norm, viewDir, albedo);
+//        else if (lights[i].type == 1)
+//            result += CalcPointLight(lights[i], norm, fs_in.fragPos, viewDir, albedo);
+//    }
+//
+//    colorFrag = vec4(result, 1.0);
 }
 
 

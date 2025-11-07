@@ -79,6 +79,12 @@ if(WIN32)
     find_package(RTTR CONFIG REQUIRED Core)
 endif()
 
+#add stb_image into include directory for debian sid build
+set(STB_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Sources/Thirdparty/stb")
+# 将 stb 头文件目录添加到全局包含路径
+include_directories(${STB_INCLUDE_DIR})
+
+
 #now comes some package which have neither cmake nor vcpkg support
 #ImReflect
 include_directories(${INCLUDE_DIRECTORIES} "${CMAKE_SOURCE_DIR}/Sources/HardDependencies/ImReflect/")
@@ -294,7 +300,22 @@ copy_resources(Sandbox resources/defaulttexture.png)
 copy_resources(Sandbox engine.cfg)
 copy_resources(Sandbox resources)
 
+set(RESOURCE_DIR "${CMAKE_SOURCE_DIR}/resources")
+set(OUTPUT_DIR "${CMAKE_BINARY_DIR}/Sandbox")
 
+# 定义一个名为 copy_resources 的自定义目标
+add_custom_target(copy_resources ALL
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${RESOURCE_DIR}"
+        "${OUTPUT_DIR}"
+        COMMENT "Copying resource files to build directory..."
+        COMMAND ${CMAKE_COMMAND} -E copy
+        "${CMAKE_SOURCE_DIR}/engine.cfg"
+        "${OUTPUT_DIR}"
+        COMMAND ${CMAKE_COMMAND} -E copy
+        "${CMAKE_SOURCE_DIR}/resources/defaulttexture.png"
+        "${OUTPUT_DIR}"
+)
 
 
 ########WINDOWS DEBUG ZONE###########

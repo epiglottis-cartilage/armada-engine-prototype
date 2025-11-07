@@ -20,6 +20,7 @@ int main(int argc, char** argv){
         sizeof(int)
     );
 
+
     fleet::Shader* phongShader = gameengine->getRenderSystem()->getShaderManager()->getOrCreate("Phong");
     fleet::Shader* lightShader = gameengine->getRenderSystem()->getShaderManager()->getOrCreate("Light");
     fleet::Shader* debugphongShader = gameengine->getRenderSystem()->getShaderManager()->getOrCreate("DebugPhong");
@@ -121,19 +122,19 @@ int main(int argc, char** argv){
         modeldir / "terraintest.glb",
         phongShader
     );
-    fleet::Entity terrainEnt = gSceneManager->create();
-    gSceneManager->emplace<fleet::NameComponent>(terrainEnt, "Ground Normal");
-    gSceneManager->emplace<fleet::TransformComponent>(
-        terrainEnt,
-        glm::vec3(0.0f),
-        glm::vec3(-90.0f, 0.0f, 0.0f),
-        glm::vec3(1.0f)
-    );
-    gSceneManager->emplace<fleet::MeshComponent>(
-        terrainEnt,
-        modeldir / "terraintest.glb",
-        debugphongShader
-    );
+//    fleet::Entity terrainEnt = gSceneManager->create();
+//    gSceneManager->emplace<fleet::NameComponent>(terrainEnt, "Ground Normal");
+//    gSceneManager->emplace<fleet::TransformComponent>(
+//        terrainEnt,
+//        glm::vec3(0.0f),
+//        glm::vec3(-90.0f, 0.0f, 0.0f),
+//        glm::vec3(1.0f)
+//    );
+//    gSceneManager->emplace<fleet::MeshComponent>(
+//        terrainEnt,
+//        modeldir / "terraintest.glb",
+//        debugphongShader
+//    );
 
 
     //add a heli model

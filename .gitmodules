@@ -7,3 +7,6 @@
 [submodule "Sources/Thirdparty/entt"]
 	path = Sources/Thirdparty/entt
 	url = https://github.com/skypjack/entt.git
+[submodule "Sources/Thirdparty/stb"]
+	path = Sources/Thirdparty/stb
+	url = https://github.com/nothings/stb.git

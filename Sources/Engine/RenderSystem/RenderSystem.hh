@@ -174,7 +174,7 @@ void static initGLDebug()
     void submit(const Model* model, const Shader* shader, const glm::mat4& transform);
     void executecommand(const RenderCommand& command);
 
-    void drawmesh(const Model::Mesh& mesh, const Shader& shader, const glm::mat4& transform) const;
+    void drawmesh(const Model& model, const Model::Mesh& mesh, const Shader& shader, const glm::mat4& transform) const;
     void drawmodel(const Model& model, const Shader& shader, const glm::mat4& transform) const;
 
     cfgRenderSystem config;

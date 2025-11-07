@@ -19,6 +19,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include <assimp/Exceptional.h>
+#include <tiny_gltf.h>
 
 
 #include <Shader.hh>
@@ -40,8 +41,8 @@ enum class TextureType{
 struct Vertex
 {
     glm::vec3 Position;
-    glm::vec3 Normal;
-    glm::vec2 TexCoords;
+    glm::vec3 Normal = {0.0f, 0.0f, 0.1f};
+    glm::vec2 TexCoords = {0.0f, 0.0f};
     glm::vec3 tangent;
     glm::vec3 bitangent;
 };
@@ -49,54 +50,56 @@ struct Vertex
 struct Texture
 {
     GLuint id;
-    string type = {};
-    aiString path = {};
+    TextureType type;
+    string type_str = {};
+};
+
+class Model;
+
+struct Primitive {
+    vector<Vertex> vertices;
+    vector<GLuint> indices;
+    GLenum enumIndexMode = GL_TRIANGLES;
+    int indexMaterial;
+    Primitive(vector<Vertex> vertices, vector<GLuint> indices, GLenum enumIndexMode, int indexMaterial) :
+        vertices(vertices), indices(indices), enumIndexMode(enumIndexMode), indexMaterial(indexMaterial) {
+        this->setupPrimitive();
+    }
+    GLuint VAO = 0, VBO = 0, EBO = 0;
+    void setupPrimitive();
+    void processPrimitive();
+    void drawPrimitive(const Shader& shader, const glm::mat4 transform, const Model* parentmodel) const;
 };
 
 class Model 
 {
 public:
-    class Material
-    {
+    class Material{
     public:
         vector<Texture> textures;
     };
-    class Mesh
-    {
+    class Mesh{
     public:
-        vector<Vertex> vertices;
-        vector<GLuint> indices;
-        int materialIndex;
+        glm::mat4 localtransform;
+        vector<Primitive> primitives;
 
-
-        Mesh(vector<Vertex> vertices, vector<GLuint> indices, int texture, Model* parentmodel) :
-            vertices(vertices), indices(indices), materialIndex(texture),
-            parent_usedfortexture(parentmodel),
-            VAO(0), VBO(0), EBO(0)
-        {
+        Mesh(glm::mat4 transform, vector<Primitive> primitives) :
+            localtransform(transform), primitives(primitives){
             this->setupMesh();
         };
-
-    //    void Draw(const Shader& shader, const glm::mat4& transform) const;
-        GLuint getVAO() const { return this->VAO; }
-        Model* getParentUsedForTexture() const { return this->parent_usedfortexture; }
     private:
-        Model* parent_usedfortexture;
-        GLuint VAO, VBO, EBO;
         void setupMesh();
     };
 
 
-    Model(string path, bool flipuv=true)
-    {
+    Model(string path, bool flipuv=true){
         ENGINE_INFO("DEPRECATE METHOD: Model(string path)");
         fs::path p = fs::path{path};
         ENGINE_INFO("loading model: {}\nValid: {}", p.string(), fs::exists(p));
         this->loadModel(path, flipuv);
     }
 
-    Model(const fs::path path, bool flipuv=true)
-    {
+    Model(const fs::path path, bool flipuv=true){
 
         ENGINE_VALIDLOCATION(path);
 
@@ -127,13 +130,18 @@ protected:
     
     Shader* shader;
 
-    Material PBRload(aiMaterial* aimat, const aiScene* scene);
+    Material PBRload(tinygltf::Material& gltfmat, tinygltf::Model& gltfmodel);
     void loadModel(string path, bool flipUVy = false);
-    void loadMaterials(const aiScene* scene);
-    void processNode(aiNode* node, const aiScene* scene);
-    Mesh processMesh(aiMesh* mesh, const aiScene* scene);
-    vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type );
+    void loadMaterials(tinygltf::Model& model);
+    void processNode(tinygltf::Node* node, tinygltf::Model* model);
+    optional<Model::Mesh> processMesh(const tinygltf::Node* node, const tinygltf::Model* model);
     optional<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, string typeName);
+    Texture loadTexturefromGLTF(
+        const tinygltf::Model& gltfmodel,
+        const tinygltf::Material& gltfmat,
+        int index,
+        TextureType textype
+        );
 
     static Texture loadDefaultTexture() {
 
@@ -141,8 +149,8 @@ protected:
         ENGINE_DEBUG("loading default texture\n");
 
         texture.id = TextureSdlGl{ fs::path{fs::current_path() / DEFAULT_TEXTURE_NAME}.string() }.getTextureId();
-        texture.type = "Default";
-        texture.path = aiString{ DEFAULT_TEXTURE_NAME };
+        texture.type = TextureType::COUNT;
+        texture.type_str = { DEFAULT_TEXTURE_NAME };
 
         return texture;
     }

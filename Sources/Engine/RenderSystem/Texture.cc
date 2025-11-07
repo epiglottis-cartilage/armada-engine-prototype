@@ -24,9 +24,6 @@ TextureSdlGl::TextureSdlGl(string filepathTexture) {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
 
-        ENGINE_DEBUG("Current Exec Pos: Inside TextureSdlGl::TextureSdlGl(string filepathTexture)"
-                     "After load an image as SDL_Surface and before convert it to GL texture\n");
-
         glTexImage2D(GL_TEXTURE_2D,
             0,
             GL_RGBA,
@@ -37,10 +34,6 @@ TextureSdlGl::TextureSdlGl(string filepathTexture) {
             GL_UNSIGNED_BYTE,
             surface->pixels
         );
-        ENGINE_DEBUG("Current Exec Pos: Inside TextureSdlGl::TextureSdlGl(string filepathTexture)"
-        "After convert SDL surface to GL texture"
-        "if you see this, it means SDL_Surface has been successfully converted to GL texture\n");
-
         GLenum errorClass;
         while((errorClass = glGetError()) != GL_NO_ERROR){
             ENGINE_ERROR("SDL surface to GL texture Error: %u\n", errorClass);
@@ -53,9 +46,6 @@ TextureSdlGl::TextureSdlGl(string filepathTexture) {
             ENGINE_ERROR("GL generate Mipmap Error: %u\n", errorClass);
         }
 
-        ENGINE_DEBUG("Current Exec Pos: Inside TextureSdlGl::TextureSdlGl(string filepathTexture)"
-                     "after generate Mipmap, before Freeing SDL surface\n"
-                    );
 
         SDL_FreeSurface(surface);
         glBindTexture(GL_TEXTURE_2D, 0);
@@ -123,9 +113,6 @@ TextureSdlGl::TextureSdlGl(string filepathTexture) {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
-        ENGINE_DEBUG("Current Exec Pos: Inside TextureSdlGl::TextureSdlGl(const aiTexture* inmemptr)"
-                     "After load an image as SDL_Surface and before convert it to GL texture\n");
-
         //convert to rgba32 format
         surface = SDL_ConvertSurfaceFormat(surface, SDL_PIXELFORMAT_RGBA32, 0);
         if (surface == NULL){
@@ -150,9 +137,6 @@ TextureSdlGl::TextureSdlGl(string filepathTexture) {
             ENGINE_ERROR("SDL surface to GL texture Error: %u\n", errorClass);
         }
 
-        ENGINE_DEBUG("Current Exec Pos: Inside TextureSdlGl::TextureSdlGl(string filepathTexture)"
-        "After convert SDL surface to GL texture"
-        "if you see this, it means SDL_Surface has been successfully converted to GL texture\n");
 
         glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -161,9 +145,6 @@ TextureSdlGl::TextureSdlGl(string filepathTexture) {
             ENGINE_ERROR("GL generate Mipmap Error: {}\n", errorClass);
         }
 
-        ENGINE_DEBUG("Current Exec Pos: Inside TextureSdlGl::TextureSdlGl(string filepathTexture)"
-                     "after generate Mipmap, before Freeing SDL surface\n"
-                    );
 
         SDL_FreeSurface(surface);
         glBindTexture(GL_TEXTURE_2D, 0);

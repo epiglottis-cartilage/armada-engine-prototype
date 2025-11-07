@@ -57,7 +57,7 @@ void RenderSystem::init(){
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
     error = {SDL_GetError()};
     if(error != ""){
-        ENGINE_ERROR("SDL set GL attribute Error: %s\n", error);
+        ENGINE_ERROR("SDL set GL attribute Error:{}", error);
     }
 
     string windowtitle = objptrAppContext->aGamename + " " + objptrAppContext->aGameVersion;
@@ -70,11 +70,11 @@ void RenderSystem::init(){
     error = {SDL_GetError()};
     objptrAppContext->aRenderContext->mainwindow = this->window;
     if(window == NULL){
-        ENGINE_ERROR("SDL_CreateWindow Error: \n", error);
+        ENGINE_ERROR("SDL_CreateWindow Error: {}", error);
     }
     
     if(error != ""){
-        ENGINE_ERROR("SDL set GL attribute Error: \n", error);
+        ENGINE_ERROR("SDL set GL attribute Error: {}", error);
     }
 
     auto img_init_result = IMG_Init(this->sdl_image_flags);
@@ -195,42 +195,16 @@ void RenderSystem::postrender(RenderContext* context){
 /*This method implicitly active the shader in second params,
 transform the transform matrix in third parm to the active shader,
 and then run gl drawcalls*/
-void RenderSystem::drawmesh(const Model::Mesh& mesh, const Shader& shader, const glm::mat4& transform) const{
-    glUseProgram(shader.getID());
-
-    string pbrnames[] = {
-        "textureBaseColor",
-        "textureRoughness",
-        "textureMetalic",
-        "textureNormalMap",
-        "textureAmbientOcclusion",
-    };
-
-    Model* parentmodel = mesh.getParentUsedForTexture();
-
-    for (GLuint i = 0; i < parentmodel->getMaterials()[mesh.materialIndex].textures.size(); i++) {
-        glActiveTexture(GL_TEXTURE0 + i);
-        glUniform1i(
-            glGetUniformLocation(shader.getID(), pbrnames[static_cast<int>(i)].c_str()),
-            i
-        );
-        glBindTexture(GL_TEXTURE_2D, parentmodel->getMaterials()[mesh.materialIndex].textures[i].id);
+void RenderSystem::drawmesh(const Model& model, const Model::Mesh& mesh, const Shader& shader, const glm::mat4& transform) const{
+    for (auto& prim: mesh.primitives) {
+        prim.drawPrimitive(shader, transform * this->modelMatrix, &model);
     }
-    glActiveTexture(GL_TEXTURE0);
-
-    //apply transform
-    shader.setUniform("matrixModel", transform);
-
-    glBindVertexArray(mesh.getVAO());
-    glDrawElements(GL_TRIANGLES, mesh.indices.size(), GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
-    glUseProgram(0);
 }
 
 void RenderSystem::drawmodel(const Model& model, const Shader& shader, const glm::mat4& transform) const{
     for (int i = 0; i < model.getMeshes().size(); i++) {
         Model::Mesh mesh = model.getMeshes()[i];
-        this->drawmesh(mesh, shader, transform);
+        this->drawmesh(model, mesh, shader, transform);
     }
 }
 
