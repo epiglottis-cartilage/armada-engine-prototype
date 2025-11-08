@@ -174,7 +174,6 @@ void static initGLDebug()
     void submit(const Model* model, const Shader* shader, const glm::mat4& transform);
     void executecommand(const RenderCommand& command);
 
-    void drawmesh(const Model& model, const Model::Mesh& mesh, const Shader& shader, const glm::mat4& transform) const;
     void drawmodel(const Model& model, const Shader& shader, const glm::mat4& transform) const;
 
     cfgRenderSystem config;
@@ -194,11 +193,6 @@ void static initGLDebug()
     ShaderManager* shaderManager;
 
     eastl::vector<RenderCommand> cmdQueue;
-
-
-    glm::mat4 projection;
-    glm::mat4 view;
-    glm::mat4 modelMatrix;
 };
 
 

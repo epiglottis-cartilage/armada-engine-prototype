@@ -3,8 +3,6 @@
 #define TINYGLTF_IMPLEMENTATION
 #include <Model.hh>
 #include <Texture.hh>
-#include <cstddef>
-#include <imgui.h>
 #include <entt/entity/entity.hpp>
 
 
@@ -17,6 +15,8 @@ NAMESPACE_BEGIN
     glBindVertexArray(this->VAO);
     glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
 
+    if (vertices.empty())
+        ENGINE_WARN("Loading 0 vertex primitives into GPU!!!");
     glBufferData(GL_ARRAY_BUFFER, this->vertices.size() * sizeof(Vertex),
                  &this->vertices[0], GL_STATIC_DRAW);
 
@@ -46,6 +46,10 @@ NAMESPACE_BEGIN
                          (GLvoid*)offsetof(Vertex, bitangent));
 
     glBindVertexArray(0);
+    GLenum err;
+    while ((err = glGetError()) != GL_NO_ERROR) {
+        ENGINE_ERROR("Uploading Primitives Error: {}", static_cast<int>(err));
+    }
 }
 
 void Primitive::drawPrimitive(const Shader& shader, const glm::mat4 transform, const Model* parentmodel) const {
@@ -73,17 +77,22 @@ void Primitive::drawPrimitive(const Shader& shader, const glm::mat4 transform, c
     shader.setUniform("matrixModel", transform );
 
     glBindVertexArray(VAO);
-    glDrawElements(this->enumIndexMode, indices.size(), GL_UNSIGNED_INT, 0);
+    glDrawElements(this->enumIndexMode, indicessizes, enumIndexType, NULL);
     glBindVertexArray(0);
     glUseProgram(0);
 }
 
 
 void Model::Mesh::setupMesh() {
+    //free the vertex on cpu end for better memory control
+    for (auto& eachprim: this->primitives) {
+        vector<GLuint>().swap(eachprim.indices);
+        vector<Vertex>().swap(eachprim.vertices);
+    }
 }
 
 
-Texture Model::loadTexturefromGLTF(const tinygltf::Model& gltfmodel,const tinygltf::Material& gltfmat, int index, TextureType textype) {
+Texture Model::loadTexturefromGLB(const tinygltf::Model& gltfmodel,const tinygltf::Material& gltfmat, int index, TextureType textype) {
     const tinygltf::Texture& gltftexture = gltfmodel.textures[index];
     const tinygltf::Image& image = gltfmodel.images[gltftexture.source];
 
@@ -132,7 +141,7 @@ Model::Material Model::PBRload(tinygltf::Material& gltfmat, tinygltf::Model& glt
     Texture current_texture = {};
     auto tex_index = gltfmat.pbrMetallicRoughness.baseColorTexture.index;
     if (tex_index >= 0 && tex_index < gltfmodel.textures.size()) {
-        current_texture = loadTexturefromGLTF(
+        current_texture = loadTexturefromGLB(
             gltfmodel,
             gltfmat,
             tex_index,
@@ -149,7 +158,7 @@ Model::Material Model::PBRload(tinygltf::Material& gltfmat, tinygltf::Model& glt
     current_texture;
     tex_index = gltfmat.pbrMetallicRoughness.metallicRoughnessTexture.index;
     if (tex_index >= 0 && tex_index < gltfmodel.textures.size()) {
-        current_texture = loadTexturefromGLTF(
+        current_texture = loadTexturefromGLB(
             gltfmodel,
             gltfmat,
             tex_index,
@@ -166,7 +175,7 @@ Model::Material Model::PBRload(tinygltf::Material& gltfmat, tinygltf::Model& glt
     current_texture;
     tex_index = gltfmat.normalTexture.index;
     if (tex_index >= 0 && tex_index < gltfmodel.textures.size()) {
-        current_texture = loadTexturefromGLTF(
+        current_texture = loadTexturefromGLB(
             gltfmodel,
             gltfmat,
             tex_index,
@@ -182,7 +191,7 @@ Model::Material Model::PBRload(tinygltf::Material& gltfmat, tinygltf::Model& glt
     current_texture;
     tex_index = gltfmat.occlusionTexture.index;
     if (tex_index >= 0 && tex_index < gltfmodel.textures.size()) {
-        current_texture = loadTexturefromGLTF(
+        current_texture = loadTexturefromGLB(
             gltfmodel,
             gltfmat,
             tex_index,
@@ -367,11 +376,18 @@ optional<Model::Mesh> Model::processMesh(const tinygltf::Node* node, const tinyg
             }
         }
 
+        GLenum IndexType = GL_UNSIGNED_INT;
         // ----------- 处理 Indices ----------
         if (prims.indices >= 0) {
             const tinygltf::Accessor& idxAccessor = model->accessors[prims.indices];
             const tinygltf::BufferView& idxView = model->bufferViews[idxAccessor.bufferView];
             const tinygltf::Buffer& idxBuffer = model->buffers[idxView.buffer];
+
+            switch (idxAccessor.componentType) {
+                case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE: IndexType= GL_UNSIGNED_BYTE; break;
+                case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:IndexType= GL_UNSIGNED_SHORT; break;
+                case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:  IndexType= GL_UNSIGNED_INT; break;
+            }
 
             const unsigned char* idxData =
                 idxBuffer.data.data() + idxView.byteOffset + idxAccessor.byteOffset;
@@ -407,7 +423,7 @@ optional<Model::Mesh> Model::processMesh(const tinygltf::Node* node, const tinyg
         }
         // ----------- 构建 mesh -----------
         auto primes_meterial_index = (prims.material >= 0) ? prims.material : 0;
-        Primitive prim = {std::move(vertices), std::move(indices), drawMode, primes_meterial_index};
+        Primitive prim = {std::move(vertices), std::move(indices), drawMode, IndexType, primes_meterial_index};
         primsarray.push_back(std::move(prim));
     }
 

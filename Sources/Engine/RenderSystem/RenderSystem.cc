@@ -123,7 +123,7 @@ void RenderSystem::init(){
     this->shaderManager = new ShaderManager{};
 
     //experiment zone:
-    glEnable(GL_CULL_FACE);
+//    glEnable(GL_CULL_FACE);
 
     auto vender = reinterpret_cast<const char*>(glGetString(GL_VENDOR));
     auto renderer = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
@@ -200,16 +200,11 @@ void RenderSystem::postrender(RenderContext* context){
 /*This method implicitly active the shader in second params,
 transform the transform matrix in third parm to the active shader,
 and then run gl drawcalls*/
-void RenderSystem::drawmesh(const Model& model, const Model::Mesh& mesh, const Shader& shader, const glm::mat4& transform) const{
-    for (auto& prim: mesh.primitives) {
-        prim.drawPrimitive(shader, transform * this->modelMatrix, &model);
-    }
-}
-
 void RenderSystem::drawmodel(const Model& model, const Shader& shader, const glm::mat4& transform) const{
-    for (int i = 0; i < model.getMeshes().size(); i++) {
-        Model::Mesh mesh = model.getMeshes()[i];
-        this->drawmesh(model, mesh, shader, transform);
+    for (const auto& eachmesh: model.getMeshes()) {
+        for (auto& prim: eachmesh.primitives) {
+            prim.drawPrimitive(shader, transform * eachmesh.localtransform, &model);
+        }
     }
 }
 

@@ -57,15 +57,24 @@ struct Texture
 class Model;
 
 struct Primitive {
+    int indicessizes = 0;
+    int indexMaterial;
+    GLuint VAO = 0, VBO = 0, EBO = 0;
+    GLenum enumIndexType = GL_UNSIGNED_INT;
+    GLenum enumIndexMode = GL_TRIANGLES;
+
     vector<Vertex> vertices;
     vector<GLuint> indices;
-    GLenum enumIndexMode = GL_TRIANGLES;
-    int indexMaterial;
-    Primitive(vector<Vertex> vertices, vector<GLuint> indices, GLenum enumIndexMode, int indexMaterial) :
-        vertices(vertices), indices(indices), enumIndexMode(enumIndexMode), indexMaterial(indexMaterial) {
+
+
+    Primitive(vector<Vertex> vertices, vector<GLuint> indices, GLenum enumIndexMode, GLenum enumIndexType, int indexMaterial) :
+        vertices(vertices), indices(indices),
+        indicessizes(indices.size()), enumIndexMode(enumIndexMode),
+        enumIndexType(enumIndexType), indexMaterial(indexMaterial)
+    {
         this->setupPrimitive();
     }
-    GLuint VAO = 0, VBO = 0, EBO = 0;
+
     void setupPrimitive();
     void processPrimitive();
     void drawPrimitive(const Shader& shader, const glm::mat4 transform, const Model* parentmodel) const;
@@ -129,7 +138,7 @@ protected:
     void processNode(tinygltf::Node* node, tinygltf::Model* model);
     optional<Model::Mesh> processMesh(const tinygltf::Node* node, const tinygltf::Model* model);
     optional<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, string typeName);
-    Texture loadTexturefromGLTF(
+    Texture loadTexturefromGLB(
         const tinygltf::Model& gltfmodel,
         const tinygltf::Material& gltfmat,
         int index,
