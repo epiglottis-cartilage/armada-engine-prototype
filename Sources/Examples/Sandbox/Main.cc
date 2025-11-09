@@ -38,7 +38,7 @@ int main(int argc, char** argv){
     gSceneManager->emplace<fleet::TransformComponent>(
         apc,
         glm::vec3(1.0f),
-        glm::vec3(0.0f, 0.0f, 90.0f),
+        glm::vec3(0.0f),
         glm::vec3(1.0f)
     );
     //add entity with model
@@ -114,7 +114,7 @@ int main(int argc, char** argv){
     gSceneManager->emplace<fleet::TransformComponent>(
         terrainEntOg,
         glm::vec3(0.0f),
-        glm::vec3(-90.0f, 0.0f, 0.0f),
+        glm::vec3(0.0f),
         glm::vec3(1.0f)
     );
     gSceneManager->emplace<fleet::MeshComponent>(
@@ -127,7 +127,7 @@ int main(int argc, char** argv){
     gSceneManager->emplace<fleet::TransformComponent>(
         terrainEnt,
         glm::vec3(0.0f),
-        glm::vec3(-90.0f, 0.0f, 0.0f),
+        glm::vec3(0.0f),
         glm::vec3(1.0f)
     );
     gSceneManager->emplace<fleet::MeshComponent>(
@@ -143,7 +143,7 @@ int main(int argc, char** argv){
     gSceneManager->emplace<fleet::TransformComponent>(
         heli,
         glm::vec3(5.0f, 10.0f, -10.0f),
-        glm::vec3(0.0f, 0.0f, 90.0f),
+        glm::vec3(0.0f),
         glm::vec3(1.0f)
     );
     //add entity with model

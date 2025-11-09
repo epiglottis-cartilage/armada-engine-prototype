@@ -60,17 +60,16 @@ struct Primitive {
     int indicessizes = 0;
     int indexMaterial;
     GLuint VAO = 0, VBO = 0, EBO = 0;
-    GLenum enumIndexType = GL_UNSIGNED_INT;
     GLenum enumIndexMode = GL_TRIANGLES;
 
     vector<Vertex> vertices;
     vector<GLuint> indices;
 
 
-    Primitive(vector<Vertex> vertices, vector<GLuint> indices, GLenum enumIndexMode, GLenum enumIndexType, int indexMaterial) :
+    Primitive(vector<Vertex> vertices, vector<GLuint> indices, GLenum enumIndexMode, int indexMaterial) :
         vertices(vertices), indices(indices),
         indicessizes(indices.size()), enumIndexMode(enumIndexMode),
-        enumIndexType(enumIndexType), indexMaterial(indexMaterial)
+         indexMaterial(indexMaterial)
     {
         this->setupPrimitive();
     }

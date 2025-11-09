@@ -77,7 +77,7 @@ void Primitive::drawPrimitive(const Shader& shader, const glm::mat4 transform, c
     shader.setUniform("matrixModel", transform );
 
     glBindVertexArray(VAO);
-    glDrawElements(this->enumIndexMode, indicessizes, enumIndexType, NULL);
+    glDrawElements(this->enumIndexMode, indicessizes, GL_UNSIGNED_INT, NULL);
     glBindVertexArray(0);
     glUseProgram(0);
 }
@@ -375,8 +375,12 @@ optional<Model::Mesh> Model::processMesh(const tinygltf::Node* node, const tinyg
                 vertices[i].bitangent = glm::cross(vertices[i].Normal, vertices[i].tangent) * t[3];
             }
         }
+        else {
+            ENGINE_WARN("model {} primitive has not tangent", string{this->modelnameandpath});
+        }
 
-        GLenum IndexType = GL_UNSIGNED_INT;
+
+        auto IndexType = GL_UNSIGNED_INT;
         // ----------- 处理 Indices ----------
         if (prims.indices >= 0) {
             const tinygltf::Accessor& idxAccessor = model->accessors[prims.indices];
@@ -386,11 +390,12 @@ optional<Model::Mesh> Model::processMesh(const tinygltf::Node* node, const tinyg
             switch (idxAccessor.componentType) {
                 case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE: IndexType= GL_UNSIGNED_BYTE; break;
                 case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:IndexType= GL_UNSIGNED_SHORT; break;
-                case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:  IndexType= GL_UNSIGNED_INT; break;
+                case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT: IndexType= GL_UNSIGNED_INT; break;
             }
 
             const unsigned char* idxData =
                 idxBuffer.data.data() + idxView.byteOffset + idxAccessor.byteOffset;
+
 
             for (size_t i = 0; i < idxAccessor.count; ++i) {
                 uint32_t index = 0;
@@ -423,7 +428,8 @@ optional<Model::Mesh> Model::processMesh(const tinygltf::Node* node, const tinyg
         }
         // ----------- 构建 mesh -----------
         auto primes_meterial_index = (prims.material >= 0) ? prims.material : 0;
-        Primitive prim = {std::move(vertices), std::move(indices), drawMode, IndexType, primes_meterial_index};
+        ENGINE_INFO("model {} primitive indices type is {}", this->modelnameandpath.string(), static_cast<int>(IndexType));
+        Primitive prim = {std::move(vertices), std::move(indices), drawMode, primes_meterial_index};
         primsarray.push_back(std::move(prim));
     }
 

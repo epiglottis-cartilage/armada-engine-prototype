@@ -203,7 +203,7 @@ and then run gl drawcalls*/
 void RenderSystem::drawmodel(const Model& model, const Shader& shader, const glm::mat4& transform) const{
     for (const auto& eachmesh: model.getMeshes()) {
         for (auto& prim: eachmesh.primitives) {
-            prim.drawPrimitive(shader, transform * eachmesh.localtransform, &model);
+            prim.drawPrimitive(shader, transform * eachmesh.localtransform , &model);
         }
     }
 }
