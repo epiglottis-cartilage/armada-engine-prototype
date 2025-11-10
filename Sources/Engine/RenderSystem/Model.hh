@@ -123,6 +123,7 @@ public:
     vector<Material> getMaterials() const { return materials; }
     
 protected:
+    std::unordered_map<int, GLuint>* loadedTextures;
     glm::mat4 transform = glm::mat4(1.0f);
     vector<Mesh> meshes;
     vector<Material> materials;
@@ -138,8 +139,8 @@ protected:
     optional<Model::Mesh> processMesh(const tinygltf::Node* node, const tinygltf::Model* model);
     optional<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, string typeName);
     Texture loadTexturefromGLB(
-        const tinygltf::Model& gltfmodel,
-        const tinygltf::Material& gltfmat,
+        tinygltf::Model& gltfmodel,
+        tinygltf::Material& mat,
         int index,
         TextureType textype
         );

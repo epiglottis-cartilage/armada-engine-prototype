@@ -28,7 +28,6 @@ int main(int argc, char** argv){
 
     //always get dir using asset system
     fs::path modeldir = gameengine->getAssetSystem()->getModelDir();
-    fs::path apc_file = modeldir / "ba_stryker_icv.glb";
 
     //add model to stage manager to display
     fleet::StateManager* gSceneManager = gameengine->getStateManager();
@@ -44,7 +43,7 @@ int main(int argc, char** argv){
     //add entity with model
     gSceneManager->emplace<fleet::MeshComponent>(
         apc,
-        apc_file,
+        modeldir / "apc.glb",
         phongShader
     );
 
@@ -52,7 +51,7 @@ int main(int argc, char** argv){
     gSceneManager->emplace<fleet::NameComponent>(smallPointLightEnt, "Small Point Light");
     gSceneManager->emplace<fleet::TransformComponent>(
         smallPointLightEnt,
-        glm::vec3(3.0f),
+        glm::vec3(-10.0f, 5.0f, -5.0f),
         glm::vec3(0.0f),
         glm::vec3(0.1f)
     );
@@ -66,7 +65,7 @@ int main(int argc, char** argv){
     );
     gSceneManager->emplace<fleet::MeshComponent>(
         smallPointLightEnt,
-        modeldir / "cvchelmet.glb",
+        modeldir / "bl_y.glb",
         lightShader
     );
     //Warning, this interface will be changed without backward support in next release
@@ -77,11 +76,11 @@ int main(int argc, char** argv){
         sunDirectionLight,
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(0.0f),
-        glm::vec3(1.0f)
+        glm::vec3(0.1f)
     );
     gSceneManager->emplace<fleet::MeshComponent>(
         sunDirectionLight,
-        modeldir / "minuszarrow.glb",
+        modeldir / "bl_y.glb",
 		lightShader
 	);
     gSceneManager->emplace<fleet::LightComponent>(
@@ -98,7 +97,7 @@ int main(int argc, char** argv){
     gSceneManager->emplace<fleet::NameComponent>(pbrhelmet, "pbr helmet");
     gSceneManager->emplace<fleet::TransformComponent>(
         pbrhelmet,
-        glm::vec3{0.0f},
+        glm::vec3{0.0f, 0.5f, 0.3f},
         glm::vec3(0.0f),
         glm::vec3{1.0f}
     );
@@ -142,7 +141,7 @@ int main(int argc, char** argv){
     gSceneManager->emplace<fleet::NameComponent>(heli, "Mi-35");
     gSceneManager->emplace<fleet::TransformComponent>(
         heli,
-        glm::vec3(5.0f, 10.0f, -10.0f),
+        glm::vec3(-10.0f, 5.0f, 3.0f),
         glm::vec3(0.0f),
         glm::vec3(1.0f)
     );

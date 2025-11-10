@@ -47,11 +47,21 @@ void FPSCamera::UpdateCamera(float dt)
         position += glm::normalize(moveDirection) * cameraSpeed * dt;
 
     // Calculate new direction from pitch and yaw
-    glm::vec3 front;
-    front.x = cos(glm::radians(yawNum)) * cos(glm::radians(pitchNum));
-    front.y = sin(glm::radians(pitchNum));
-    front.z = sin(glm::radians(yawNum)) * cos(glm::radians(pitchNum));
-    cameraDirection = glm::normalize(front);
+    //in case you forget: the first two line calculate the x, z plane based on yaw,
+    //pitch is difference between current cameraDirection and 0,0,-1, rotate towards y+ is positive
+    //yaw is difference between cameraDirection and 0,0,-1, rotate towards x+ is positive
+    cameraDirection = glm::vec3{
+        sin(glm::radians(yawNum)) * cos(glm::radians(pitchNum)),
+        sin(glm::radians(pitchNum)),
+        -cos(glm::radians(yawNum)) * cos(glm::radians(pitchNum))
+    };
+    //don't forget update camera up, using pitch and yaw
+    cameraUp = glm::vec3{
+        -sin(glm::radians(yawNum)) * sin(glm::radians(pitchNum)),
+        cos(glm::radians(pitchNum)),
+        cos(glm::radians(yawNum)) * sin(glm::radians(pitchNum))
+    };
+
 
     // Update view matrix
     viewMatrix = glm::lookAt(position, position + cameraDirection, cameraUp);

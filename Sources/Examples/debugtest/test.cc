@@ -1,35 +1,29 @@
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-
+#define GLM_ENABLE_EXPERIMENTAL
 #include <iostream>
 #include <filesystem>
+
+#include <glm/glm.hpp>
+#include <glm/ext/matrix_transform.hpp>
+#include <glm/gtx/euler_angles.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 using namespace std;
 namespace fs = std::filesystem;
 
 int main(int argc, char** argv){
 
-    fs::path p = {"../../"};
-    p = p / "resources" / "models" / "mi35m" / "mi35.glb";
-    cout << "valid: " << fs::exists(p) << endl;
+    using std::cout, std::endl;
+    glm::vec4 mypoint = {0.0f, 0.0f, -1.0f, 1.0f};
 
-    Assimp::Importer importer;
-	cout << "path loc: " << p.string() << endl;
-    const aiScene* scene = importer.ReadFile(p.string(), aiProcess_Triangulate);
+    glm::mat4 translate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+    cout << glm::to_string(translate) << endl;
 
+    glm::mat4 rotate = glm::yawPitchRoll(glm::radians(0.0f), glm::radians(0.0f), glm::radians(0.0f));
+    cout << glm::to_string(rotate) << endl;
 
+    mypoint = translate * rotate * mypoint;
 
-
-
-    if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode){
-        
-        cout << "error: " << importer.GetErrorString() << endl;
-        return -1;
-    }
-    cout << "model loaded successfully" << endl;
-
-
+    cout << glm::to_string(mypoint) << endl;
 
     return 0;
 

@@ -323,6 +323,6 @@ add_custom_target(copy_resources ALL
 ########WINDOWS DEBUG ZONE###########
 set(debug_sourcesfile "${CMAKE_SOURCE_DIR}/Sources/Examples/debugtest/test.cc")
 add_executable(debugtest  ${debug_sourcesfile})
-target_link_libraries(debugtest PUBLIC 
-    assimp::assimp
+target_link_libraries(debugtest PUBLIC
+    glm::glm
 )

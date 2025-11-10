@@ -4,6 +4,7 @@
 #include <Model.hh>
 #include <Texture.hh>
 #include <entt/entity/entity.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 
 NAMESPACE_BEGIN
@@ -92,13 +93,18 @@ void Model::Mesh::setupMesh() {
 }
 
 
-Texture Model::loadTexturefromGLB(const tinygltf::Model& gltfmodel,const tinygltf::Material& gltfmat, int index, TextureType textype) {
-    const tinygltf::Texture& gltftexture = gltfmodel.textures[index];
-    const tinygltf::Image& image = gltfmodel.images[gltftexture.source];
+//load gltfmode.texture[index] into GPU. the gltfmat params just for info output
+Texture Model::loadTexturefromGLB(tinygltf::Model& gltfmodel, tinygltf::Material& mat, int index, TextureType textype) {
+    const tinygltf::Texture& gltfTex = gltfmodel.textures[index];
+    auto& map = *this->loadedTextures;
+    if (map.find(gltfTex.source) != map.end()) {
+        ENGINE_DEBUG("Texture {} already loaded, cache hit!", gltfTex.name);
+        return Texture{map[gltfTex.source], textype, gltfTex.name};
+    }
+    const tinygltf::Image& image = gltfmodel.images[gltfTex.source];
 
-    ENGINE_INFO("Base color texture name: {}", gltftexture.name);
-    ENGINE_DEBUG("Model loading: material-{} get type:{} "
-                 "texture, image: {}", gltfmat.name,static_cast<int>(textype),image.name );
+    ENGINE_DEBUG("Loading model {} material {} texture {} into GPU", this->modelnameandpath.string(), mat.name, image.uri);
+
 
     Texture tex{0, textype, image.uri};
 
@@ -108,6 +114,9 @@ Texture Model::loadTexturefromGLB(const tinygltf::Model& gltfmodel,const tinyglt
     else if (image.component == 4) format = GL_RGBA;
 
     glGenTextures(1, &tex.id);
+    /////===========================
+    map[gltfTex.source] = tex.id;
+    /////===========================
     glBindTexture(GL_TEXTURE_2D, tex.id);
 
     glTexImage2D(
@@ -149,7 +158,7 @@ Model::Material Model::PBRload(tinygltf::Material& gltfmat, tinygltf::Model& glt
     }else {
         //load default texture
         current_texture = loadDefaultTexture();
-        ENGINE_WARN("No diffuse texture found in material, using default...");
+        ENGINE_WARN("No base color texture found in material, using default...");
     }
     mat.textures[static_cast<int>(TextureType::BASE_COLOR)] = current_texture;
 
@@ -166,7 +175,7 @@ Model::Material Model::PBRload(tinygltf::Material& gltfmat, tinygltf::Model& glt
     }else {
         //load default texture
         current_texture = loadDefaultTexture();
-        ENGINE_WARN("No diffuse texture found in material, using default...");
+        ENGINE_WARN("No roughness and metalic texture found in material, using default...");
     }
     mat.textures[static_cast<int>(TextureType::ROUGHNESS)] = current_texture;
 
@@ -183,7 +192,7 @@ Model::Material Model::PBRload(tinygltf::Material& gltfmat, tinygltf::Model& glt
     }else {
         //load default texture
         current_texture = loadDefaultTexture();
-        ENGINE_WARN("No diffuse texture found in material, using default...");
+        ENGINE_WARN("No Normal map texture found in material, using default...");
     }
     mat.textures[static_cast<int>(TextureType::NORMAL)] = current_texture;
 
@@ -199,7 +208,7 @@ Model::Material Model::PBRload(tinygltf::Material& gltfmat, tinygltf::Model& glt
     }else {
         //load default texture
         current_texture = loadDefaultTexture();
-        ENGINE_WARN("No diffuse texture found in material, using default...");
+        ENGINE_WARN("No AO texture found in material, using default...");
     }
     mat.textures[static_cast<int>(TextureType::AMBIENT_OCCLUSION)] = current_texture;
     return mat;
@@ -207,6 +216,7 @@ Model::Material Model::PBRload(tinygltf::Material& gltfmat, tinygltf::Model& glt
 
 void Model::loadMaterials(tinygltf::Model& model) {
     auto material_size = model.materials.size();
+
     if (material_size == 0) {
         ENGINE_INFO("this model have no materials, constructing default textures.....");
         this->materials.resize(1);
@@ -216,6 +226,8 @@ void Model::loadMaterials(tinygltf::Model& model) {
         this->materials[0] = {move(defaultmat)};;
         return;
     }
+    this->loadedTextures->reserve(model.images.size());
+
     ENGINE_INFO("Loading {} materials", material_size);
     ENGINE_INFO("This model has {} textures in total", model.textures.size());
     //resize the material vectors to size of actual materials
@@ -233,6 +245,7 @@ void Model::loadMaterials(tinygltf::Model& model) {
 flipUVy is False by default, which means no flip happens.
 */
 void Model::loadModel(string path, bool flipUVy) {
+    this->loadedTextures = new std::unordered_map<int, GLuint>();
     //assimp load the model into memory
     tinygltf::TinyGLTF importer;
     tinygltf::Model model;
@@ -256,6 +269,7 @@ void Model::loadModel(string path, bool flipUVy) {
     ENGINE_INFO("Model now loading materials");
 
     this->loadMaterials(model);
+    delete this->loadedTextures;
 
     ENGINE_INFO("Model now processin nodes");
     for (auto& rootnodes : scene->nodes) {
@@ -439,6 +453,7 @@ optional<Model::Mesh> Model::processMesh(const tinygltf::Node* node, const tinyg
     if (node->matrix.size() == 16)
     {
         localMatrix = glm::make_mat4(node->matrix.data());
+        ENGINE_DEBUG("found Matrix in model node: {}", glm::to_string(localMatrix));
     }
     else
     {
@@ -456,6 +471,7 @@ optional<Model::Mesh> Model::processMesh(const tinygltf::Node* node, const tinyg
         localMatrix = glm::translate(glm::mat4(1.0f), translation)
                     * glm::mat4_cast(rotation)
                     * glm::scale(glm::mat4(1.0f), scale);
+        ENGINE_DEBUG("Found NO matrix in model node, using constructed matrix: {}", glm::to_string(localMatrix));
     }
 
     Model::Mesh resultmesh = {localMatrix, std::move(primsarray) };
