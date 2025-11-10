@@ -66,8 +66,17 @@ void FPSCamera::UpdateCamera(float dt)
     // Update view matrix
     viewMatrix = glm::lookAt(position, position + cameraDirection, cameraUp);
     // Optionally update projection matrix if FOV changes
-    // projectionMatrix = ...
-    return;
+    if (project_dirty) {
+        ENGINE_DEBUG("Camera Dirty Processing!");
+        float aspect_ratio = static_cast<float>(objptrAppContext->aRenderContext->windowwidth) / static_cast<float>(objptrAppContext->aRenderContext->windowheight);
+        ENGINE_DEBUG("camera ratio:{} near:{} far:{} fov:{}", aspect_ratio, near, far, degreeFOV);
+        setCameraProjectionMatrix(glm::perspective(
+            glm::radians(degreeFOV),
+            aspect_ratio,
+            near, far
+        ));
+        project_dirty = false;
+    }
 }
 
 FPSCamera::FPSCamera(glm::vec3 position, float angle) :

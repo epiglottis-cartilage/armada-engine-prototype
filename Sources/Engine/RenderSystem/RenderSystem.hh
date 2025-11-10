@@ -42,11 +42,17 @@ struct RenderCommand {
 };
 
 
+/* Render Context is created when App Context was created. it is a unique pointer, holded by app context.
+ * Render System was created after rendercontext, so it is suggested to put some important args in Rcontext,
+ * such as window ratio, render backend, current active camera, etc.
+ */
 struct RenderContext {
+    int windowheight, windowwidth;
+    int vsync;//-1 is adaptive, 0 is off, 1 is on
+    float deltatime;
     SDL_Window* mainwindow;
     SDL_GLContext glcontext;
     Camera* aCurrentCamera;
-    float deltatime;
     vector<GLuint> uboBindings;
     vector<RenderCommand> drawtargets;
     cfgRenderSystem configRender = {};
@@ -179,11 +185,7 @@ void static initGLDebug()
     cfgRenderSystem config;
     AssetSystem* assetManagerPtr;
 
-    int windowWidth;
-    int windowHeight;
     int windowFlags;
-    bool vsync_on;
-    int sdl_image_flags;
 
     
     SDL_Window* window;

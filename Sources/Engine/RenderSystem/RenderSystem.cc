@@ -1,7 +1,10 @@
 #include <RenderSystem.hh>
+#include <Engine.hh>
 
 NAMESPACE_BEGIN
 
+class Engine;
+extern Engine* objptrGameEngine;
 
 RenderSystem::RenderSystem(cfgRenderSystem config, AssetSystem* assetManager)
 {
@@ -17,17 +20,17 @@ void RenderSystem::parseconfig(cfgRenderSystem config){
     if(config.screenmode == "window"){
         this->windowFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
     }else if(config.screenmode == "fullscreen"){
-        this->windowFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN;
+        this->windowFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_FULLSCREEN ;
     }
 
     if(config.vsync){
-        this->vsync_on = true;
+        objptrAppContext->aRenderContext->vsync = true;
     }else {
-        this->vsync_on = false;
+        objptrAppContext->aRenderContext->vsync = false;
     }
 
-    this->windowWidth = config.screenwidth;
-    this->windowHeight = config.screenheight;
+    objptrAppContext->aRenderContext->windowwidth = config.screenwidth;
+    objptrAppContext->aRenderContext->windowheight = config.screenheight;
 
 //    if(config.sdlimg_format == "png"){
 //        this->sdl_image_flags = IMG_INIT_PNG;
@@ -35,7 +38,6 @@ void RenderSystem::parseconfig(cfgRenderSystem config){
 //    if(config.sdlimg_format == "jpg"){
 //        this->sdl_image_flags = IMG_INIT_JPG;
 //    }
-    this->sdl_image_flags = IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF | IMG_INIT_WEBP  ;
 
 
 }
@@ -62,10 +64,9 @@ void RenderSystem::init(){
 
     string windowtitle = objptrAppContext->aGamename + " " + objptrAppContext->aGameVersion;
     this->window = SDL_CreateWindow(windowtitle.c_str(), SDL_WINDOWPOS_CENTERED,
-        SDL_WINDOWPOS_CENTERED, 
-        this->windowWidth, 
-        this->windowHeight,  
-        this->windowFlags 
+        SDL_WINDOWPOS_CENTERED,
+        objptrAppContext->aRenderContext->windowwidth, objptrAppContext->aRenderContext->windowheight,
+        this->windowFlags
     );
     error = {SDL_GetError()};
     objptrAppContext->aRenderContext->mainwindow = this->window;
@@ -77,9 +78,10 @@ void RenderSystem::init(){
         ENGINE_ERROR("SDL set GL attribute Error: {}", error);
     }
 
-    auto img_init_result = IMG_Init(this->sdl_image_flags);
+    int sdl_image_flags = IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF | IMG_INIT_WEBP  ;
+    auto img_init_result = IMG_Init(sdl_image_flags);
 
-    if(img_init_result != this->sdl_image_flags){
+    if(img_init_result != sdl_image_flags){
         ENGINE_DEBUG("{}\n",img_init_result);
         cout << img_init_result << endl;
         error = {IMG_GetError()};
@@ -99,8 +101,7 @@ void RenderSystem::init(){
 
     glViewport(0, 0, windowwidth, windowheight);
 
-    int vsync = this->vsync_on ? 1 : 0;
-    SDL_GL_SetSwapInterval(vsync);
+    SDL_GL_SetSwapInterval(objptrAppContext->aRenderContext->vsync);
 
     glEnable(GL_DEPTH_TEST);
 
@@ -123,12 +124,28 @@ void RenderSystem::init(){
     this->shaderManager = new ShaderManager{};
 
     //experiment zone:
-//    glEnable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
 
     auto vender = reinterpret_cast<const char*>(glGetString(GL_VENDOR));
     auto renderer = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
     auto version = reinterpret_cast<const char*>(glGetString(GL_VERSION));
     ENGINE_DEBUG("GL_VENDOR-GL_RENDERER-GL_VERSION: {} {} {}", vender, renderer, version);
+
+    auto* geventmangager =  objptrGameEngine->getEventManager();
+    auto* ptrTmpAppCtx = objptrAppContext;
+    geventmangager->subscribe(EventType::WindowResizeEvent, [ptrTmpAppCtx](const Event& e) {
+        //update render context first
+        SDL_GL_GetDrawableSize(
+            ptrTmpAppCtx->aRenderContext->mainwindow,
+            &ptrTmpAppCtx->aRenderContext->windowwidth,
+            &ptrTmpAppCtx->aRenderContext->windowheight
+            );
+        glViewport(0, 0,
+            ptrTmpAppCtx->aRenderContext->windowwidth,
+            ptrTmpAppCtx->aRenderContext->windowheight
+            );
+        ptrTmpAppCtx->aRenderContext->aCurrentCamera->setCameraDirty();
+    });
 }
 
 RenderSystem::~RenderSystem(){

@@ -12,26 +12,12 @@
 NAMESPACE_BEGIN
 
 
-//class InputManager {
-//public:
-//    InputManager(EventManager& eventMgr)
-//        : eventManager(eventMgr) {}
-//
-//    bool isKeyHeld(SDL_Scancode key) const;
-//    bool isMouseButtonHeld(Uint8 button) const;
-//
-//
-//    void pollEvents();
-//
-//private:
-//    EventManager& eventManager;
-//};
-
+//Input Manager relys on previous eventMgr. On each frame, Input Manager will poll sdl event, and trigger every e
 class InputManager {
 public:
     InputManager(EventManager& eventMgr): eventManager(eventMgr) {};
 
-    // 每帧调用
+    //
     void pollEvents();
 
     // ✅ 状态查询接口

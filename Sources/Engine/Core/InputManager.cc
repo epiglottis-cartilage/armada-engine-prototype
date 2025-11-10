@@ -48,6 +48,20 @@ void InputManager::pollEvents() {
             eventManager.publish(QuitEvent(e));
             break;
 
+        case SDL_WINDOWEVENT:
+
+            switch (e.window.event) {
+            case SDL_WINDOWEVENT_RESIZED: {
+                auto& windowEvent = e.window;
+                eventManager.publish(WindowResizedEvent(windowEvent.data1, windowEvent.data2));
+                break;
+            }
+
+            default:
+                break;
+            }
+            break;
+
         case SDL_KEYDOWN:
             if (!e.key.repeat) { // 防止系统级重复事件
                 keyStates[e.key.keysym.scancode] = true;

@@ -26,6 +26,9 @@
 #include <Texture.hh>
 #include <Logger.hh>
 
+#include "Camera.hh"
+#include "Camera.hh"
+
 using namespace std;
 
 NAMESPACE_BEGIN
@@ -135,8 +138,8 @@ protected:
     Material PBRload(tinygltf::Material& gltfmat, tinygltf::Model& gltfmodel);
     void loadModel(string path, bool flipUVy = false);
     void loadMaterials(tinygltf::Model& model);
-    void processNode(tinygltf::Node* node, tinygltf::Model* model);
-    optional<Model::Mesh> processMesh(const tinygltf::Node* node, const tinygltf::Model* model);
+    void processNode(tinygltf::Node* node, tinygltf::Model* model, glm::mat4 transformParent);
+    optional<Model::Mesh> processMesh(const tinygltf::Node* node, const tinygltf::Model* model, glm::mat4 transform);
     optional<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, string typeName);
     Texture loadTexturefromGLB(
         tinygltf::Model& gltfmodel,

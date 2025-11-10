@@ -10,8 +10,11 @@
 
 NAMESPACE_BEGIN
 
+//normally this should print all vals, but....i am lazy with that.
+//if engine user need some other event, they need a little hacking into engine
 enum class EventType {
-    None,
+    General,
+    WindowResizeEvent,
     KeyPressed,
     KeyReleased,
     MouseMoved,
@@ -22,17 +25,33 @@ enum class EventType {
     //further extension can be put here....not sure if this is good design
 };
 
+// 所有事件的基类
 struct Event {
 public:
     SDL_Event rawevent;
     Event() = default;
     Event(SDL_Event e) : rawevent(e) {};
     virtual ~Event() = default;
-    virtual EventType getType() const {return EventType::None;};
+    virtual EventType getType() const {return EventType::General;};
 };
 
-//so....struct can inherit from a ......class?????
-// 所有事件的基类
+struct WindowResizedEvent : public Event {
+    int width, height;
+    WindowResizedEvent(int w,int h) : width(w), height(h) {}
+    EventType getType() const override { return EventType::WindowResizeEvent; }
+};
+
+struct MouseButtonPressedEvent : public Event {
+    int x, y;
+    MouseButtonPressedEvent(int mx, int my) : x(mx), y(my) {}
+    EventType getType() const override { return EventType::MouseButtonPressed; }
+};
+
+struct MouseButtonReleasedEvent : public Event {
+    int x, y;
+    MouseButtonReleasedEvent(int mx, int my) : x(mx), y(my) {}
+    EventType getType() const override { return EventType::MouseButtonReleased; }
+};
 
 // 各种具体事件类型
 struct KeyPressedEvent : public Event {

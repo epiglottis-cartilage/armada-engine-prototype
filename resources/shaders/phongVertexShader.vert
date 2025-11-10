@@ -13,7 +13,7 @@ out VS_OUT {
 } vs_out;
 
 //transform to camera , to screen
-layout (std140) uniform CameraMatrices
+layout (std140, binding = 0) uniform CameraMatrices
 {
     mat4 matrixView;
     mat4 matrixProjection;

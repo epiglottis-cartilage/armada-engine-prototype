@@ -27,7 +27,6 @@ The active camera is always the last one using above method.
 */
 class Camera{
 public:
-    Camera(glm::vec3 position);
     Camera(glm::vec3 position, float angle);
     ~Camera() = default;
     
@@ -69,6 +68,7 @@ public:
     glm::mat4 getViewMatrix(){return viewMatrix;}
     glm::mat4 getProjectionMatrix(){return projectionMatrix;}
 	float getCameraSpeed() { return cameraSpeed; }
+    void setCameraDirty() {project_dirty = true;}
 
 
     //delete this once event listener is done
@@ -81,8 +81,11 @@ protected:
 
     glm::mat4 viewMatrix;
     glm::mat4 projectionMatrix;
+    bool project_dirty = false;
 
     float pitchNum, yawNum, rollNum;
+    float degreeFOV;
+    float near,far;
     glm::vec3 sensitivity;
     float cameraSpeed;
     bool enableDeadZone;

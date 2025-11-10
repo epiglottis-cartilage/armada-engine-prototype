@@ -273,7 +273,7 @@ void Model::loadModel(string path, bool flipUVy) {
 
     ENGINE_INFO("Model now processin nodes");
     for (auto& rootnodes : scene->nodes) {
-        this->processNode(&model.nodes[rootnodes], &model);
+        this->processNode(&model.nodes[rootnodes], &model, glm::mat4(1.0f));
     }
 
 
@@ -291,21 +291,48 @@ void Model::loadModel(string path, bool flipUVy) {
 
 
 //convert disk glb structure into engine structure
-void Model::processNode(tinygltf::Node* node, tinygltf::Model* model){
+void Model::processNode(tinygltf::Node* node, tinygltf::Model* model, glm::mat4 transformParent){
+    //calculate the transform
+    glm::mat4 localMatrix(1.0f);
+
+    if (node->matrix.size() == 16)
+    {
+        localMatrix = glm::make_mat4(node->matrix.data());
+        ENGINE_DEBUG("found Matrix in model node: {}", glm::to_string(localMatrix));
+    }
+    else
+    {
+        glm::vec3 translation(0.0f);
+        glm::quat rotation(1.0f, 0.0f, 0.0f, 0.0f);
+        glm::vec3 scale(1.0f);
+
+        if (node->translation.size() == 3)
+            translation = glm::make_vec3(node->translation.data());
+        if (node->rotation.size() == 4)
+            rotation = glm::make_quat(node->rotation.data());
+        if (node->scale.size() == 3)
+            scale = glm::make_vec3(node->scale.data());
+
+        localMatrix = glm::translate(glm::mat4(1.0f), translation)
+                    * glm::mat4_cast(rotation)
+                    * glm::scale(glm::mat4(1.0f), scale);
+        ENGINE_DEBUG("Found NO matrix in model node, using constructed matrix: {}", glm::to_string(localMatrix));
+    }
+    glm::mat4 transformAccumulated = transformParent * localMatrix;
     //forward iterating
     //process all the primitives of current node
-    if (auto resultmesh = processMesh(node, model))
+    if (auto resultmesh = processMesh(node, model, transformAccumulated))
         this->meshes.push_back(move(*resultmesh));
     // 递归处理该节点的子孙节点
     for(int i = 0; i < node->children.size(); i++){
-        this->processNode(&model->nodes[node->children[i]], model);
+        this->processNode(&model->nodes[node->children[i]], model, transformAccumulated);
     }
 }
 
 /*
 convert assimp format mesh to engine format mesh
 */
-optional<Model::Mesh> Model::processMesh(const tinygltf::Node* node, const tinygltf::Model* model) {
+optional<Model::Mesh> Model::processMesh(const tinygltf::Node* node, const tinygltf::Model* model, glm::mat4 transform) {
     if (node->mesh == -1)
         return nullopt;
     auto& meshes = model->meshes[node->mesh];
@@ -366,7 +393,10 @@ optional<Model::Mesh> Model::processMesh(const tinygltf::Node* node, const tinyg
             for (size_t i = 0; i < uvAccessor.count; ++i) {
                 const float* uv = reinterpret_cast<const float*>(uvData + i * uvStride);
                 // 注意：GLTF 的 V 坐标是反的
-                vertices[i].TexCoords = glm::vec2(uv[0], 1.0f - uv[1]);
+                // /\  /\  /\  /\  /\
+                // ||  ||  ||  ||  ||
+                //反你妈, byd ai 一派胡言
+                vertices[i].TexCoords = glm::vec2(uv[0], uv[1]);
             }
         } else {
             for (auto& v : vertices) v.TexCoords = glm::vec2(0.0f);
@@ -384,7 +414,7 @@ optional<Model::Mesh> Model::processMesh(const tinygltf::Node* node, const tinyg
 
             for (size_t i = 0; i < tanAccessor.count; ++i) {
                 const float* t = reinterpret_cast<const float*>(tanData + i * tanStride);
-                vertices[i].tangent = glm::vec3(t[0], t[1], t[2]);
+                vertices[i].tangent = glm::normalize(glm::vec3(t[0], t[1], t[2]));
                 // bitangent 可以稍后由 cross(N, T) * t[3] 计算（t[3] 是方向系数）
                 vertices[i].bitangent = glm::cross(vertices[i].Normal, vertices[i].tangent) * t[3];
             }
@@ -447,34 +477,8 @@ optional<Model::Mesh> Model::processMesh(const tinygltf::Node* node, const tinyg
         primsarray.push_back(std::move(prim));
     }
 
-    //calculate the transform
-    glm::mat4 localMatrix(1.0f);
 
-    if (node->matrix.size() == 16)
-    {
-        localMatrix = glm::make_mat4(node->matrix.data());
-        ENGINE_DEBUG("found Matrix in model node: {}", glm::to_string(localMatrix));
-    }
-    else
-    {
-        glm::vec3 translation(0.0f);
-        glm::quat rotation(1.0f, 0.0f, 0.0f, 0.0f);
-        glm::vec3 scale(1.0f);
-
-        if (node->translation.size() == 3)
-            translation = glm::make_vec3(node->translation.data());
-        if (node->rotation.size() == 4)
-            rotation = glm::make_quat(node->rotation.data());
-        if (node->scale.size() == 3)
-            scale = glm::make_vec3(node->scale.data());
-
-        localMatrix = glm::translate(glm::mat4(1.0f), translation)
-                    * glm::mat4_cast(rotation)
-                    * glm::scale(glm::mat4(1.0f), scale);
-        ENGINE_DEBUG("Found NO matrix in model node, using constructed matrix: {}", glm::to_string(localMatrix));
-    }
-
-    Model::Mesh resultmesh = {localMatrix, std::move(primsarray) };
+    Model::Mesh resultmesh = {transform, std::move(primsarray) };
     return resultmesh;
 }
 
