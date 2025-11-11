@@ -44,6 +44,13 @@ struct RenderCommand {
 
 };
 
+enum class MSAA {
+    Off = 0,
+    One = 1,
+    Two = 2,
+    Four = 4,
+    Eight = 8,
+};
 
 /* Render Context is created on Heap when App Context was created. it is a unique pointer, holded by app context.
  * Render System was created after rendercontext, so it is suggested to put some important args in Rcontext,
@@ -57,7 +64,7 @@ struct RenderContext {
     int windowheight, windowwidth;
     bool resize_dirty = false;
     int vsync;//-1 is adaptive, 0 is off, 1 is on
-    int MSAA = 0;
+    MSAA msaa = MSAA::Off;
     bool MSAA_dirty = false;
 
     //ctx fields
@@ -67,14 +74,16 @@ struct RenderContext {
     vector<RenderCommand> drawtargets;
 
     //render backends configs: NOT visible when game shipping!
+    bool glcullface_enable = true;
     SDL_Window* mainwindow;
     SDL_GLContext glcontext;
 
     //misc
-    void setMSAA(int MSAA) {
-        this->MSAA = (MSAA%2) ? 4 : MSAA;
+    void setMSAA(MSAA msaa) {
+        this->msaa = msaa;
         this->MSAA_dirty = true;
     }
+    MSAA getMSAA() {return this->msaa;}
     RTTR_ENABLE()
     RTTR_REGISTRATION_FRIEND
 };

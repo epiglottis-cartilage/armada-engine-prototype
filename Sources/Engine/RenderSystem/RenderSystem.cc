@@ -17,7 +17,7 @@ RTTR_REGISTRATION
 
         // 注册字段
         .property("vsync", &RenderContext::vsync)
-        .property("MSAA" , &RenderContext::MSAA, &RenderContext::setMSAA)
+        .property("MSAA" , &RenderContext::getMSAA, &RenderContext::setMSAA)
         ;
 }
 
@@ -48,23 +48,17 @@ void RenderSystem::parseconfig(cfgRenderSystem config){
     objptrAppContext->aRenderContext->windowwidth = config.screenwidth;
     objptrAppContext->aRenderContext->windowheight = config.screenheight;
 
-//    if(config.sdlimg_format == "png"){
-//        this->sdl_image_flags = IMG_INIT_PNG;
-//    }
-//    if(config.sdlimg_format == "jpg"){
-//        this->sdl_image_flags = IMG_INIT_JPG;
-//    }
-
-
 }
 
 /*On run, a RenderSystem will implicitly create a ShaderManager on init()*/
 void RenderSystem::init(){
+    this->rebuildWindowContext(this->firsttime_init);
 
     auto* geventmangager =  objptrGameEngine->getEventManager();
     auto* ptrTmpAppCtx = objptrAppContext;
 
     geventmangager->subscribe(EventType::WindowResizeEvent, [ptrTmpAppCtx](const Event& e) {
+        ptrTmpAppCtx->aRenderContext->contextDirdy = true;
         ptrTmpAppCtx->aRenderContext->resize_dirty = true;
         ptrTmpAppCtx->aRenderContext->aCurrentCamera->setCameraDirty();
     });
@@ -129,20 +123,19 @@ void RenderSystem::rebuildWindowContext(bool firsttime_init) {
     SDL_GL_MakeCurrent(window, objptrAppContext->aRenderContext->glcontext);
     glewExperimental = GL_TRUE;
 
-    glewInit();
-    initGLDebug();
-    glGetError();
+    if (firsttime_init) {
+        glewInit();
+        initGLDebug();
+        glGetError();
+    }
 
     int windowwidth, windowheight;
     SDL_GetWindowSize(window, &windowwidth, &windowheight);
-
     glViewport(0, 0, windowwidth, windowheight);
 
-    SDL_GL_SetSwapInterval(objptrAppContext->aRenderContext->vsync);
 
     glEnable(GL_DEPTH_TEST);
 
-    ENGINE_INFO("code execute to init_win_and_gl end");
     while((errorClass = glGetError()) != GL_NO_ERROR){
         ENGINE_ERROR("GL error occur! Error code: {}", errorClass);
     }
@@ -151,25 +144,26 @@ void RenderSystem::rebuildWindowContext(bool firsttime_init) {
         ENGINE_ERROR("SDL set GL attribute Error: {}", error);
     }
 
-    ENGINE_INFO("RENDER SYSTEM INIT COMPLETE");
-    ENGINE_INFO("GL VERSION: {}", string{reinterpret_cast<const char*>(glGetString(GL_VERSION))});
-    ENGINE_INFO("GLSL VERSION: {}", string{reinterpret_cast<const char*>(glGetString(GL_SHADING_LANGUAGE_VERSION))});
+    if (firsttime_init) {
+        ENGINE_INFO("RENDER SYSTEM INIT COMPLETE");
+        ENGINE_INFO("GL VERSION: {}", string{reinterpret_cast<const char*>(glGetString(GL_VERSION))});
+        ENGINE_INFO("GLSL VERSION: {}", string{reinterpret_cast<const char*>(glGetString(GL_SHADING_LANGUAGE_VERSION))});
 
-    ENGINE_INFO("Register Phong Shader to ShaderFactory");
-    ShaderFactory::init(this->assetManagerPtr->getShaderDir() );
-    ENGINE_INFO("Creating ShaderManager...");
-    this->shaderManager = new ShaderManager{};
+        ENGINE_INFO("Register Phong Shader to ShaderFactory");
+        ShaderFactory::init(this->assetManagerPtr->getShaderDir() );
+        ENGINE_INFO("Creating ShaderManager...");
+        this->shaderManager = new ShaderManager{};
+    }
 
-    //experiment zone:
-    glEnable(GL_CULL_FACE);
 
-    auto vender = reinterpret_cast<const char*>(glGetString(GL_VENDOR));
-    auto renderer = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
-    auto version = reinterpret_cast<const char*>(glGetString(GL_VERSION));
-    ENGINE_DEBUG("GL_VENDOR-GL_RENDERER-GL_VERSION: {} {} {}", vender, renderer, version);
+    if (firsttime_init) {
+        auto vender = reinterpret_cast<const char*>(glGetString(GL_VENDOR));
+        auto renderer = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
+        auto version = reinterpret_cast<const char*>(glGetString(GL_VERSION));
+        ENGINE_DEBUG("GL_VENDOR-GL_RENDERER-GL_VERSION: {} {} {}", vender, renderer, version);
 
-    if (firsttime_init)
         this->firsttime_init = false;
+    }
 }
 
 
@@ -191,11 +185,7 @@ void RenderSystem::executecommand(const RenderCommand& cmd){
  * GL/SDL context may be destroy and created for new setting
  */
 void RenderSystem::RefreshContext(RenderContext* rctx) {
-    // Vertical Sync off/on
-    if (rctx->vsync != -1 && rctx->vsync != 0 && rctx->vsync != 1)
-        rctx->vsync = 1;
-    SDL_GL_SetSwapInterval(rctx->vsync);
-
+    rctx->contextDirdy = false;
     // Window Size is handled by event manager inside RenderSystem::Init
 
     //MSAA
@@ -204,36 +194,42 @@ void RenderSystem::RefreshContext(RenderContext* rctx) {
         SDL_DestroyWindow(rctx->mainwindow);
         SDL_GL_ResetAttributes();
 
-        if (rctx->MSAA > 0) {
+        if (rctx->msaa != MSAA::Off) {
             SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-            SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, rctx->MSAA);
+            SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, int(rctx->msaa));
         } else {
             SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
             SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
         }
 
-        //传家宝&黑话
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 5);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
-        rctx->mainwindow = SDL_CreateWindow(objptrAppContext->aGamename.c_str(),
-            SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-            rctx->windowwidth, rctx->windowheight,
-            this->windowFlags
-            );
-        rctx->glcontext = SDL_GL_CreateContext(rctx->mainwindow);
-        SDL_GL_MakeCurrent(rctx->mainwindow, rctx->glcontext);
+        //this will destroy all configs above! it means if you modify something, then msaa changes,
+        // then you will need to reconfig everything again!!!!!
+        rebuildWindowContext(false);
 
-        if (rctx->MSAA > 0)
-            glEnable(GL_MULTISAMPLE);
-        else
+        if (rctx->msaa == MSAA::Off)
             glDisable(GL_MULTISAMPLE);
+        else
+            glEnable(GL_MULTISAMPLE);
     }
 
+    if (rctx->resize_dirty) {
+        rctx->resize_dirty = false;
+        int w,h;
+        SDL_GL_GetDrawableSize(rctx->mainwindow,&w, &h);
+        glViewport(0,0,w, h);
+        rctx->windowheight = h;rctx->windowwidth = w;
+    }
 
-    rctx->contextDirdy = false;
+    // Vertical Sync off/on
+    if (rctx->vsync != -1 && rctx->vsync != 0 && rctx->vsync != 1)
+        rctx->vsync = 1;
+    SDL_GL_SetSwapInterval(rctx->vsync);
+
+    //GL cull face off/on
+    if (rctx->glcullface_enable) {glEnable(GL_CULL_FACE);} else {glDisable(GL_CULL_FACE);}
+
 }
+
 
 /* this method prepare the viewport & window for later rendering. UI predraw is after this method.
  * this method runs first during one framedraw. so all window/context init/changes should be made here.

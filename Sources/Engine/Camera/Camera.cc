@@ -8,21 +8,6 @@ NAMESPACE_BEGIN
 
 extern AppContext* objptrAppContext;
 
-RTTR_REGISTRATION
-{
-    using namespace rttr;
-
-    registration::class_<Camera>("Camera")
-        // 注册构造函数
-        .constructor<>()
-
-        // 注册字段
-        .property("FOV", &Camera::getCameraFOV, &Camera::setCameraFOV)
-        .property("Camera Speed", &Camera::cameraSpeed)
-        .property("near", &Camera::getCameraNear, &Camera::setCameraNear)
-        .property("far", &Camera::getCameraFar, &Camera::setCameraFar)
-        ;
-}
 
 Camera::Camera(glm::vec3 position, float angle) :
     position(position), 
@@ -57,5 +42,20 @@ void Camera::UpdateCamera(float dt){
 }
 
 
+using namespace rttr;
+RTTR_REGISTRATION
+{
+
+    registration::class_<Camera>("Camera")
+        // 注册构造函数
+        .constructor<>()
+
+        // 注册字段
+        .property("FOV", &Camera::getCameraFOV, &Camera::setCameraFOV)
+        .property("Camera Speed", &Camera::cameraSpeed)
+        .property("near", &Camera::getCameraNear, &Camera::setCameraNear)
+        .property("far", &Camera::getCameraFar, &Camera::setCameraFar)
+        ;
+}
 
 NAMESPACE_END

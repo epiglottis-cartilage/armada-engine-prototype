@@ -2,16 +2,15 @@
 
 #include <Common.hh>
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <SDL2/SDL.h>
 #include <iostream>
 #include <Logger.hh>
 #include <functional>
 
+#include <rttr/registration>
+#include <rttr/registration_friend.h>
 #include <rttr/type>
-
-#include "rttr/registration_friend.h"
 
 //delete this once event listener is done
 
@@ -81,8 +80,7 @@ public:
     void setCameraDirty() {project_dirty = true;}
 
 
-    //delete this once event listener is done
-    std::function<void ()> onExitCalled;
+    float cameraSpeed;
 
 protected:
     glm::vec3 position;
@@ -97,7 +95,6 @@ protected:
     float degreeFOV;
     float near,far;
     glm::vec3 sensitivity;
-    float cameraSpeed;
     bool enableDeadZone;
     float deadZoneX, deadZoneY;
 
