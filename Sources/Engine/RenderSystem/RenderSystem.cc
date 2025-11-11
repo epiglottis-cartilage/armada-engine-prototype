@@ -1,10 +1,26 @@
 #include <RenderSystem.hh>
 #include <Engine.hh>
+#include <rttr/registration>
 
 NAMESPACE_BEGIN
 
 class Engine;
 extern Engine* objptrGameEngine;
+
+RTTR_REGISTRATION
+{
+    using namespace rttr;
+
+    registration::class_<RenderContext>("RenderContext")
+        // 注册构造函数
+        .constructor<>()
+
+        // 注册字段
+        .property("vsync", &RenderContext::vsync)
+        .property("MSAA" , &RenderContext::MSAA, &RenderContext::setMSAA)
+        ;
+}
+
 
 RenderSystem::RenderSystem(cfgRenderSystem config, AssetSystem* assetManager)
 {
@@ -44,12 +60,31 @@ void RenderSystem::parseconfig(cfgRenderSystem config){
 
 /*On run, a RenderSystem will implicitly create a ShaderManager on init()*/
 void RenderSystem::init(){
-    GLuint errorcode;
+
+    auto* geventmangager =  objptrGameEngine->getEventManager();
+    auto* ptrTmpAppCtx = objptrAppContext;
+
+    geventmangager->subscribe(EventType::WindowResizeEvent, [ptrTmpAppCtx](const Event& e) {
+        ptrTmpAppCtx->aRenderContext->resize_dirty = true;
+        ptrTmpAppCtx->aRenderContext->aCurrentCamera->setCameraDirty();
+    });
+}
+
+RenderSystem::~RenderSystem(){
+    SDL_GL_DeleteContext(objptrAppContext->aRenderContext->glcontext);
+    SDL_DestroyWindow(objptrAppContext->aRenderContext->mainwindow);
+    SDL_Quit();
+}
+
+void RenderSystem::rebuildWindowContext(bool firsttime_init) {
     GLenum errorClass;
-    SDL_Init(SDL_INIT_EVERYTHING);
-    string error = {SDL_GetError()};
-    if(error != ""){
-        ENGINE_ERROR("SDL_Init Error: %s\n", error);
+    string error;
+    if (firsttime_init) {
+        SDL_Init(SDL_INIT_EVERYTHING);
+        error = {SDL_GetError()};
+        if(error != ""){
+            ENGINE_ERROR("SDL_Init Error: %s\n", error);
+        }
     }
 
 
@@ -63,33 +98,35 @@ void RenderSystem::init(){
     }
 
     string windowtitle = objptrAppContext->aGamename + " " + objptrAppContext->aGameVersion;
-    this->window = SDL_CreateWindow(windowtitle.c_str(), SDL_WINDOWPOS_CENTERED,
+    auto window = SDL_CreateWindow(windowtitle.c_str(), SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
         objptrAppContext->aRenderContext->windowwidth, objptrAppContext->aRenderContext->windowheight,
         this->windowFlags
     );
+    objptrAppContext->aRenderContext->mainwindow = window;
     error = {SDL_GetError()};
-    objptrAppContext->aRenderContext->mainwindow = this->window;
     if(window == NULL){
         ENGINE_ERROR("SDL_CreateWindow Error: {}", error);
     }
-    
+
     if(error != ""){
         ENGINE_ERROR("SDL set GL attribute Error: {}", error);
     }
 
-    int sdl_image_flags = IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF | IMG_INIT_WEBP  ;
-    auto img_init_result = IMG_Init(sdl_image_flags);
+    if (firsttime_init) {
+        int sdl_image_flags = IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF | IMG_INIT_WEBP  ;
+        auto img_init_result = IMG_Init(sdl_image_flags);
 
-    if(img_init_result != sdl_image_flags){
-        ENGINE_DEBUG("{}\n",img_init_result);
-        cout << img_init_result << endl;
-        error = {IMG_GetError()};
-        ENGINE_ERROR("IMG_Init Error: {}\n", error);
+        if(img_init_result != sdl_image_flags){
+            ENGINE_DEBUG("{}\n",img_init_result);
+            cout << img_init_result << endl;
+            error = {IMG_GetError()};
+            ENGINE_ERROR("IMG_Init Error: {}\n", error);
+        }
     }
 
-    this->glContext = SDL_GL_CreateContext(window);
-    objptrAppContext->aRenderContext->glcontext = this->glContext;
+    objptrAppContext->aRenderContext->glcontext = SDL_GL_CreateContext(window);
+    SDL_GL_MakeCurrent(window, objptrAppContext->aRenderContext->glcontext);
     glewExperimental = GL_TRUE;
 
     glewInit();
@@ -131,29 +168,9 @@ void RenderSystem::init(){
     auto version = reinterpret_cast<const char*>(glGetString(GL_VERSION));
     ENGINE_DEBUG("GL_VENDOR-GL_RENDERER-GL_VERSION: {} {} {}", vender, renderer, version);
 
-    auto* geventmangager =  objptrGameEngine->getEventManager();
-    auto* ptrTmpAppCtx = objptrAppContext;
-    geventmangager->subscribe(EventType::WindowResizeEvent, [ptrTmpAppCtx](const Event& e) {
-        //update render context first
-        SDL_GL_GetDrawableSize(
-            ptrTmpAppCtx->aRenderContext->mainwindow,
-            &ptrTmpAppCtx->aRenderContext->windowwidth,
-            &ptrTmpAppCtx->aRenderContext->windowheight
-            );
-        glViewport(0, 0,
-            ptrTmpAppCtx->aRenderContext->windowwidth,
-            ptrTmpAppCtx->aRenderContext->windowheight
-            );
-        ptrTmpAppCtx->aRenderContext->aCurrentCamera->setCameraDirty();
-    });
+    if (firsttime_init)
+        this->firsttime_init = false;
 }
-
-RenderSystem::~RenderSystem(){
-    SDL_GL_DeleteContext(this->glContext);
-    SDL_DestroyWindow(this->window);
-    SDL_Quit();
-}
-
 
 
 //Rendering Command System
@@ -170,8 +187,61 @@ void RenderSystem::executecommand(const RenderCommand& cmd){
     this->drawmodel(*cmd.model, *cmd.shader, cmd.transform);
 }
 
+/* After config the render setting in the imgui, this method will be called to refresh the context
+ * GL/SDL context may be destroy and created for new setting
+ */
+void RenderSystem::RefreshContext(RenderContext* rctx) {
+    // Vertical Sync off/on
+    if (rctx->vsync != -1 && rctx->vsync != 0 && rctx->vsync != 1)
+        rctx->vsync = 1;
+    SDL_GL_SetSwapInterval(rctx->vsync);
 
+    // Window Size is handled by event manager inside RenderSystem::Init
+
+    //MSAA
+    if (rctx->MSAA_dirty) {
+        SDL_GL_DeleteContext(rctx->glcontext);
+        SDL_DestroyWindow(rctx->mainwindow);
+        SDL_GL_ResetAttributes();
+
+        if (rctx->MSAA > 0) {
+            SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+            SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, rctx->MSAA);
+        } else {
+            SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
+            SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
+        }
+
+        //传家宝&黑话
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 5);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
+        rctx->mainwindow = SDL_CreateWindow(objptrAppContext->aGamename.c_str(),
+            SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+            rctx->windowwidth, rctx->windowheight,
+            this->windowFlags
+            );
+        rctx->glcontext = SDL_GL_CreateContext(rctx->mainwindow);
+        SDL_GL_MakeCurrent(rctx->mainwindow, rctx->glcontext);
+
+        if (rctx->MSAA > 0)
+            glEnable(GL_MULTISAMPLE);
+        else
+            glDisable(GL_MULTISAMPLE);
+    }
+
+
+    rctx->contextDirdy = false;
+}
+
+/* this method prepare the viewport & window for later rendering. UI predraw is after this method.
+ * this method runs first during one framedraw. so all window/context init/changes should be made here.
+ */
 void RenderSystem::prerender(RenderContext* context){
+    if (context->contextDirdy)
+        RefreshContext(context);
+
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -183,12 +253,7 @@ void RenderSystem::prerender(RenderContext* context){
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 
-    //gltransform the transform matrix
-//    auto rendertargets = this->stateManager->getEntities();
-//    for(const auto& rendertarget: rendertargets){
-//        auto model = rendertarget.second->getModel();
-//        submit(model, model->getShader(), rendertarget.second->getTransform());
-//    }
+    //poll rendercommand from rctx, send it to Rendersystem
     auto& rendertargetsref = context->drawtargets;
     for (const auto& eachcommands: rendertargetsref)
     {
@@ -208,7 +273,7 @@ void RenderSystem::renderframe(RenderContext* context){
 }
 
 void RenderSystem::postrender(RenderContext* context){
-    SDL_GL_SwapWindow(this->window);
+    SDL_GL_SwapWindow(objptrAppContext->aRenderContext->mainwindow);
 }
 
 //Processing rendering command

@@ -14,9 +14,12 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_video.h>
 #include <SDL2/SDL_image.h>
 #include <GL/glew.h>
 #include <SDL2/SDL_opengl.h>
+#include <rttr/type>
+
 
 //coupling to ECS currently......but same as Ogre!
 #include <StageManager.hh>
@@ -42,20 +45,38 @@ struct RenderCommand {
 };
 
 
-/* Render Context is created when App Context was created. it is a unique pointer, holded by app context.
+/* Render Context is created on Heap when App Context was created. it is a unique pointer, holded by app context.
  * Render System was created after rendercontext, so it is suggested to put some important args in Rcontext,
  * such as window ratio, render backend, current active camera, etc.
  */
 struct RenderContext {
+    bool contextDirdy = true;
+    cfgRenderSystem configRender = {};
+
+    //graphics configs
     int windowheight, windowwidth;
+    bool resize_dirty = false;
     int vsync;//-1 is adaptive, 0 is off, 1 is on
+    int MSAA = 0;
+    bool MSAA_dirty = false;
+
+    //ctx fields
     float deltatime;
-    SDL_Window* mainwindow;
-    SDL_GLContext glcontext;
     Camera* aCurrentCamera;
     vector<GLuint> uboBindings;
     vector<RenderCommand> drawtargets;
-    cfgRenderSystem configRender = {};
+
+    //render backends configs: NOT visible when game shipping!
+    SDL_Window* mainwindow;
+    SDL_GLContext glcontext;
+
+    //misc
+    void setMSAA(int MSAA) {
+        this->MSAA = (MSAA%2) ? 4 : MSAA;
+        this->MSAA_dirty = true;
+    }
+    RTTR_ENABLE()
+    RTTR_REGISTRATION_FRIEND
 };
 
 
@@ -172,6 +193,7 @@ void static initGLDebug()
 }
 
     void init();
+    void RefreshContext(RenderContext* rctx);
     void parseconfig(cfgRenderSystem config);
 
     /*submit a render request on model, using model's transform*/
@@ -179,6 +201,7 @@ void static initGLDebug()
     /*submit a render request on model, using the transform in parameter*/
     void submit(const Model* model, const Shader* shader, const glm::mat4& transform);
     void executecommand(const RenderCommand& command);
+    void rebuildWindowContext(bool firsttime_init);
 
     void drawmodel(const Model& model, const Shader& shader, const glm::mat4& transform) const;
 
@@ -187,10 +210,7 @@ void static initGLDebug()
 
     int windowFlags;
 
-    
-    SDL_Window* window;
-    //SDL_GLContext is already void* pointer.......although I hate such usage
-    SDL_GLContext glContext;
+    bool firsttime_init = true;
 
     ShaderManager* shaderManager;
 

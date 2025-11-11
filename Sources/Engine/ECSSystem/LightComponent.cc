@@ -66,7 +66,6 @@ void LightComponent::tick(float dt) {
     );
 
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
-    ENGINE_DEBUG("Light Component Ticks, ubo shared buffer touched");
     RenderSystem::errorposition(__FILE__, __LINE__);
 }
 

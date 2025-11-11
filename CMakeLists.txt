@@ -104,10 +104,12 @@ set(ENGINE_HEADERS_DIRS
     ${CMAKE_SOURCE_DIR}/Sources/Engine/ECSSystem
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Core
 
+    ${CMAKE_SOURCE_DIR}/Sources/HardDependencies
 )
 
 set(ENGINE_HEADERS_FILES
     #Dependencies
+    ${CMAKE_SOURCE_DIR}/Sources/HardDependencies/ImReflect/ImReflect.hpp
 
 
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Common.hh

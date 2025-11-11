@@ -2,12 +2,27 @@
 
 #include <imgui_impl_sdl2.h>
 #include <GlobalContext.hh>
-
+#include <rttr/registration>
 
 NAMESPACE_BEGIN
 
 extern AppContext* objptrAppContext;
 
+RTTR_REGISTRATION
+{
+    using namespace rttr;
+
+    registration::class_<Camera>("Camera")
+        // 注册构造函数
+        .constructor<>()
+
+        // 注册字段
+        .property("FOV", &Camera::getCameraFOV, &Camera::setCameraFOV)
+        .property("Camera Speed", &Camera::cameraSpeed)
+        .property("near", &Camera::getCameraNear, &Camera::setCameraNear)
+        .property("far", &Camera::getCameraFar, &Camera::setCameraFar)
+        ;
+}
 
 Camera::Camera(glm::vec3 position, float angle) :
     position(position), 
@@ -19,7 +34,7 @@ Camera::Camera(glm::vec3 position, float angle) :
     yawNum(0.0f), 
     rollNum(0.0f),
     degreeFOV(angle),
-    near(1.0f),far(1000.0f),
+    near(1.0f),far(1500.0f),
     sensitivity(glm::vec3(0.1f, 0.1f, 0.1f)), 
     cameraSpeed(15.0f), 
     enableDeadZone(true), 
@@ -40,5 +55,7 @@ Camera::Camera(glm::vec3 position, float angle) :
 
 void Camera::UpdateCamera(float dt){
 }
+
+
 
 NAMESPACE_END

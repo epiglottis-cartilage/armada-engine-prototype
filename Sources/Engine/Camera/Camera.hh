@@ -9,6 +9,10 @@
 #include <Logger.hh>
 #include <functional>
 
+#include <rttr/type>
+
+#include "rttr/registration_friend.h"
+
 //delete this once event listener is done
 
 NAMESPACE_BEGIN
@@ -27,6 +31,7 @@ The active camera is always the last one using above method.
 */
 class Camera{
 public:
+    Camera() = default;
     Camera(glm::vec3 position, float angle);
     ~Camera() = default;
     
@@ -53,7 +58,9 @@ public:
 
     void setCameraViewMatrix(glm::mat4 newView){viewMatrix = newView;}
     void setCameraProjectionMatrix(glm::mat4 newProj){projectionMatrix = newProj;}
-    void setCameraFOV(float newFov);
+    void setCameraNear(float newNear){near = newNear;project_dirty = true;}
+    void setCameraFar(float newFar){far = newFar;project_dirty = true;}
+    void setCameraFOV(float newFov) {this->degreeFOV = newFov;project_dirty = true;};
     void setCameraSensitivity(glm::vec3 newSensitivity){
         this->sensitivity = newSensitivity;
     }
@@ -68,6 +75,9 @@ public:
     glm::mat4 getViewMatrix(){return viewMatrix;}
     glm::mat4 getProjectionMatrix(){return projectionMatrix;}
 	float getCameraSpeed() { return cameraSpeed; }
+    float getCameraFOV(){ return degreeFOV;}
+    float getCameraNear(){ return near;}
+    float getCameraFar(){ return far;}
     void setCameraDirty() {project_dirty = true;}
 
 
@@ -90,6 +100,9 @@ protected:
     float cameraSpeed;
     bool enableDeadZone;
     float deadZoneX, deadZoneY;
+
+    RTTR_ENABLE()
+    RTTR_REGISTRATION_FRIEND
 };
 
 NAMESPACE_END

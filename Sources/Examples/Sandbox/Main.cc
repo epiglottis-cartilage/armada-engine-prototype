@@ -36,7 +36,7 @@ int main(int argc, char** argv){
     gSceneManager->emplace<fleet::NameComponent>(apc, "Armored APC");
     gSceneManager->emplace<fleet::TransformComponent>(
         apc,
-        glm::vec3(1.0f),
+        glm::vec3(10.0f),
         glm::vec3(0.0f),
         glm::vec3(1.0f)
     );
@@ -46,12 +46,25 @@ int main(int argc, char** argv){
         modeldir / "apc.glb",
         phongShader
     );
+//    fleet::Entity terrainEnt = gSceneManager->create();
+//    gSceneManager->emplace<fleet::NameComponent>(terrainEnt, "APC normal");
+//    gSceneManager->emplace<fleet::TransformComponent>(
+//        terrainEnt,
+//        glm::vec3(10.0f),
+//        glm::vec3(0.0f),
+//        glm::vec3(1.0f)
+//    );
+//    gSceneManager->emplace<fleet::MeshComponent>(
+//        terrainEnt,
+//        modeldir / "apc.glb",
+//        debugphongShader
+//    );
 
     fleet::Entity smallPointLightEnt = gSceneManager->create();
     gSceneManager->emplace<fleet::NameComponent>(smallPointLightEnt, "Small Point Light");
     gSceneManager->emplace<fleet::TransformComponent>(
         smallPointLightEnt,
-        glm::vec3(-10.0f, 5.0f, -5.0f),
+        glm::vec3(10.0f, 15.0f, 10.0f),
         glm::vec3(0.0f),
         glm::vec3(0.1f)
     );
@@ -97,7 +110,7 @@ int main(int argc, char** argv){
     gSceneManager->emplace<fleet::NameComponent>(pbrhelmet, "pbr helmet");
     gSceneManager->emplace<fleet::TransformComponent>(
         pbrhelmet,
-        glm::vec3{0.0f, 0.5f, 0.3f},
+        glm::vec3{0.0f, 0.5f, 9.3f},
         glm::vec3(0.0f),
         glm::vec3{1.0f}
     );
@@ -120,19 +133,6 @@ int main(int argc, char** argv){
         terrainEntOg,
         modeldir / "terraintest.glb",
         phongShader
-    );
-    fleet::Entity terrainEnt = gSceneManager->create();
-    gSceneManager->emplace<fleet::NameComponent>(terrainEnt, "Ground Normal");
-    gSceneManager->emplace<fleet::TransformComponent>(
-        terrainEnt,
-        glm::vec3(0.0f),
-        glm::vec3(0.0f),
-        glm::vec3(1.0f)
-    );
-    gSceneManager->emplace<fleet::MeshComponent>(
-        terrainEnt,
-        modeldir / "terraintest.glb",
-        debugphongShader
     );
 
 

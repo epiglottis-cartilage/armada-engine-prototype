@@ -4,8 +4,7 @@
 #include <PointLightShader.hh>
 
 NAMESPACE_BEGIN
-
-void TransformSystem::tick(float deltatime) {
+    void TransformSystem::tick(float deltatime) {
     auto view = enttregistry->view<TransformComponent>();
     for (auto [entity, transform]: view.each()) {
 

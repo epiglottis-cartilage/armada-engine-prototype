@@ -8,6 +8,7 @@
 #include <vector>
 #include <optional>
 #include <memory>
+#include <glm/gtx/string_cast.hpp>
 
 #define NAMESPACE_BEGIN namespace fleet {
 #define NAMESPACE_END }
