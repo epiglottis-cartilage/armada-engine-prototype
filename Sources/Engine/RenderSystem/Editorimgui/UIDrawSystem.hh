@@ -4,11 +4,12 @@
 #include <backends/imgui_impl_sdl2.h>
 #include <backends/imgui_impl_opengl3.h>
 #include <SDL2/SDL.h>
-#include <GL/glew.h>
+
+#include <rttr/type>
+#include "rttr/instance.h"
 
 NAMESPACE_BEGIN
-
-class AppContext;
+    class AppContext;
 
 class UIDrawSystem {
 
@@ -30,6 +31,9 @@ public:
 
 
 private:
+
+    void drawRenderContext();
+    void DrawRTTRObject(rttr::instance obj);
     void init(SDL_Window* window, SDL_GLContext glcontext);
     void quit();
 

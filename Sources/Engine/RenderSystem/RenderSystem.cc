@@ -16,9 +16,21 @@ RTTR_REGISTRATION
         .constructor<>()
 
         // 注册字段
-        .property("vsync", &RenderContext::vsync)
-        .property("MSAA" , &RenderContext::getMSAA, &RenderContext::setMSAA)
+        .property("VSync", &RenderContext::vsync)
+        (
+        metadata("ui_type", "combo"),
+        metadata("options", std::vector<std::string>{"Adaptive", "Off", "On"}),
+        metadata("values", std::vector<int>{-1, 0, 1})
+        )
+        .property("MSAA", &RenderContext::getMSAA, &RenderContext::setMSAA)
+        (
+        metadata("ui_type", "combo"),
+        metadata("options", std::vector<std::string>{"Off", "2x", "4x", "8x"}),
+        metadata("values", std::vector<MSAA>{MSAA::Off, MSAA::Two, MSAA::Four, MSAA::Eight})
+        )
+        .property("GL Cull Face", &RenderContext::glcullface_enable)
         ;
+
 }
 
 
@@ -40,9 +52,9 @@ void RenderSystem::parseconfig(cfgRenderSystem config){
     }
 
     if(config.vsync){
-        objptrAppContext->aRenderContext->vsync = true;
+        objptrAppContext->aRenderContext->vsync = Vsync::On;
     }else {
-        objptrAppContext->aRenderContext->vsync = false;
+        objptrAppContext->aRenderContext->vsync = Vsync::Off;
     }
 
     objptrAppContext->aRenderContext->windowwidth = config.screenwidth;
@@ -221,9 +233,7 @@ void RenderSystem::RefreshContext(RenderContext* rctx) {
     }
 
     // Vertical Sync off/on
-    if (rctx->vsync != -1 && rctx->vsync != 0 && rctx->vsync != 1)
-        rctx->vsync = 1;
-    SDL_GL_SetSwapInterval(rctx->vsync);
+    SDL_GL_SetSwapInterval(static_cast<int>(rctx->vsync));
 
     //GL cull face off/on
     if (rctx->glcullface_enable) {glEnable(GL_CULL_FACE);} else {glDisable(GL_CULL_FACE);}

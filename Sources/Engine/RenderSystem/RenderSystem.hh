@@ -52,6 +52,12 @@ enum class MSAA {
     Eight = 8,
 };
 
+enum class Vsync {
+    Adaptive = -1,
+    Off = 0,
+    On = 1
+};
+
 /* Render Context is created on Heap when App Context was created. it is a unique pointer, holded by app context.
  * Render System was created after rendercontext, so it is suggested to put some important args in Rcontext,
  * such as window ratio, render backend, current active camera, etc.
@@ -63,7 +69,7 @@ struct RenderContext {
     //graphics configs
     int windowheight, windowwidth;
     bool resize_dirty = false;
-    int vsync;//-1 is adaptive, 0 is off, 1 is on
+    Vsync vsync;//-1 is adaptive, 0 is off, 1 is on
     MSAA msaa = MSAA::Off;
     bool MSAA_dirty = false;
 

@@ -2,20 +2,130 @@
 #include <GlobalContext.hh>
 #include <Engine.hh>
 #include <SDL2/SDL.h>
+#include <RenderSystem.hh>
 
 NAMESPACE_BEGIN
 extern AppContext* objptrAppContext;
 extern Engine* objptrGameEngine;
 
-void UIDrawSystem::drawframe()
+
+void UIDrawSystem::DrawRTTRObject(rttr::instance obj)
 {
+    using namespace rttr;
+    type t = obj.get_type();
+
+    for (auto& prop : t.get_properties())
+    {
+        variant val = prop.get_value(obj);
+
+        if (!val.is_valid())
+            continue;
+
+        const auto uiTypeMeta = prop.get_metadata("ui_type");
+        std::string uiType = uiTypeMeta.is_valid() ? uiTypeMeta.get_value<std::string>() : "default";
+
+        if (uiType == "combo")
+        {
+            auto names = prop.get_metadata("options").get_value<std::vector<std::string>>();
+            auto values = prop.get_metadata("values");
+
+            int currentIndex = 0;
+
+            // 将当前属性值匹配到列表中
+            if (values.is_valid())
+            {
+                std::vector<rttr::variant> valueList;
+
+                // 1️⃣ 判断值类型是 vector<int>
+                if (values.get_type() == rttr::type::get<std::vector<int>>())
+                {
+                    auto ints = values.get_value<std::vector<int>>();
+                    for (auto& v : ints) valueList.emplace_back(v);
+                }
+                // 2️⃣ 判断值类型是 vector<MSAA>
+                else if (values.get_type() == rttr::type::get<std::vector<MSAA>>())
+                {
+                    auto enums = values.get_value<std::vector<MSAA>>();
+                    for (auto& v : enums) valueList.emplace_back(v);
+                }
+                // 3️⃣ 如果本来就是 vector<variant>
+                else if (values.get_type() == rttr::type::get<std::vector<rttr::variant>>())
+                {
+                    valueList = values.get_value<std::vector<rttr::variant>>();
+                }
+                else
+                {
+                    ImGui::Text("Unsupported metadata value type for property: %s",
+                                prop.get_name().to_string().c_str());
+                    continue;
+                }
+
+                // ✅ 现在可以安全使用 valueList
+                int currentIndex = 0;
+                for (int i = 0; i < (int)valueList.size(); ++i)
+                {
+                    if (val == valueList[i])
+                    {
+                        currentIndex = i;
+                        break;
+                    }
+                }
+
+                if (ImGui::BeginCombo(prop.get_name().to_string().c_str(), names[currentIndex].c_str()))
+                {
+                    for (int i = 0; i < (int)names.size(); ++i)
+                    {
+                        bool selected = (i == currentIndex);
+                        if (ImGui::Selectable(names[i].c_str(), selected))
+                        {
+                            prop.set_value(obj, valueList[i]);
+                        }
+                        if (selected)
+                            ImGui::SetItemDefaultFocus();
+                    }
+                    ImGui::EndCombo();
+                }
+            }
+        }
+        else if (val.is_type<bool>())
+        {
+            bool b = val.get_value<bool>();
+            if (ImGui::Checkbox(prop.get_name().to_string().c_str(), &b))
+                prop.set_value(obj, b);
+        }
+        else if (val.is_type<int>())
+        {
+            int v = val.get_value<int>();
+            if (ImGui::InputInt(prop.get_name().to_string().c_str(), &v))
+                prop.set_value(obj, v);
+        }
+        else if (val.is_type<float>())
+        {
+            float f = val.get_value<float>();
+            if (ImGui::InputFloat(prop.get_name().to_string().c_str(), &f))
+                prop.set_value(obj, f);
+        }
+        else
+        {
+            ImGui::Text("%s (unhandled type)", prop.get_name().to_string().c_str());
+        }
+    }
+}
+
+void UIDrawSystem::drawframe() {
     ImGui::Begin("ECS Editor");
     ImGui::Text("Press F10 to switch to editor");
     ImGui::Text("Press F9 to hide editor");
     ImGui::Separator();
 
-//    ImGui::TreeNode("RenderConfig");
-//    ImGui::TreePop();
+
+    if (ImGui::TreeNode("RenderConfig")) {
+
+        RenderContext& rendercontext = *objptrAppContext->aRenderContext;
+        rttr::instance rendercontextinstance = rttr::instance(&rendercontext);
+        DrawRTTRObject(rendercontextinstance);
+        ImGui::TreePop();
+    }
 
     StateManager* stateManager = objptrGameEngine->getStateManager();
     auto view = stateManager->view<TransformComponent>();

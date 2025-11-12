@@ -105,10 +105,12 @@ set(ENGINE_HEADERS_DIRS
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Core
 
     ${CMAKE_SOURCE_DIR}/Sources/HardDependencies
+    ${CMAKE_SOURCE_DIR}/Sources/HardDependencies/imgui_stdlib
 )
 
 set(ENGINE_HEADERS_FILES
     #Dependencies
+    ${CMAKE_SOURCE_DIR}/Sources/HardDependencies/imgui_stdlib/imgui_stdlib.h
     ${CMAKE_SOURCE_DIR}/Sources/HardDependencies/ImReflect/ImReflect.hpp
 
 
@@ -153,7 +155,11 @@ set(ENGINE_HEADERS_FILES
 )
 
 
-set(ENGINE_SOURCES_FILES 
+set(ENGINE_SOURCES_FILES
+    #Dependencies
+    ${CMAKE_SOURCE_DIR}/Sources/HardDependencies/imgui_stdlib/imgui_stdlib.cpp
+
+
     #engine main
     ${CMAKE_SOURCE_DIR}/Sources/Engine/Engine.cc
     ${CMAKE_SOURCE_DIR}/Sources/Engine/GlobalContext.cc
